@@ -1,0 +1,15 @@
+{% extends 'portfolio/base.html' %}
+
+{% block title %}Home - My Portfolio{% endblock %}
+
+{% block content %}
+<h2>Welcome, {{ name }}!</h2>
+<p>{{ bio }}</p>
+
+<h3>My Skills</h3>
+<ul>
+    {% for skill in skills %}
+        <li>{{ skill }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}
