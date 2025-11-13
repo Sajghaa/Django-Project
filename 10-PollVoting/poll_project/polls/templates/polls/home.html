@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Polls</title>
+</head>
+<body>
+    <h2>Available Polls</h2>
+    <ul>
+        {% for q in questions %}
+            <li><a href="{% url 'vote' q.id %}">{{ q.question_text }}</a></li>
+        {% empty %}
+            <p>No polls available.</p>
+        {% endfor %}
+    </ul>
+</body>
+</html>
