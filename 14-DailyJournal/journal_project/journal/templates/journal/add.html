@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Entry</title>
+    <style>
+        body { font-family: Arial; padding: 30px; }
+        input, textarea { width: 100%; padding: 10px; margin-bottom: 15px; }
+        button { padding: 10px 20px; background: black; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<h1>Add New Journal Entry</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    <input type="text" name="title" placeholder="Entry Title" required>
+    <textarea name="content" placeholder="Write your thoughts..." rows="8" required></textarea>
+    <button type="submit">Save</button>
+</form>
+
+</body>
+</html>
