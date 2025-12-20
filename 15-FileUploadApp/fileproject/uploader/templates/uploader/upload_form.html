@@ -1,0 +1,22 @@
+{% extends 'uploader/base.html' %}
+
+{% block content %}
+    <h2>Upload a File</h2>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div>
+            <label>Select File:</label>
+            {{ form.file }}
+        </div>
+        
+        <div>
+            <label>Description (optional):</label>
+            {{ form.description }}
+        </div>
+        
+        <button type="submit" class="btn">Upload File</button>
+        <a href="{% url 'file_list' %}">Cancel</a>
+    </form>
+{% endblock %}

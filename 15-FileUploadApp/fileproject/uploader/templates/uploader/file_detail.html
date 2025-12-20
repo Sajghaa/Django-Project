@@ -1,0 +1,18 @@
+{% extends 'uploader/base.html' %}
+
+{% block content %}
+    <div class="file-item">
+        <h2>File Details</h2>
+        
+        <p><strong>Filename:</strong> {{ file.file.name|slice:"8:" }}</p>
+        <p><strong>Description:</strong> {{ file.description|default:"No description" }}</p>
+        <p><strong>Uploaded:</strong> {{ file.uploaded_at|date:"F d, Y, H:i" }}</p>
+        <p><strong>File size:</strong> {{ file.file.size|filesizeformat }}</p>
+        
+        <div>
+            <a href="{{ file.file.url }}" download class="btn">📥 Download File</a>
+            <a href="{% url 'delete_file' pk=file.pk %}" class="btn btn-delete">🗑️ Delete</a>
+            <a href="{% url 'file_list' %}">← Back to Files</a>
+        </div>
+    </div>
+{% endblock %}
