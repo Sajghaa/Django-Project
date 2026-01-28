@@ -23,11 +23,12 @@ class Result(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    score = models.IntegerChoices()
+    score = models.PositiveIntegerField()
     completed_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-completed-at']
+        ordering = ['-completed_at']
+        unique_together = ("user", "quiz","completed_at")
 
     def __str__(self):
         return f"{self.user.username} - {self.quiz.title}: {self.score}"
