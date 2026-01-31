@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question {{question.id}}</title>
+    <style>
+
+        .card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            background-origin: #f9f9f9;
+        }
+
+        .meta {
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Question #{{question.id}}</h2>
+        <p><strong>Text:</strong>{{question.text}}</p>
+        <p class="meta">
+            <strong>Created: </strong>{{ question.created_at|date:"F d, Y H:i"}}
+        </p>
+        <p class="meta">
+         <strong>ID in database:</strong> {{ question.id}}
+        </p>
+    </div>
+    <hr>
+    <p><a href="/questions/">Back to All Questions</a></p>
+    <p><a href="/">Back to Home</a></p>
+</body>
+</html>

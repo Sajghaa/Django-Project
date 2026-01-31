@@ -1,0 +1,40 @@
+{% extends 'quiz/base.html' %}
+
+{% block title %}Home - Quiz App{% endblock %}
+
+{% block heading %}Welcome to Quiz App!{% endblock %}
+
+{% block content %}
+    <p>We have {{ question_count }} questions in our database.</p>
+    
+    {% if question_count > 0 %}
+        <p style="color: green; padding: 10px; background-color: #e8f5e8;">
+            ✓ Database is working! Questions are loading correctly.
+        </p>
+        
+        <div style="background-color: #e3f2fd; padding: 15px; border-radius: 5px;">
+            <h3>Quick Actions:</h3>
+            <p><a href="/questions/">View All {{ question_count }} Questions →</a></p>
+            <p><a href="/questions/1/">See Question #1 Details →</a></p>
+        </div>
+    {% else %}
+        <div style="color: #856404; background-color: #fff3cd; padding: 15px; border-radius: 5px;">
+            <h3>⚠ Setup Required</h3>
+            <p>No questions found in database.</p>
+            <p><a href="/admin/quiz/question/add/">Add your first question in Admin Panel →</a></p>
+        </div>
+    {% endif %}
+    
+    <hr>
+    
+    <h3>What You've Built So Far:</h3>
+    <ul>
+        <li>✅ Django Project & App Setup</li>
+        <li>✅ Database Model (Question)</li>
+        <li>✅ Admin Interface</li>
+        <li>✅ Home Page with Database Count</li>
+        <li>✅ List All Questions Page</li>
+        <li>✅ Question Detail Page</li>
+        <li>✅ Template Inheritance (Base Template)</li>
+    </ul>
+{% endblock %}

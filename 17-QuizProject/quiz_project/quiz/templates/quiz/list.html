@@ -1,0 +1,57 @@
+<!-- quiz/templates/quiz/list.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Questions</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .empty {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>All Questions ({{ total }})</h1>
+    
+    {% if questions %}
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Question Text</th>
+                <th>Created At</th>
+            </tr>
+            
+            {% for question in questions %}
+            <tr>
+                <td>{{ question.id }}</td>
+                <td>{{ question.text }}</td>
+                <td>{{ question.created_at|date:"M d, Y" }}</td>
+                <td>
+                    <a href="/questions/{{ question.id }}">
+                        {{ question.text }}
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p class="empty">No questions in database yet.</p>
+    {% endif %}
+    
+    <hr>
+    <p><a href="/"> Back to Home</a></p>
+    <p><a href="/admin/quiz/question/add/">Add New Question (Admin)</a></p>
+</body>
+</html>
