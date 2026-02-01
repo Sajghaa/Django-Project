@@ -1,0 +1,30 @@
+{% extends 'journal/base.html' %}
+
+{% block title %}{{ entry.title }} - Daily Journal{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="h3 mb-0">{{ entry.title }}</h1>
+            <span class="mood-icon" style="font-size: 2em;">{{ entry.mood }}</span>
+        </div>
+        <p class="text-muted mb-0">
+            Created: {{ entry.date_created|date:"F j, Y \a\t g:i A" }}
+            {% if entry.date_created != entry.date_modified %}
+                <br>Last modified: {{ entry.date_modified|date:"F j, Y \a\t g:i A" }}
+            {% endif %}
+        </p>
+    </div>
+    <div class="card-body">
+        <div class="entry-content" style="white-space: pre-line; line-height: 1.6;">
+            {{ entry.content }}
+        </div>
+    </div>
+    <div class="card-footer">
+        <a href="{% url 'entry_list' %}" class="btn btn-outline-secondary">Back to List</a>
+        <a href="{% url 'entry_update' entry.pk %}" class="btn btn-primary">Edit</a>
+        <a href="{% url 'entry_delete' entry.pk %}" class="btn btn-outline-danger">Delete</a>
+    </div>
+</div>
+{% endblock %}
