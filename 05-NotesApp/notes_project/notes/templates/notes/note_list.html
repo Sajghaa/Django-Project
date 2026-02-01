@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Notes</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <div class="container">
+    <h1> My Notes</h1>
+    <a href="{% url 'add_note' %}" class="btn">Add New Note</a>
+
+    {% for note in notes %}
+      <div class="note">
+        <h2>{{ note.title }}</h2>
+        <p>{{ note.content }}</p>
+        <small>Created: {{ note.created_at|date:"d M Y, H:i" }}</small><br>
+        <a href="{% url 'edit_note' note.id %}" class="edit">Edit</a>
+        <a href="{% url 'delete_note' note.id %}" class="delete">Delete</a>
+      </div>
+    {% empty %}
+      <p>No notes yet!</p>
+    {% endfor %}
+  </div>
+</body>
+</html>

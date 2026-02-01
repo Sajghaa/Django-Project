@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BMI Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 350px;
+      text-align: center;
+    }
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover { background: #1e40af; }
+    .result {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #111827;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>BMI Calculator</h2>
+    <form method="POST">
+      {% csrf_token %}
+      <input type="number" step="0.1" name="weight" placeholder="Enter weight (kg)" required>
+      <input type="number" step="0.1" name="height" placeholder="Enter height (cm)" required>
+      <button type="submit">Calculate BMI</button>
+    </form>
+
+    {% if bmi %}
+      <div class="result">
+        <p><strong>Your BMI:</strong> {{ bmi }}</p>
+        <p><strong>Category:</strong> {{ category }}</p>
+      </div>
+    {% endif %}
+  </div>
+</body>
+</html>

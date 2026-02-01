@@ -1,0 +1,14 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+<article class="post-detail">
+    <h2>{{ post.title }}</h2>
+    <p class="date">{{ post.created_at|date:"F j, Y, g:i a" }}</p>
+    <p>{{ post.content }}</p>
+
+    <div class="actions">
+        <a href="{% url 'post_edit' post.pk %}" class="btn edit">✏️ Edit</a>
+        <a href="{% url 'post_delete' post.pk %}" class="btn delete">🗑️ Delete</a>
+        <a href="{% url 'post_list' %}" class="btn back">⬅️ Back</a>
+    </div>
+</article>
+{% endblock %}

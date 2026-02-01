@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File Upload App</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        .header { background: #2c3e50; color: white; padding: 20px; }
+        .nav a { color: white; margin-right: 20px; text-decoration: none; }
+        .file-item { border: 1px solid #ddd; padding: 15px; margin: 10px 0; }
+        .btn { padding: 8px 15px; background: #3498db; color: white; border: none; display: inline-block; margin: 5px; text-decoration: none; }
+        .btn-delete { background: #e74c3c; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📁 File Upload App</h1>
+        <div class="nav">
+            <a href="{% url 'file_list' %}">Home</a>
+            <a href="{% url 'upload_file' %}">Upload File</a>
+            <a href="/admin/">Admin</a>
+        </div>
+    </div>
+    
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>

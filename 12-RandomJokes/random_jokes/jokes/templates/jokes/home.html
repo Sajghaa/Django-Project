@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Random Joke Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f3f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            width: 420px;
+            border-radius: 14px;
+            text-align: center;
+            box-shadow: 0px 5px 12px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+        button {
+            margin-top: 25px;
+            padding: 12px 25px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #43a047;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Random Joke Generator 😂</h2>
+    <p>{{ joke }}</p>
+
+    <form method="GET">
+        <button type="submit">Tell me another!</button>
+    </form>
+</div>
+
+</body>
+</html>
