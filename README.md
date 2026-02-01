@@ -2,7 +2,7 @@
 
 > A curated collection of Django projects demonstrating Django mastery through real-world applications.
 
-**Progress:** 15 / 100 completed
+**Progress:** 17 / 100 completed
 
 ---
 
@@ -10,7 +10,7 @@
 
 | # | Project Name | Description | Status | Ready to Run |
 |---|--------------|-------------|--------|--------------|
-| 1 | [01-HelloWorld](01-HelloWorld) | No description yet | Planned | ❌ |
+| 1 | [01-HelloWorld](01-HelloWorld) | No description yet | Planned | ✅ |
 | 2 | [02-PersonalPortfolio](02-PersonalPortfolio) | No description yet | Planned | ✅ |
 | 3 | [03-SimpleBlogApp](03-SimpleBlogApp) | No description yet | Planned | ✅ |
 | 4 | [04-ToDoList](04-ToDoList) | No description yet | Planned | ✅ |
@@ -24,7 +24,7 @@
 | 12 | [12-RandomJokes](12-RandomJokes) | No description yet | Planned | ✅ |
 | 13 | [13-FeedBackForm](13-FeedBackForm) | No description yet | Planned | ✅ |
 | 14 | [14-dailyJournal](14-dailyJournal) | No description yet | Planned | ✅ |
-| 15 | [15-FileUploadApp](15-FileUploadApp) | No description yet | Planned | ❌ |
+| 15 | [15-FileUploadApp](15-FileUploadApp) | No description yet | Planned | ✅ |
 | 16 | [16-ImageGallery](16-ImageGallery) | No description yet | Planned | ✅ |
 | 17 | [17-QuizProject](17-QuizProject) | No description yet | Planned | ✅ |
 
