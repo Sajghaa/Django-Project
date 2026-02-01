@@ -4,7 +4,11 @@ import os
 PROJECTS_ROOT = r"D:\Coding_Projects\100 Django Projects"
 OUTPUT_README = os.path.join(PROJECTS_ROOT, "README.md")
 DESCRIPTION_FILENAME = "description.txt"
+<<<<<<< HEAD
 VENV_NAMES = ["ss_venv", "env"]
+=======
+VENV_NAMES = ["ss_venv", "venv","env"]
+>>>>>>> c6f130b20 (Add root README and generate_root_readme.py script)
 IGNORE_FOLDERS = {".git", ".vscode", ".idea", "__pycache__"}
 # ==================
 
