@@ -2,7 +2,7 @@
 
 > A curated collection of Django projects demonstrating Django mastery through real-world applications.
 
-**Progress:** 17 / 100 completed
+**Progress:** 18 / 100 completed
 
 ---
 
@@ -27,6 +27,7 @@
 | 15 | [15-FileUploadApp](15-FileUploadApp) | No description yet | Planned | ✅ |
 | 16 | [16-ImageGallery](16-ImageGallery) | No description yet | Planned | ✅ |
 | 17 | [17-QuizProject](17-QuizProject) | No description yet | Planned | ✅ |
+| 18 | [18-StudentManagement](18-StudentManagement) | No description yet | Planned | ✅ |
 
 ---
 
