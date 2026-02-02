@@ -1,4 +1,3 @@
-# core/views.py
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.db.models import Q, Count, Avg
@@ -6,60 +5,60 @@ from django.core.paginator import Paginator
 from .models import Student, Department, Course, Enrollment, Result
 from .forms import StudentForm, DepartmentForm, CourseForm, EnrollmentForm
 
+# core/views.py
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.db.models import Q, Count
+from .models import Student, Department, Course, Enrollment, Result
+from .forms import StudentForm
+
 def home(request):
     """Dashboard/home view"""
-    context = {
-        'total_students': Student.objects.count(),
-        'total_departments': Department.objects.count(),
-        'total_courses': Course.objects.count(),
-        'active_students': Student.objects.filter(status='active').count(),
+    try:
+        total_students = Student.objects.count()
+        total_departments = Department.objects.count()
+        total_courses = Course.objects.count()
+        active_students = Student.objects.filter(status='active').count()
+        recent_students = Student.objects.order_by('-created_at')[:5]
         
-        'recent_students': Student.objects.order_by('-created_at')[:5],
-        'departments': Department.objects.annotate(
+        departments = Department.objects.annotate(
             student_count=Count('students')
-        ).order_by('-student_count')[:5],
+        ).order_by('-student_count')[:5]
         
-        'status_distribution': Student.objects.values('status').annotate(
+        status_distribution = Student.objects.values('status').annotate(
             count=Count('id')
-        ),
+        )
+    except Exception as e:
+        # If database tables don't exist yet
+        total_students = 0
+        total_departments = 0
+        total_courses = 0
+        active_students = 0
+        recent_students = []
+        departments = []
+        status_distribution = []
+    
+    context = {
+        'total_students': total_students,
+        'total_departments': total_departments,
+        'total_courses': total_courses,
+        'active_students': active_students,
+        'recent_students': recent_students,
+        'departments': departments,
+        'status_distribution': status_distribution,
     }
     return render(request, 'core/home.html', context)
 
 def student_list(request):
-    """List all students with search and filter"""
-    students = Student.objects.select_related('department')
-    
-    # Search
-    search_query = request.GET.get('search', '')
-    if search_query:
-        students = students.filter(
-            Q(student_id__icontains=search_query) |
-            Q(first_name__icontains=search_query) |
-            Q(last_name__icontains=search_query) |
-            Q(email__icontains=search_query)
-        )
-    
-    # Filter by department
-    dept_filter = request.GET.get('department')
-    if dept_filter:
-        students = students.filter(department_id=dept_filter)
-    
-    # Filter by status
-    status_filter = request.GET.get('status')
-    if status_filter:
-        students = students.filter(status=status_filter)
-    
-    # Pagination
-    paginator = Paginator(students, 20)  # 20 per page
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    """List all students"""
+    try:
+        students = Student.objects.select_related('department').all()
+    except:
+        students = []
     
     context = {
-        'page_obj': page_obj,
-        'departments': Department.objects.all(),
-        'search_query': search_query,
-        'selected_dept': dept_filter,
-        'selected_status': status_filter,
+        'students': students,
+        'departments': Department.objects.all() if Department.objects.exists() else [],
     }
     return render(request, 'core/student_list.html', context)
 
