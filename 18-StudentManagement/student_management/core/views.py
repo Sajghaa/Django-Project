@@ -1,64 +1,68 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from django.db.models import Q, Count, Avg
+from django.db.models import Q, Count
 from django.core.paginator import Paginator
 from .models import Student, Department, Course, Enrollment, Result
 from .forms import StudentForm, DepartmentForm, CourseForm, EnrollmentForm
 
-# core/views.py
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from django.db.models import Q, Count
-from .models import Student, Department, Course, Enrollment, Result
-from .forms import StudentForm
-
 def home(request):
-    """Dashboard/home view"""
-    try:
-        total_students = Student.objects.count()
-        total_departments = Department.objects.count()
-        total_courses = Course.objects.count()
-        active_students = Student.objects.filter(status='active').count()
-        recent_students = Student.objects.order_by('-created_at')[:5]
-        
-        departments = Department.objects.annotate(
-            student_count=Count('students')
-        ).order_by('-student_count')[:5]
-        
-        status_distribution = Student.objects.values('status').annotate(
-            count=Count('id')
-        )
-    except Exception as e:
-        # If database tables don't exist yet
-        total_students = 0
-        total_departments = 0
-        total_courses = 0
-        active_students = 0
-        recent_students = []
-        departments = []
-        status_distribution = []
-    
+    """Dashboard view"""
     context = {
-        'total_students': total_students,
-        'total_departments': total_departments,
-        'total_courses': total_courses,
-        'active_students': active_students,
-        'recent_students': recent_students,
-        'departments': departments,
-        'status_distribution': status_distribution,
+        'total_students': Student.objects.count(),
+        'total_departments': Department.objects.count(),
+        'total_courses': Course.objects.count(),
+        'active_students': Student.objects.filter(status='active').count(),
+        'recent_students': Student.objects.select_related('department').order_by('-id')[:5],
+        'departments': Department.objects.annotate(
+            student_count=Count('students')
+        ).order_by('-student_count')[:5],
+        'status_distribution': list(Student.objects.values('status').annotate(
+            count=Count('id')
+        )),
     }
     return render(request, 'core/home.html', context)
 
 def student_list(request):
-    """List all students"""
-    try:
-        students = Student.objects.select_related('department').all()
-    except:
-        students = []
+    """List all students with search and filter"""
+    students = Student.objects.select_related('department').all()
+    
+    # Search
+    search_query = request.GET.get('search', '')
+    if search_query:
+        students = students.filter(
+            Q(student_id__icontains=search_query) |
+            Q(first_name__icontains=search_query) |
+            Q(last_name__icontains=search_query) |
+            Q(email__icontains=search_query)
+        )
+    
+    # Filter by department
+    dept_filter = request.GET.get('department')
+    if dept_filter and dept_filter != '':
+        students = students.filter(department_id=dept_filter)
+    
+    # Filter by status
+    status_filter = request.GET.get('status')
+    if status_filter and status_filter != '':
+        students = students.filter(status=status_filter)
+    
+    # Ordering
+    order_by = request.GET.get('order_by', '-enrollment_date')
+    if order_by in ['first_name', 'last_name', 'student_id', 'enrollment_date', '-enrollment_date']:
+        students = students.order_by(order_by)
+    
+    # Pagination
+    paginator = Paginator(students, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     
     context = {
-        'students': students,
-        'departments': Department.objects.all() if Department.objects.exists() else [],
+        'page_obj': page_obj,
+        'departments': Department.objects.all(),
+        'search_query': search_query,
+        'selected_dept': dept_filter,
+        'selected_status': status_filter,
+        'order_by': order_by,
     }
     return render(request, 'core/student_list.html', context)
 
@@ -70,6 +74,8 @@ def student_create(request):
             student = form.save()
             messages.success(request, f'Student {student.full_name} created successfully!')
             return redirect('core:student_detail', pk=student.pk)
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = StudentForm()
     
@@ -85,12 +91,10 @@ def student_detail(request, pk):
         pk=pk
     )
     
-    # Get enrollments
     enrollments = Enrollment.objects.filter(
         student=student
-    ).select_related('course')
+    ).select_related('course', 'course__department')
     
-    # Get results
     results = Result.objects.filter(student=student)
     
     context = {
@@ -107,9 +111,11 @@ def student_update(request, pk):
     if request.method == 'POST':
         form = StudentForm(request.POST, request.FILES, instance=student)
         if form.is_valid():
-            form.save()
+            student = form.save()
             messages.success(request, f'Student {student.full_name} updated successfully!')
             return redirect('core:student_detail', pk=student.pk)
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = StudentForm(instance=student)
     
@@ -124,8 +130,9 @@ def student_delete(request, pk):
     student = get_object_or_404(Student, pk=pk)
     
     if request.method == 'POST':
+        student_name = student.full_name
         student.delete()
-        messages.success(request, f'Student {student.full_name} deleted successfully!')
+        messages.success(request, f'Student {student_name} deleted successfully!')
         return redirect('core:student_list')
     
     return render(request, 'core/student_confirm_delete.html', {'student': student})
@@ -139,10 +146,42 @@ def department_list(request):
     
     return render(request, 'core/department_list.html', {'departments': departments})
 
+def department_create(request):
+    """Create new department"""
+    if request.method == 'POST':
+        form = DepartmentForm(request.POST)
+        if form.is_valid():
+            department = form.save()
+            messages.success(request, f'Department {department.name} created successfully!')
+            return redirect('core:department_list')
+    else:
+        form = DepartmentForm()
+    
+    return render(request, 'core/department_form.html', {
+        'form': form,
+        'title': 'Add New Department'
+    })
+
 def course_list(request):
     """List courses"""
     courses = Course.objects.select_related('department').order_by('code')
     return render(request, 'core/course_list.html', {'courses': courses})
+
+def course_create(request):
+    """Create new course"""
+    if request.method == 'POST':
+        form = CourseForm(request.POST)
+        if form.is_valid():
+            course = form.save()
+            messages.success(request, f'Course {course.code} created successfully!')
+            return redirect('core:course_list')
+    else:
+        form = CourseForm()
+    
+    return render(request, 'core/course_form.html', {
+        'form': form,
+        'title': 'Add New Course'
+    })
 
 def enrollment_list(request):
     """List enrollments"""
@@ -151,6 +190,22 @@ def enrollment_list(request):
     ).order_by('-enrollment_date')
     
     return render(request, 'core/enrollment_list.html', {'enrollments': enrollments})
+
+def enrollment_create(request):
+    """Create new enrollment"""
+    if request.method == 'POST':
+        form = EnrollmentForm(request.POST)
+        if form.is_valid():
+            enrollment = form.save()
+            messages.success(request, f'Enrollment created successfully!')
+            return redirect('core:enrollment_list')
+    else:
+        form = EnrollmentForm()
+    
+    return render(request, 'core/enrollment_form.html', {
+        'form': form,
+        'title': 'Add New Enrollment'
+    })
 
 def result_list(request):
     """List results"""

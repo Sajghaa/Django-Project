@@ -1,22 +1,15 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator, EmailValidator
-import uuid
+from django.utils import timezone
 from datetime import date
 
-class BaseModel(models.Model):
-    """Abstract base model for common fields"""
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    is_active = models.BooleanField(default=True)
-    
-    class Meta:
-        abstract = True
-
-class Department(BaseModel):
+class Department(models.Model):
     """Academic department"""
     name = models.CharField(max_length=100, unique=True)
     code = models.CharField(max_length=10, unique=True)
     description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
         ordering = ['name']
@@ -28,8 +21,8 @@ class Department(BaseModel):
     def student_count(self):
         return self.students.count()
 
-class Student(BaseModel):
-    """Student model with all necessary fields"""
+class Student(models.Model):
+    """Student model"""
     GENDER_CHOICES = [
         ('M', 'Male'),
         ('F', 'Female'),
@@ -43,20 +36,23 @@ class Student(BaseModel):
         ('AB+', 'AB+'), ('AB-', 'AB-'),
     ]
     
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+        ('graduated', 'Graated'),
+        ('suspended', 'Suspended'),
+    ]
+    
     # Personal Information
-    student_id = models.CharField(
-        max_length=20,
-        unique=True,
-        help_text="Format: DEPT-YEAR-ROLL (e.g., CS-2023-001)"
-    )
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
+    student_id = models.CharField(max_length=20, unique=True, blank=True)  # Will auto-generate
     date_of_birth = models.DateField()
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES, blank=True)
     
     # Contact Information
-    email = models.EmailField(unique=True, validators=[EmailValidator()])
+    email = models.EmailField(unique=True)
     phone = models.CharField(max_length=15, blank=True)
     address = models.TextField()
     emergency_contact = models.CharField(max_length=15, blank=True)
@@ -64,24 +60,12 @@ class Student(BaseModel):
     # Academic Information
     department = models.ForeignKey(
         Department,
-        on_delete=models.PROTECT,  # Prevent deletion if students exist
+        on_delete=models.PROTECT,
         related_name='students'
     )
     enrollment_date = models.DateField(default=date.today)
     graduation_date = models.DateField(null=True, blank=True)
-    
-    # Status
-    STATUS_CHOICES = [
-        ('active', 'Active'),
-        ('inactive', 'Inactive'),
-        ('graduated', 'Graated'),
-        ('suspended', 'Suspended'),
-    ]
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default='active'
-    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
     
     # Additional
     profile_picture = models.ImageField(
@@ -90,13 +74,11 @@ class Student(BaseModel):
         null=True
     )
     
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
     class Meta:
-        ordering = ['-enrollment_date', 'student_id']
-        indexes = [
-            models.Index(fields=['student_id']),
-            models.Index(fields=['email']),
-            models.Index(fields=['status']),
-        ]
+        ordering = ['-enrollment_date', 'last_name']
     
     def __str__(self):
         return f"{self.full_name} ({self.student_id})"
@@ -112,36 +94,22 @@ class Student(BaseModel):
             (today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day)
         )
     
-    @property
-    def is_graduated(self):
-        return self.status == 'graduated'
-    
-    @property
-    def current_semester(self):
-        """Calculate current semester based on enrollment date"""
-        from dateutil.relativedelta import relativedelta
-        if self.is_graduated:
-            return "Graated"
-        
-        today = date.today()
-        months_enrolled = (today.year - self.enrollment_date.year) * 12 + today.month - self.enrollment_date.month
-        semester = (months_enrolled // 6) + 1
-        return f"Semester {semester}"
-    
     def save(self, *args, **kwargs):
         """Auto-generate student ID if not provided"""
         if not self.student_id:
-            # Generate ID: DEPTCODE-YEAR-ROLLNUM
             year = self.enrollment_date.year
             dept_code = self.department.code
             last_student = Student.objects.filter(
                 department=self.department,
                 enrollment_date__year=year
-            ).order_by('student_id').last()
+            ).order_by('-id').first()
             
-            if last_student:
-                last_roll = int(last_student.student_id.split('-')[-1])
-                new_roll = last_roll + 1
+            if last_student and last_student.student_id:
+                try:
+                    last_roll = int(last_student.student_id.split('-')[-1])
+                    new_roll = last_roll + 1
+                except:
+                    new_roll = 1
             else:
                 new_roll = 1
             
@@ -149,29 +117,32 @@ class Student(BaseModel):
         
         super().save(*args, **kwargs)
 
-class Course(BaseModel):
+class Course(models.Model):
     """Course model"""
     department = models.ForeignKey(
         Department,
         on_delete=models.CASCADE,
         related_name='courses'
     )
-    code = models.CharField(max_length=10, unique=True)
+    code = models.CharField(max_length=10)
     name = models.CharField(max_length=100)
-    credit_hours = models.IntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(6)]
-    )
+    credit_hours = models.IntegerField(default=3)
     description = models.TextField(blank=True)
     
     class Meta:
+        unique_together = ['department', 'code']
         ordering = ['code']
-        unique_together = ['department', 'name']
     
     def __str__(self):
         return f"{self.code} - {self.name}"
 
-class Enrollment(BaseModel):
+class Enrollment(models.Model):
     """Student enrollment in courses"""
+    GRADE_CHOICES = [
+        ('A', 'A'), ('B', 'B'), ('C', 'C'),
+        ('D', 'D'), ('F', 'F'), ('', 'Not Graded'),
+    ]
+    
     student = models.ForeignKey(
         Student,
         on_delete=models.CASCADE,
@@ -186,33 +157,21 @@ class Enrollment(BaseModel):
         validators=[MinValueValidator(1), MaxValueValidator(8)]
     )
     enrollment_date = models.DateField(auto_now_add=True)
-    grade = models.CharField(
-        max_length=2,
-        blank=True,
-        choices=[
-            ('A', 'A'), ('B', 'B'), ('C', 'C'),
-            ('D', 'D'), ('F', 'F'), ('I', 'Incomplete'),
-        ]
-    )
+    grade = models.CharField(max_length=2, choices=GRADE_CHOICES, default='')
     
     class Meta:
-        ordering = ['-enrollment_date']
         unique_together = ['student', 'course', 'semester']
+        ordering = ['-enrollment_date']
     
     def __str__(self):
         return f"{self.student} - {self.course} (Sem {self.semester})"
     
     @property
     def is_passed(self):
-        return self.grade in ['A', 'B', 'C', 'D']
-    
-    @property
-    def grade_point(self):
-        grade_points = {'A': 4.0, 'B': 3.0, 'C': 2.0, 'D': 1.0, 'F': 0.0}
-        return grade_points.get(self.grade, 0.0)
+        return self.grade in ['A', 'B', 'C', 'D'] and self.grade != ''
 
-class Result(BaseModel):
-    """Student result/semester GPA"""
+class Result(models.Model):
+    """Student semester result"""
     student = models.ForeignKey(
         Student,
         on_delete=models.CASCADE,
@@ -226,35 +185,13 @@ class Result(BaseModel):
     gpa = models.DecimalField(
         max_digits=3,
         decimal_places=2,
+        default=0.00,
         validators=[MinValueValidator(0.0), MaxValueValidator(4.0)]
     )
     
     class Meta:
-        ordering = ['student', 'semester']
         unique_together = ['student', 'semester']
+        ordering = ['student', 'semester']
     
     def __str__(self):
         return f"{self.student} - Sem {self.semester}: GPA {self.gpa}"
-    
-    def calculate_gpa(self):
-        """Calculate GPA from enrollments"""
-        enrollments = Enrollment.objects.filter(
-            student=self.student,
-            semester=self.semester
-        )
-        
-        total_points = 0
-        total_credits = 0
-        earned_credits = 0
-        
-        for enrollment in enrollments:
-            if enrollment.grade:  # Only if graded
-                total_points += enrollment.grade_point * enrollment.course.credit_hours
-                total_credits += enrollment.course.credit_hours
-                if enrollment.is_passed:
-                    earned_credits += enrollment.course.credit_hours
-        
-        self.total_credits = total_credits
-        self.earned_credits = earned_credits
-        self.gpa = (total_points / total_credits) if total_credits > 0 else 0.0
-        self.save()

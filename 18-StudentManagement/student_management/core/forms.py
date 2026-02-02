@@ -3,16 +3,15 @@ from django.core.exceptions import ValidationError
 from .models import Student, Department, Course, Enrollment
 
 class StudentForm(forms.ModelForm):
-    """Form for creating/updating students"""
     date_of_birth = forms.DateField(
-        widget=forms.DateInput(attrs={'type': 'date'}),
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         help_text="Format: YYYY-MM-DD"
     )
     enrollment_date = forms.DateField(
-        widget=forms.DateInput(attrs={'type': 'date'})
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
     )
     graduation_date = forms.DateField(
-        widget=forms.DateInput(attrs={'type': 'date'}),
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         required=False
     )
     
@@ -25,8 +24,16 @@ class StudentForm(forms.ModelForm):
             'profile_picture'
         ]
         widgets = {
-            'address': forms.Textarea(attrs={'rows': 3}),
-            'gender': forms.RadioSelect(),
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'gender': forms.Select(attrs={'class': 'form-control'}),
+            'blood_group': forms.Select(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'emergency_contact': forms.TextInput(attrs={'class': 'form-control'}),
+            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'department': forms.Select(attrs={'class': 'form-control'}),
+            'status': forms.Select(attrs={'class': 'form-control'}),
         }
     
     def clean_email(self):
@@ -34,31 +41,36 @@ class StudentForm(forms.ModelForm):
         if Student.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
             raise ValidationError("A student with this email already exists.")
         return email
-    
-    def clean(self):
-        cleaned_data = super().clean()
-        enrollment_date = cleaned_data.get('enrollment_date')
-        graduation_date = cleaned_data.get('graduation_date')
-        
-        if graduation_date and enrollment_date and graduation_date < enrollment_date:
-            raise ValidationError("Graduation date cannot be before enrollment date.")
-        
-        return cleaned_data
 
 class DepartmentForm(forms.ModelForm):
     class Meta:
         model = Department
         fields = ['name', 'code', 'description']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'code': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
 
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = ['department', 'code', 'name', 'credit_hours', 'description']
+        widgets = {
+            'department': forms.Select(attrs={'class': 'form-control'}),
+            'code': forms.TextInput(attrs={'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'credit_hours': forms.NumberInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
 
 class EnrollmentForm(forms.ModelForm):
     class Meta:
         model = Enrollment
         fields = ['student', 'course', 'semester', 'grade']
         widgets = {
-            'semester': forms.NumberInput(attrs={'min': 1, 'max': 8}),
+            'student': forms.Select(attrs={'class': 'form-control'}),
+            'course': forms.Select(attrs={'class': 'form-control'}),
+            'semester': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 8}),
+            'grade': forms.Select(attrs={'class': 'form-control'}),
         }
