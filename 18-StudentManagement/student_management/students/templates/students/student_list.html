@@ -14,7 +14,8 @@
         {% for student in students %}
              <li>
                 {{student.name}} ({{ student.student_id}})
-                <a href="/update/{{ student.id}}">Edit</a>
+                <a href="/update/{{ student.id }}">Edit</a>
+                <a href="/delete/{{ student.id }}">Delete</a>
             </li>
         {% endfor %}
        </ul>
