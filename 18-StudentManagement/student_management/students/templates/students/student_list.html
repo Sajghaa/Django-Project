@@ -12,13 +12,14 @@
     {% if students %}
        <ul>
         {% for student in students %}
-             <li>{{student.name}} ({{ student.student_id}})</li>
+             <li>
+                {{student.name}} ({{ student.student_id}})
+                <a href="/update/{{ student.id}}">Edit</a>
+            </li>
         {% endfor %}
        </ul>
     {% else %}
-       <p>No students yet.</p>
+       <p>No students yet. <a href="/create/">Add first student</a></p>
     {% endif %}
-
-    <a href="/admin/students/student/add">Add student (Admin)</a>
 </body>
 </html>
