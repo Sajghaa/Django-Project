@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ student.name }}</title>
+</head>
+<body>
+    <h1>{{ student.name }}</h1>
+    <p>Student ID: {{ student.student_id }}</p>
+    <a href="/update/{{ student.id }}">Edit</a>
+    <a href="/delte/{{ student.id }}">Delete</a>
+    <br><br>
+    <a href="/">Back to List</a>
+</body>
+</html>
