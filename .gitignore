@@ -1,4 +1,18 @@
+# Python
+*.pyc
+__pycache__/
+
+#django
+db.sqlite3
+media/
+*.log
+
 # Ignore virtual environments
 **/env/
 **/ss_venv/
 **/venv/
+
+
+#IDE/Editor
+.vscode/
+.idea/
