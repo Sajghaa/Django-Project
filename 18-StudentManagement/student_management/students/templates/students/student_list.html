@@ -1,27 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Students List</title>
-</head>
-<body>
-    <h1>Students</h1>
-    <a href="/create/">Add New Student</a>
+{% extends 'base.html' %}
 
-    {% if students %}
-       <ul>
+{% block content %}
+<a href="/create/" class="btn btn-succss mb-3">Add New Student</a>
+
+{% if students %}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Student ID</th>
+            <th>Email</th>
+            <th>GPA</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
         {% for student in students %}
-             <li>
-                <a href="/{{ student.id }}/">{{ student.name }}</a>
-                 ({{ student.student_id }})
-                <a href="/update/{{ student.id }}">Edit</a>
-                <a href="/delete/{{ student.id }}">Delete</a>
-            </li>
+        <tr>
+            <td><a href="/{{ student.id }}">{{ student.name}}</a></td>
+            <td>{{ student.student_id }}</td>
+            <td>{{ student.email}}</td>
+            <td>{{ student.gpa}}</td>
+            <td>
+                <a href="/update/{{ student.id }}/" class="btn btn-warning btn-sm">Edit</a>
+                <a href="/delete/{{ student.id }}/" class="btn btn-danger btn-sm">Delete</a>
+            </td>
+        </tr>
         {% endfor %}
-       </ul>
-    {% else %}
-       <p>No students yet. <a href="/create/">Add first student</a></p>
-    {% endif %}
-</body>
-</html>
+    </tbody>
+</table>
+{% else %}
+<div class="alert alert-info">
+    No students yet. <a href="/create/">Add first student</a>
+</div>
+{% endif %}
+{% endblock%}

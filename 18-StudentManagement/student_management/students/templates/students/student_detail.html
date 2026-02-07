@@ -7,7 +7,10 @@
 </head>
 <body>
     <h1>{{ student.name }}</h1>
-    <p>Student ID: {{ student.student_id }}</p>
+    <p><strong>Student ID:</strong>{{ student.student_id }}</p>
+    <p><strong>Email:</strong> {{ student.email}}</p>
+    <p><strong>GPA:</strong> {{ student.gpa}}</p>
+    <p><strong>Created:</strong> {{ student.created_at}}</p>
     <a href="/update/{{ student.id }}">Edit</a>
     <a href="/delte/{{ student.id }}">Delete</a>
     <br><br>
