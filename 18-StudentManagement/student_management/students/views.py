@@ -1,16 +1,25 @@
 from django.shortcuts import render, redirect,get_object_or_404
+from django.contrib import messages
 from .models import Student
 from .forms import StudentForm
 
 def student_list(request):
     students = Student.objects.all()
-    return render(request, 'students/student_list.html', {'students':students})
+    # search functionality
+    search_query = request.GET.get('search', '')
+    if search_query:
+        students = students.filter(name__icontains=search_query)
+    return render(request, 'students/student_list.html', {
+        'students':students,
+        'search_query': search_query,
+        })
 
 def student_create(request):
     if request.method == 'POST':
         form = StudentForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Student created successfully!')
             return redirect('student_list')
     else:
         form =StudentForm()
@@ -25,6 +34,7 @@ def student_update(request, pk):
         form = StudentForm(request.POST, instance=student)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Student updated successfully')
             return redirect('student_list')
     else:
         form = StudentForm(instance=student)
@@ -36,6 +46,7 @@ def student_delete(request, pk):
 
     if request.method == 'POST':
         student.delete()
+        messages.success(request, 'Student deleted successfully!')
         return redirect('student_list')
     
     return render(request, 'students/student_confirm_delete.html', {'student':student})
