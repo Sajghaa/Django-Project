@@ -7,13 +7,19 @@
 </head>
 <body>
     <h1>{{ student.name }}</h1>
-    <p><strong>Student ID:</strong>{{ student.student_id }}</p>
-    <p><strong>Email:</strong> {{ student.email}}</p>
-    <p><strong>GPA:</strong> {{ student.gpa}}</p>
-    <p><strong>Created:</strong> {{ student.created_at}}</p>
-    <a href="/update/{{ student.id }}">Edit</a>
-    <a href="/delte/{{ student.id }}">Delete</a>
+    <p><strong>Student ID:</strong> {{ student.student_id }}</p>
+    <p><strong>Email:</strong> {{ student.email }}</p>
+    <p><strong>GPA:</strong> {{ student.gpa }}</p>
+    <p><strong>Academic Status:</strong> 
+        <span class="badge bg-{% if student.gpa >= 3.5 %}success{% elif student.gpa >= 2.0 %}info{% else %}warning{% endif %}">
+            {{ student.get_academic_status }}
+        </span>
+    </p>
+    <p><strong>Created:</strong> {{ student.created_at }}</p>
+    
+    <a href="/update/{{ student.id }}/" class="btn btn-warning">Edit</a>
+    <a href="/delete/{{ student.id }}/" class="btn btn-danger">Delete</a>
     <br><br>
-    <a href="/">Back to List</a>
+    <a href="/" class="btn btn-secondary">Back to List</a>
 </body>
 </html>

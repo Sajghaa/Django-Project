@@ -1,0 +1,39 @@
+<!-- students/templates/students/home.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card text-center">
+    <div class="card-body">
+        <h2 class="card-title">Welcome to Student Management System</h2>
+        <p class="card-text">
+            Total Students: <strong>{{ total_students }}</strong>
+        </p>
+        <a href="/" class="btn btn-primary">View All Students</a>
+        <a href="/create/" class="btn btn-success">Add New Student</a>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5>Quick Stats</h5>
+                <p>Manage student records efficiently with CRUD operations.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5>Features</h5>
+                <ul>
+                    <li>Create new students</li>
+                    <li>Edit existing records</li>
+                    <li>Search functionality</li>
+                    <li>Responsive design</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

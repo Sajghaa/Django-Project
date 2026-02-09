@@ -3,6 +3,14 @@ from django.contrib import messages
 from .models import Student
 from .forms import StudentForm
 
+
+
+def home(request):
+    total_students = Student.objects.count()
+    return render(request, 'students/home.html', {
+        'total_students': total_students
+    })
+
 def student_list(request):
     students = Student.objects.all()
     # search functionality
