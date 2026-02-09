@@ -1,25 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ student.name }}</title>
-</head>
-<body>
-    <h1>{{ student.name }}</h1>
-    <p><strong>Student ID:</strong> {{ student.student_id }}</p>
-    <p><strong>Email:</strong> {{ student.email }}</p>
-    <p><strong>GPA:</strong> {{ student.gpa }}</p>
-    <p><strong>Academic Status:</strong> 
-        <span class="badge bg-{% if student.gpa >= 3.5 %}success{% elif student.gpa >= 2.0 %}info{% else %}warning{% endif %}">
-            {{ student.get_academic_status }}
-        </span>
-    </p>
-    <p><strong>Created:</strong> {{ student.created_at }}</p>
-    
-    <a href="/update/{{ student.id }}/" class="btn btn-warning">Edit</a>
-    <a href="/delete/{{ student.id }}/" class="btn btn-danger">Delete</a>
-    <br><br>
-    <a href="/" class="btn btn-secondary">Back to List</a>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}{{ student.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4>Student Information</h4>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">{{ student.name }}</h5>
+                <p class="card-text">
+                    <strong>Student ID:</strong> {{ student.student_id }}<br>
+                    <strong>Email:</strong> {{ student.email }}<br>
+                    <strong>GPA:</strong> {{ student.gpa }}<br>
+                    <strong>Academic Status:</strong> 
+                    <span class="badge bg-{% if student.gpa >= 3.5 %}success{% elif student.gpa >= 2.0 %}info{% else %}warning{% endif %}">
+                        {{ student.get_academic_status }}
+                    </span><br>
+                    <strong>Created:</strong> {{ student.created_at|date:"M d, Y" }}
+                </p>
+            </div>
+            <div class="card-footer">
+                <a href="/students/update/{{ student.id }}/" class="btn btn-warning">Edit</a>
+                <a href="/students/delete/{{ student.id }}/" class="btn btn-danger">Delete</a>
+                <a href="/students/" class="btn btn-secondary">Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
