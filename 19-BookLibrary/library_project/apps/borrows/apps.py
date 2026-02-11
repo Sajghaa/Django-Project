@@ -3,4 +3,4 @@ from django.apps import AppConfig
 
 class BorrowsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'borrows'
+    name = 'apps.borrows'
