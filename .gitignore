@@ -1,13 +1,36 @@
+# =================
 # Python
+# =================
 *.pyc
 __pycache__/
 
-# Ignore virtual environments
+# =================
+# Django / Databases / Media
+# =================
+*.sqlite3          # ignore all SQLite databases
+*/media/           # ignore media folders in any project
+*.log              # ignore logs
+
+# =================
+# Virtual Environments
+# =================
+**/venv/
 **/env/
 **/ss_venv/
-**/venv/
 
-
-#IDE/Editor
+# =================
+# IDEs / Editors
+# =================
 .vscode/
 .idea/
+
+# =================
+# Environment / Secret Files
+# =================
+*.env
+
+# =================
+# OS / System
+# =================
+.DS_Store
+Thumbs.db
