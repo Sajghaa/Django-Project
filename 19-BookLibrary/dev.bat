@@ -5,7 +5,7 @@ REM ==============================
 REM CONFIG
 REM ==============================
 set PROJECT_ROOT=D:\Coding_Projects\100 Django Projects\19-BookLibrary
-set PROJECT_DIR=%PROJECT_ROOT%\quiz_project
+set PROJECT_DIR=%PROJECT_ROOT%\library_project
 
 REM ==============================
 REM AUTO-DETECT VENV
