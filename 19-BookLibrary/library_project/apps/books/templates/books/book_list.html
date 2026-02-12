@@ -1,0 +1,14 @@
+<h1>Library Books</h1>
+
+{% for book in books %}
+    <div>
+        <h3>{{ book.title }}</h3>
+        <p>Author: {{ book.author }}</p>
+        <p>Available: {{ book.available_copies }}</p>
+
+        <a href="{% url 'borrow_book' book.id %}">Borrow</a>
+        <a href="{% url 'return_book' book.id %}">Return</a>
+
+        <hr>
+    </div>
+{% endfor %}
