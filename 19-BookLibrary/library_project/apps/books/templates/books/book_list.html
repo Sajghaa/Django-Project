@@ -6,14 +6,17 @@
         <p>Author: {{ book.author }}</p>
         <p>Available: {{ book.available_copies }}</p>
 
-        {% if book.available_copies > 0 %}
+        {% if book.available_copies > 0 and book.id not in borrowed_book_ids %}
             <a href="{% url 'borrow_book' book.id %}">Borrow</a>
+        {% elif book.id in borrowed_book_ids %}
+            <span style="color:blue;">You borrowed this</span>
         {% else %}
             <span style="color: red;">Not Available</span>
         {% endif %}
 
+        {% if book.id in borrowed_book_ids %}
         <a href="{% url 'return_book' book.id %}">Return</a>
-
+        {% endif %}
         <hr>
     </div>
 {% endfor %}
