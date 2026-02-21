@@ -2,15 +2,19 @@
 
 <h2>Currently Borrowed Books</h2>
 
-{% if borrowed_books %}
-    {% for record in borrowed_books %}
-        <div>
-            <h3>{{ record.book.title }}</h3>
-            <p>Due Date: {{ record.due_date }}</p>
+{% for record in borrowed_books %}
+    <div>
+        <h3>{{ record.book.title }}</h3>
+        <p>Due Date: {{ record.due_date }}</p>
+
+        {% if record.status == "OVERDUE" %}
+            <p style="color: red;">OVERDUE</p>
+        {% endif %}
+
+        {% if record.status == "BORROWED" %}
             <a href="{% url 'return_book' record.book.id %}">Return</a>
-            <hr>
-        </div>
-    {% endfor %}
-{% else %}
-    <p>You have not borrowed any books.</p>
-{% endif %}
+        {% endif %}
+
+        <hr>
+    </div>
+{% endfor %}
