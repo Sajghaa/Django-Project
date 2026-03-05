@@ -30,6 +30,9 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+import sys
+sys.path.insert(0, str(BASE_DIR / 'apps'))
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
