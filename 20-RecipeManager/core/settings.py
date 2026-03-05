@@ -37,8 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'apps.recipes',
-    'apps.users',
+    
 
     # Third party apps
     'crispy_forms',
@@ -46,8 +45,8 @@ INSTALLED_APPS = [
     'taggit',
 
      # Custom apps
-    'users.apps.UsersConfig',
-    'recipes.apps.RecipesConfig',
+    'apps.users.apps.UsersConfig',
+    'apps.recipes.apps.RecipesConfig',
 
   
 ]
