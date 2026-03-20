@@ -1,0 +1,102 @@
+{% extends 'recipes/base.html' %}
+
+{% block title %}{{ recipe.title }} - Recipe Manager{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'recipes:list' %}">Home</a></li>
+                <li class="breadcrumb-item active">{{ recipe.title }}</li>
+            </ol>
+        </nav>
+        
+        <h1>{{ recipe.title }}</h1>
+        <p class="lead">{{ recipe.description }}</p>
+        
+        <div class="mb-3">
+            <span class="badge bg-{% if recipe.difficulty == 'easy' %}success{% elif recipe.difficulty == 'medium' %}warning{% else %}danger{% endif %} me-2">
+                {{ recipe.get_difficulty_display }}
+            </span>
+            <span class="badge bg-secondary me-2">
+                <i class="fas fa-clock"></i> Prep: {{ recipe.prep_time }} mins
+            </span>
+            <span class="badge bg-secondary me-2">
+                <i class="fas fa-fire"></i> Cook: {{ recipe.cook_time }} mins
+            </span>
+            <span class="badge bg-info me-2">
+                <i class="fas fa-users"></i> {{ recipe.servings }} servings
+            </span>
+            <span class="badge bg-primary">
+                <i class="fas fa-hourglass-half"></i> Total: {{ recipe.total_time }} mins
+            </span>
+        </div>
+        
+        <div class="mb-4">
+            <p class="text-muted">
+                <i class="fas fa-user"></i> By {{ recipe.author.username }} |
+                <i class="fas fa-calendar"></i> {{ recipe.created_at|date:"F d, Y" }}
+                {% if recipe.updated_at != recipe.created_at %}
+                    | <i class="fas fa-edit"></i> Updated {{ recipe.updated_at|date:"M d, Y" }}
+                {% endif %}
+            </p>
+        </div>
+        
+        {% if recipe.tags.all %}
+            <div class="mb-4">
+                <strong>Tags:</strong>
+                {% for tag in recipe.tags.all %}
+                    <span class="badge bg-secondary">{{ tag.name }}</span>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Ingredients</h4>
+            </div>
+            <div class="card-body">
+                <pre class="mb-0" style="white-space: pre-wrap;">{{ recipe.ingredients }}</pre>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Instructions</h4>
+            </div>
+            <div class="card-body">
+                <pre class="mb-0" style="white-space: pre-wrap;">{{ recipe.instructions }}</pre>
+            </div>
+        </div>
+        
+        {% if user == recipe.author %}
+            <div class="mb-4">
+                <a href="{% url 'recipes:update' recipe.pk %}" class="btn btn-warning">Edit Recipe</a>
+                <a href="{% url 'recipes:delete' recipe.pk %}" class="btn btn-danger">Delete Recipe</a>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-4">
+        {% if recipe.image %}
+            <img src="{{ recipe.image.url }}" class="img-fluid rounded mb-4" alt="{{ recipe.title }}">
+        {% endif %}
+        
+        <div class="card">
+            <div class="card-header">
+                <h5>Recipe Information</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><strong>Difficulty:</strong> {{ recipe.get_difficulty_display }}</li>
+                    <li><strong>Preparation Time:</strong> {{ recipe.prep_time }} minutes</li>
+                    <li><strong>Cooking Time:</strong> {{ recipe.cook_time }} minutes</li>
+                    <li><strong>Total Time:</strong> {{ recipe.total_time }} minutes</li>
+                    <li><strong>Servings:</strong> {{ recipe.servings }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
