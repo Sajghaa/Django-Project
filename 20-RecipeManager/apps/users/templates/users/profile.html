@@ -1,0 +1,77 @@
+{% extends 'recipes/base.html' %}
+
+{% block title %}My Profile - Recipe Manager{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}" class="rounded-circle img-fluid mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                {% else %}
+                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 150px; height: 150px;">
+                        <i class="fas fa-user fa-4x"></i>
+                    </div>
+                {% endif %}
+                <h3>{{ user.username }}</h3>
+                <p class="text-muted">{{ user.email }}</p>
+                
+                <div class="mb-3">
+                    <span class="badge bg-info">{{ user.get_skill_level_display }}</span>
+                </div>
+                
+                <a href="{% url 'users:profile_edit' %}" class="btn btn-primary w-100">Edit Profile</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>About Me</h4>
+            </div>
+            <div class="card-body">
+                <p><strong>Bio:</strong></p>
+                <p>{{ user.bio|default:"No bio provided." }}</p>
+                
+                <p><strong>Favorite Cuisines:</strong></p>
+                <p>{{ user.favorite_cuisines|default:"Not specified." }}</p>
+                
+                <p><strong>Member since:</strong> {{ user.date_joined|date:"F d, Y" }}</p>
+                <p><strong>Recipes created:</strong> {{ user.recipes.count }}</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h4>My Recipes</h4>
+            </div>
+            <div class="card-body">
+                {% if user.recipes.all %}
+                    <div class="row">
+                        {% for recipe in user.recipes.all|slice:":6" %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ recipe.title }}</h5>
+                                        <p class="card-text">{{ recipe.description|truncatewords:15 }}</p>
+                                        <a href="{% url 'recipes:detail' recipe.pk %}" class="btn btn-sm btn-primary">View Recipe</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if user.recipes.count > 6 %}
+                        <div class="text-center mt-3">
+                            <a href="{% url 'recipes:list' %}?author={{ user.username }}" class="btn btn-outline-primary">View All Recipes</a>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <p class="text-center">No recipes yet. <a href="{% url 'recipes:create' %}">Create your first recipe!</a></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
