@@ -1,0 +1,25 @@
+{% extends 'recipes/base.html' %}
+
+{% block title %}Delete Recipe - Recipe Manager{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h3>Delete Recipe</h3>
+            </div>
+            <div class="card-body">
+                <p>Are you sure you want to delete "<strong>{{ recipe.title }}</strong>"?</p>
+                <p class="text-danger">This action cannot be undone!</p>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                    <a href="{% url 'recipes:detail' recipe.pk %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
