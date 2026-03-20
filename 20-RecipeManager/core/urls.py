@@ -8,7 +8,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # Now we can use just the app name since it's in Python path
     path('', include('apps.recipes.urls')),
-    path('users/', include('users.urls')),
+    path('users/', include('apps.users.urls')),
 ]
 
 if settings.DEBUG:
