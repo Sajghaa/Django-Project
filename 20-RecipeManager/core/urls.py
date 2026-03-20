@@ -7,7 +7,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     # Now we can use just the app name since it's in Python path
-    path('', include('recipes.urls')),
+    path('', include('apps.recipes.urls')),
     path('users/', include('users.urls')),
 ]
 
