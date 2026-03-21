@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Subscription Confirmed{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+        <div class="card">
+            <div class="card-body">
+                <i class="fas fa-check-circle text-success" style="font-size: 64px;"></i>
+                <h2 class="mt-3">Successfully Subscribed!</h2>
+                <p>Thank you for subscribing to our newsletter. We'll keep you updated with the latest news and offers.</p>
+                <a href="{% url 'newsletter:subscribe' %}" class="btn btn-primary">Subscribe Another Email</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
