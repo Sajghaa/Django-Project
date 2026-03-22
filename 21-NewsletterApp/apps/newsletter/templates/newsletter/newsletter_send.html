@@ -1,4 +1,4 @@
-{% extends 'templates/base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}Send Newsletter - {{ newsletter.subject }}{% endblock %}
 
@@ -11,12 +11,21 @@
             </div>
             <div class="card-body">
                 <p>Are you sure you want to send "<strong>{{ newsletter.subject }}</strong>" to all active subscribers?</p>
-                <p><strong>Recipients:</strong> {{ newsletter.sent_to_count }}</p>
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> This will send the newsletter to all subscribers with status "active".
+                </div>
                 
                 <form method="post">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-success">Yes, Send Now</button>
-                    <a href="{% url 'newsletter:newsletter_list' %}" class="btn btn-secondary">Cancel</a>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-paper-plane"></i> Yes, Send Now
+                        </button>
+                        <a href="{% url 'newsletter:newsletter_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
                 </form>
             </div>
         </div>
