@@ -1,12 +1,8 @@
 import os
-import sys
 from pathlib import Path
 
 # Build paths
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-
-# Add apps directory to Python path
-sys.path.insert(0, str(BASE_DIR / 'apps'))
 
 # Security settings
 SECRET_KEY = 'django-insecure-your-secret-key-here-for-development'
@@ -26,9 +22,9 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     
-    # Local apps - use the app names without 'apps.' prefix
-    'core',  # This is the label, not the full path
-    'newsletter',
+    # Local apps - use the full path
+    'apps.core',
+    'apps.newsletter',
 ]
 
 MIDDLEWARE = [
@@ -105,7 +101,7 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # Email settings (for development)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Use console for testing
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'newsletter@example.com'
 SITE_URL = 'http://localhost:8000'
 
