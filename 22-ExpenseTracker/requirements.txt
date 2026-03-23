@@ -1,0 +1,33 @@
+Django==5.2.12
+python-dotenv==1.0.0
+Pillow==10.2.0
+
+# Forms & Styling
+django-crispy-forms==2.1
+crispy-bootstrap5==0.7
+
+# Authentication
+django-allauth==0.60.0
+
+# REST API
+djangorestframework==3.15.0
+django-filter==24.3
+drf-yasg==1.21.7
+
+# Database
+psycopg2-binary==2.9.9
+
+# Task Queue
+celery==5.3.4
+redis==5.0.1
+
+# Reporting
+openpyxl==3.1.2
+reportlab==4.2.0
+matplotlib==3.8.3
+
+# Utilities
+python-decouple==3.8
+django-debug-toolbar==4.2.0
+django-extensions==3.2.3
+django-cors-headers==4.3.1
