@@ -5,7 +5,7 @@ from apps.core.models import BaseModel
 import uuid
 
 class Budget(BaseModel):
-    """Budget model for financial planning"""
+    """Budget model"""
     
     class Period(models.TextChoices):
         DAILY = 'daily', 'Daily'
@@ -16,30 +16,26 @@ class Budget(BaseModel):
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='budgets')
-    category = models.ForeignKey('categories.Category', on_delete=models.SET_NULL, null=True, related_name='budgets')
+    category = models.ForeignKey('categories.Category', on_delete=models.CASCADE, related_name='budgets')
     
-    name = models.CharField(max_length=200)
     amount = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)])
     period = models.CharField(max_length=20, choices=Period.choices, default=Period.MONTHLY)
     start_date = models.DateField()
     end_date = models.DateField(null=True, blank=True)
     
     alert_threshold = models.IntegerField(default=80, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    is_alert_sent = models.BooleanField(default=False)
     
     class Meta:
         ordering = ['-start_date']
-        indexes = [
-            models.Index(fields=['user', 'period']),
-            models.Index(fields=['user', 'start_date']),
-        ]
     
     def __str__(self):
-        return f"{self.name} - ${self.amount} ({self.period})"
+        return f"{self.category.name} - ${self.amount} ({self.period})"
     
     def get_spent_amount(self):
         """Calculate amount spent against this budget"""
-        expenses = self.user.expenses.filter(
+        from apps.expenses.models import Expense
+        expenses = Expense.objects.filter(
+            user=self.user,
             category=self.category,
             date__gte=self.start_date
         )
@@ -56,8 +52,3 @@ class Budget(BaseModel):
         if self.amount > 0:
             return (self.get_spent_amount() / self.amount) * 100
         return 0
-    
-    def should_alert(self):
-        """Check if budget alert should be triggered"""
-        percentage = self.get_percentage_used()
-        return percentage >= self.alert_threshold and not self.is_alert_sent
