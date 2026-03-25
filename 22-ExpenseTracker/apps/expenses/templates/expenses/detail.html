@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ expense.title }} - Expense Tracker{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3>{{ expense.title }}</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>Amount:</strong> <span class="text-danger">{{ expense.formatted_amount }}</span></p>
+                <p><strong>Date:</strong> {{ expense.date }}</p>
+                <p><strong>Category:</strong> {{ expense.category.name|default:"Uncategorized" }}</p>
+                <p><strong>Payment Method:</strong> {{ expense.get_payment_method_display }}</p>
+                <p><strong>Description:</strong> {{ expense.description|default:"No description" }}</p>
+                
+                {% if expense.receipt %}
+                <p><strong>Receipt:</strong> <a href="{{ expense.receipt.url }}" target="_blank">View Receipt</a></p>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'expenses:update' expense.pk %}" class="btn btn-warning">Edit</a>
+                <a href="{% url 'expenses:list' %}" class="btn btn-secondary">Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
