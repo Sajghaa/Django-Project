@@ -1,0 +1,52 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Budgets - Expense Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Budgets</h2>
+    <a href="{% url 'budgets:create' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add Budget
+    </a>
+</div>
+
+<div class="row">
+    {% for budget in budgets %}
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h4>{{ budget.category.name }}</h4>
+            </div>
+            <div class="card-body">
+                <p><strong>Budget Amount:</strong> ${{ budget.amount }}</p>
+                <p><strong>Period:</strong> {{ budget.get_period_display }}</p>
+                <p><strong>Start Date:</strong> {{ budget.start_date }}</p>
+                {% if budget.end_date %}
+                <p><strong>End Date:</strong> {{ budget.end_date }}</p>
+                {% endif %}
+                <p><strong>Spent:</strong> ${{ budget.spent|floatformat:2 }}</p>
+                <p><strong>Remaining:</strong> ${{ budget.remaining|floatformat:2 }}</p>
+                
+                <div class="progress mb-3">
+                    <div class="progress-bar {% if budget.percentage > 90 %}bg-danger{% elif budget.percentage > 70 %}bg-warning{% else %}bg-success{% endif %}" 
+                         style="width: {{ budget.percentage }}%">
+                        {{ budget.percentage|floatformat:0 }}%
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'budgets:detail' budget.pk %}" class="btn btn-sm btn-info">View</a>
+                <a href="{% url 'budgets:update' budget.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                <a href="{% url 'budgets:delete' budget.pk %}" class="btn btn-sm btn-danger">Delete</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            No budgets yet. <a href="{% url 'budgets:create' %}">Create your first budget</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
