@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Expense Tracker{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="alert alert-info">
+            <h4>Welcome back, {{ user.username }}!</h4>
+            <p>Your expense tracker is ready. Start adding your expenses to see insights.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Total Expenses</h5>
+                <h2>$0.00</h2>
+                <p class="card-text">This month</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Budget Left</h5>
+                <h2>$0.00</h2>
+                <p class="card-text">Remaining</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Categories</h5>
+                <h2>0</h2>
+                <p class="card-text">Active categories</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Recent Expenses</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-center text-muted">No expenses yet. 
+                    <a href="{% url 'expenses:create' %}">Add your first expense</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
