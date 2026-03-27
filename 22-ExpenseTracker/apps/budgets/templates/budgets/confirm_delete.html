@@ -1,22 +1,22 @@
 {% extends 'base.html' %}
 
-{% block title %}Delete Expense - Expense Tracker{% endblock %}
+{% block title %}Delete Budget - Expense Tracker{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="card">
             <div class="card-header bg-danger text-white">
-                <h3 class="mb-0">Delete Expense</h3>
+                <h3 class="mb-0">Delete Budget</h3>
             </div>
             <div class="card-body">
-                <p>Are you sure you want to delete "<strong>{{ expense.title }}</strong>"?</p>
+                <p>Are you sure you want to delete the budget for "<strong>{{ budget.category.name }}</strong>"?</p>
                 <p class="text-danger">This action cannot be undone!</p>
                 
                 <form method="post">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger">Yes, Delete</button>
-                    <a href="{% url 'expenses:list' %}" class="btn btn-secondary">Cancel</a>
+                    <a href="{% url 'budgets:list' %}" class="btn btn-secondary">Cancel</a>
                 </form>
             </div>
         </div>
