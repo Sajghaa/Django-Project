@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ budget.category.name }} - Budget{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3>{{ budget.category.name }} Budget</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>Budget Amount:</strong> ${{ budget.amount }}</p>
+                <p><strong>Period:</strong> {{ budget.get_period_display }}</p>
+                <p><strong>Start Date:</strong> {{ budget.start_date }}</p>
+                {% if budget.end_date %}
+                <p><strong>End Date:</strong> {{ budget.end_date }}</p>
+                {% endif %}
+                <p><strong>Alert Threshold:</strong> {{ budget.alert_threshold }}%</p>
+                
+                <hr>
+                <h4>Budget Performance</h4>
+                <p><strong>Spent:</strong> ${{ spent|floatformat:2 }}</p>
+                <p><strong>Remaining:</strong> ${{ remaining|floatformat:2 }}</p>
+                
+                <div class="progress mb-3">
+                    <div class="progress-bar {% if percentage > 90 %}bg-danger{% elif percentage > 70 %}bg-warning{% else %}bg-success{% endif %}" 
+                         style="width: {{ percentage }}%">
+                        {{ percentage|floatformat:0 }}%
+                    </div>
+                </div>
+                
+                {% if percentage >= alert_threshold %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> You have used {{ percentage|floatformat:0 }}% of your budget!
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'budgets:update' budget.pk %}" class="btn btn-warning">Edit</a>
+                <a href="{% url 'budgets:delete' budget.pk %}" class="btn btn-danger">Delete</a>
+                <a href="{% url 'budgets:list' %}" class="btn btn-secondary">Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
