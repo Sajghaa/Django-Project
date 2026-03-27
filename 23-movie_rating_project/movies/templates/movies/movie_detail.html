@@ -1,0 +1,99 @@
+{% extends 'movies/base.html' %}
+
+{% block title %}{{ movie.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-4">
+            {% if movie.poster %}
+            <img src="{{ movie.poster.url }}" class="img-fluid rounded shadow" alt="{{ movie.title }}">
+            {% else %}
+            <div class="poster-placeholder rounded shadow" style="height: 400px;">
+                <i class="fas fa-film fa-4x"></i>
+            </div>
+            {% endif %}
+        </div>
+        <div class="col-md-8">
+            <h1 class="display-4">{{ movie.title }}</h1>
+            <p class="text-muted">{{ movie.release_year }} • {{ movie.get_genre_display }} • {{ movie.duration }} min</p>
+            <p><strong>Director:</strong> {{ movie.director }}</p>
+            <div class="rating-stars mb-3">
+                <h3>
+                    {% for i in "12345"|make_list %}
+                        {% if forloop.counter <= movie.average_rating %}
+                            <i class="fas fa-star"></i>
+                        {% elif forloop.counter <= movie.average_rating|add:0.5 %}
+                            <i class="fas fa-star-half-alt"></i>
+                        {% else %}
+                            <i class="far fa-star"></i>
+                        {% endif %}
+                    {% endfor %}
+                    <span class="text-muted ms-2">{{ movie.average_rating }}/5 ({{ movie.total_reviews }} reviews)</span>
+                </h3>
+            </div>
+            <p>{{ movie.description }}</p>
+            
+            {% if user.is_authenticated %}
+                {% if user.is_superuser %}
+                <div class="mt-3">
+                    <a href="{% url 'movies:movie_edit' movie.slug %}" class="btn btn-warning">Edit Movie</a>
+                    <a href="{% url 'movies:movie_delete' movie.slug %}" class="btn btn-danger">Delete Movie</a>
+                </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-md-8">
+            <h3>Reviews</h3>
+            {% for rating in movie.ratings.all %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="card-title">{{ rating.user.username }}</h5>
+                        <div class="rating-stars">
+                            {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= rating.rating %}
+                                    <i class="fas fa-star"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <p class="card-text">{{ rating.review }}</p>
+                    <small class="text-muted">{{ rating.created_at|date:"F j, Y" }}</small>
+                    {% if user == rating.user %}
+                    <form method="post" action="{% url 'movies:delete_rating' movie.slug %}" class="mt-2">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger">Delete Review</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-muted">No reviews yet. Be the first to review!</p>
+            {% endfor %}
+        </div>
+        
+        {% if user.is_authenticated %}
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Rate this movie</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'movies:add_rating' movie.slug %}">
+                        {% csrf_token %}
+                        {{ rating_form.as_p }}
+                        <button type="submit" class="btn btn-primary w-100">Submit Rating</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
