@@ -2,7 +2,7 @@
 
 > A curated collection of Django projects demonstrating Django mastery through real-world applications.
 
-**Progress:** 19 / 100 completed
+**Progress:** 23 / 100 completed
 
 ---
 
@@ -29,6 +29,10 @@
 | 17 | [17-QuizProject](17-QuizProject) | No description yet | Planned | ✅ |
 | 18 | [18-StudentManagement](18-StudentManagement) | No description yet | Planned | ✅ |
 | 19 | [19-BookLibrary](19-BookLibrary) | No description yet | Planned | ✅ |
+| 20 | [20-RecipeManager](20-RecipeManager) | No description yet | Completed | ✅ |
+| 21 | [21-NewsletterApp](21-NewsletterApp) | No description yet | Completed | ✅ |
+| 22 | [22-ExpenseTracker](22-ExpenseTracker) | No description yet | Completed | ✅ |
+| 23 | [23-movie_rating_project](23-movie_rating_project) | No description yet | Completed | ✅ |
 
 ---
 
