@@ -6,12 +6,12 @@
 <div class="container py-4">
     <div class="row mb-4">
         <div class="col-md-8">
-            <h1 class="display-4">Movies</h1>
+            <h1 class="display-4">🎬 Movie Gallery</h1>
             <p class="lead">Discover and rate your favorite movies</p>
         </div>
         <div class="col-md-4">
-            <form method="get" class="d-flex">
-                <select name="genre" class="form-select me-2" onchange="this.form.submit()">
+            <form method="get" class="d-flex gap-2">
+                <select name="genre" class="form-select" onchange="this.form.submit()">
                     <option value="">All Genres</option>
                     {% for value, label in genres %}
                     <option value="{{ value }}" {% if selected_genre == value %}selected{% endif %}>
@@ -19,6 +19,9 @@
                     </option>
                     {% endfor %}
                 </select>
+                {% if selected_genre %}
+                <a href="{% url 'movies:movie_list' %}" class="btn btn-outline-secondary">Clear</a>
+                {% endif %}
             </form>
         </div>
     </div>
@@ -26,19 +29,20 @@
     <div class="row">
         {% for movie in movies %}
         <div class="col-md-3 mb-4">
-            <div class="card movie-card h-100">
-                {% if movie.poster %}
-                <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}" style="height: 300px; object-fit: cover;">
-                {% else %}
-                <div class="poster-placeholder">
-                    <i class="fas fa-film fa-3x"></i>
+            <div class="card movie-card h-100 shadow-sm">
+                <div class="position-relative">
+                    <img src="{{ movie.get_poster }}" class="card-img-top" alt="{{ movie.title }}" 
+                         style="height: 350px; object-fit: cover;">
+                    <div class="position-absolute top-0 end-0 m-2">
+                        <span class="badge bg-dark bg-opacity-75">
+                            {{ movie.duration }} min
+                        </span>
+                    </div>
                 </div>
-                {% endif %}
                 <div class="card-body">
                     <h5 class="card-title">{{ movie.title }}</h5>
-                    <p class="card-text text-muted">
-                        {{ movie.release_year }} • {{ movie.get_genre_display }}<br>
-                        {{ movie.duration }} min
+                    <p class="card-text text-muted small">
+                        {{ movie.release_year }} • {{ movie.get_genre_display }}
                     </p>
                     <div class="rating-stars mb-2">
                         {% with avg=movie.average_rating %}
@@ -54,15 +58,18 @@
                         <span class="text-muted ms-2">({{ movie.total_reviews }})</span>
                         {% endwith %}
                     </div>
-                    <a href="{% url 'movies:movie_detail' movie.slug %}" class="btn btn-primary btn-sm">View Details</a>
+                    <a href="{% url 'movies:movie_detail' movie.slug %}" class="btn btn-primary btn-sm w-100">
+                        <i class="fas fa-info-circle"></i> View Details
+                    </a>
                 </div>
             </div>
         </div>
         {% empty %}
         <div class="col-12 text-center py-5">
+            <i class="fas fa-film fa-4x text-muted mb-3"></i>
             <h3>No movies found</h3>
             {% if user.is_superuser %}
-            <a href="{% url 'movies:movie_create' %}" class="btn btn-primary">Add your first movie</a>
+            <a href="{% url 'movies:movie_create' %}" class="btn btn-primary mt-3">Add your first movie</a>
             {% endif %}
         </div>
         {% endfor %}
@@ -73,7 +80,9 @@
         <ul class="pagination justify-content-center">
             {% if page_obj.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}">Previous</a>
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </a>
             </li>
             {% endif %}
             
@@ -85,7 +94,9 @@
             
             {% if page_obj.has_next %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}">Next</a>
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}">
+                    Next <i class="fas fa-chevron-right"></i>
+                </a>
             </li>
             {% endif %}
         </ul>
