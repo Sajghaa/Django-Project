@@ -4,7 +4,7 @@ from .models import Movie, Rating
 class MovieForm(forms.ModelForm):
     class Meta:
         model = Movie
-        fields = ['title', 'genre', 'release_year', 'director', 'description', 'duration', 'poster']
+        fields = ['title', 'genre', 'release_year', 'director', 'description', 'duration', 'poster', 'poster_url']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter movie title'}),
             'genre': forms.Select(attrs={'class': 'form-control'}),
@@ -13,6 +13,7 @@ class MovieForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Movie description'}),
             'duration': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Duration in minutes'}),
             'poster': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'poster_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://example.com/poster.jpg'}),
         }
     
     def clean_release_year(self):
