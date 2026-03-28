@@ -16,7 +16,13 @@ urlpatterns = [
     path('movie/<slug:slug>/rate/', views.add_rating, name='add_rating'),
     path('movie/<slug:slug>/rate/delete/', views.delete_rating, name='delete_rating'),
     
-    # Authentication URLs
-    path('login/', auth_views.LoginView.as_view(template_name='movies/login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    # New Feature URLs
+    path('reviews/', views.recent_reviews, name='recent_reviews'),
+    path('stats/', views.stats_dashboard, name='stats_dashboard'),
+    path('profile/', views.user_profile, name='user_profile'),
+    path('profile/<str:username>/', views.user_profile, name='user_profile_detail'),
+    
+    # Authentication URLs - Using custom login view
+    path('login/', views.custom_login, name='login'),  # Changed to custom login
+    path('logout/', auth_views.LogoutView.as_view(next_page='movies:movie_list'), name='logout'),
 ]
