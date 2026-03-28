@@ -1,0 +1,151 @@
+{% extends 'movies/base.html' %}
+
+{% block title %}Movie Statistics{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="display-4 mb-4">
+        <i class="fas fa-chart-bar"></i> Movie Statistics Dashboard
+        <small class="text-muted fs-5">Admin Only</small>
+    </h1>
+    
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card bg-primary text-white shadow-sm hover-shadow">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-film"></i> Total Movies</h5>
+                    <h2 class="display-4">{{ total_movies }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card bg-success text-white shadow-sm hover-shadow">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-star"></i> Total Reviews</h5>
+                    <h2 class="display-4">{{ total_reviews }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card bg-info text-white shadow-sm hover-shadow">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-users"></i> Active Users</h5>
+                    <h2 class="display-4">{{ total_users }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Movies by Genre -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Movies by Genre</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr><th>Genre</th><th>Count</th><th>Percentage</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for genre in movies_by_genre %}
+                                <tr>
+                                    <td><i class="fas fa-tag"></i> {{ genre.genre }}</td>
+                                    <td><span class="badge bg-primary">{{ genre.count }}</span></td>
+                                    <td>
+                                        <div class="progress">
+                                            <div class="progress-bar progress-bar-striped" style="width: {% widthratio genre.count total_movies 100 %}%">
+                                                {% widthratio genre.count total_movies 100 %}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Top Rated Movies -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-trophy"></i> Top Rated Movies</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for movie in top_movies %}
+                        <a href="{% url 'movies:movie_detail' movie.slug %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ movie.title }}</strong>
+                                    <div class="rating-stars">
+                                        {% for i in "12345"|make_list %}
+                                            {% if forloop.counter <= movie.avg_rating %}
+                                                <i class="fas fa-star"></i>
+                                            {% elif forloop.counter <= movie.avg_rating|add:0.5 %}
+                                                <i class="fas fa-star-half-alt"></i>
+                                            {% else %}
+                                                <i class="far fa-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">{{ movie.avg_rating|floatformat:1 }}</span>
+                            </div>
+                            <small class="text-muted">{{ movie.review_count }} reviews</small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0"><i class="fas fa-history"></i> Recent Activity</h5>
+        </div>
+        <div class="card-body">
+            <div class="list-group">
+                {% for rating in recent_ratings %}
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <strong>
+                                <i class="fas fa-user-circle"></i> 
+                                <a href="{% url 'movies:user_profile_detail' rating.user.username %}">
+                                    {{ rating.user.username }}
+                                </a>
+                            </strong> rated 
+                            <a href="{% url 'movies:movie_detail' rating.movie.slug %}">
+                                <strong>{{ rating.movie.title }}</strong>
+                            </a>
+                            <div class="rating-stars mt-1">
+                                {% for i in "12345"|make_list %}
+                                    {% if forloop.counter <= rating.rating %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% if rating.review %}
+                            <p class="mt-2 mb-0 text-muted"><small>{{ rating.review|truncatechars:100 }}</small></p>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">{{ rating.created_at|timesince }} ago</small>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
