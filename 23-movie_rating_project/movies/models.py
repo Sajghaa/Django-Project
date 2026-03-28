@@ -24,6 +24,7 @@ class Movie(models.Model):
     description = models.TextField()
     duration = models.PositiveIntegerField(help_text="Duration in minutes")
     poster = models.ImageField(upload_to='movie_posters/', blank=True, null=True)
+    poster_url = models.URLField(blank=True, null=True, help_text="Optional: Use an image URL instead of uploading")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -58,6 +59,27 @@ class Movie(models.Model):
     @property
     def total_reviews(self):
         return self.ratings.count()
+    
+    @property
+    def get_poster(self):
+        """Get poster from either uploaded file, URL, or placeholder"""
+        if self.poster and self.poster.url:
+            return self.poster.url
+        elif self.poster_url:
+            return self.poster_url
+        else:
+            # Use placeholder images based on genre
+            placeholders = {
+                'Action': 'https://via.placeholder.com/300x450/1e3a8a/ffffff?text=Action+Movie',
+                'Comedy': 'https://via.placeholder.com/300x450/92400e/ffffff?text=Comedy+Movie',
+                'Drama': 'https://via.placeholder.com/300x450/1f2937/ffffff?text=Drama+Movie',
+                'Horror': 'https://via.placeholder.com/300x450/991b1b/ffffff?text=Horror+Movie',
+                'Romance': 'https://via.placeholder.com/300x450/9d174d/ffffff?text=Romance+Movie',
+                'Sci-Fi': 'https://via.placeholder.com/300x450/0f172a/ffffff?text=Sci-Fi+Movie',
+                'Thriller': 'https://via.placeholder.com/300x450/4c1d95/ffffff?text=Thriller+Movie',
+                'Animation': 'https://via.placeholder.com/300x450/047857/ffffff?text=Animation+Movie',
+            }
+            return placeholders.get(self.genre, 'https://via.placeholder.com/300x450/000000/ffffff?text=Movie')
 
 class Rating(models.Model):
     class RatingChoice(models.IntegerChoices):
