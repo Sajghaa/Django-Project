@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
 from movies.models import Movie
-from django.utils.text import slugify
 
 class Command(BaseCommand):
     help = 'Add sample movies to the database'
@@ -87,8 +86,8 @@ class Command(BaseCommand):
                 defaults=movie_data
             )
             if created:
-                self.stdout.write(self.style.SUCCESS(f'Added: {movie.title}'))
+                self.stdout.write(self.style.SUCCESS(f'✓ Added: {movie.title}'))
             else:
-                self.stdout.write(f'Already exists: {movie.title}')
+                self.stdout.write(f'○ Already exists: {movie.title}')
 
-        self.stdout.write(self.style.SUCCESS('Sample movies added successfully!'))
+        self.stdout.write(self.style.SUCCESS('\n✨ Sample movies added successfully!'))
