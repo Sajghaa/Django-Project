@@ -68,7 +68,6 @@ class Movie(models.Model):
         elif self.poster_url:
             return self.poster_url
         else:
-            # Use placeholder images based on genre
             placeholders = {
                 'Action': 'https://via.placeholder.com/300x450/1e3a8a/ffffff?text=Action+Movie',
                 'Comedy': 'https://via.placeholder.com/300x450/92400e/ffffff?text=Comedy+Movie',
