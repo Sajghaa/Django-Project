@@ -1,0 +1,117 @@
+{% extends 'portfolio/base.html' %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header bg-light py-4">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'portfolio:home' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'portfolio:portfolio_list' %}">Portfolio</a></li>
+                <li class="breadcrumb-item active">{{ portfolio.title }}</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<!-- Project Detail -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="card shadow-sm">
+                    <img src="{{ portfolio.image.url }}" class="card-img-top" alt="{{ portfolio.title }}">
+                    <div class="card-body">
+                        <h1 class="card-title">{{ portfolio.title }}</h1>
+                        <div class="mb-3">
+                            <span class="badge bg-primary">{{ portfolio.category.name }}</span>
+                            <span class="badge bg-secondary">{{ portfolio.completion_date|date:"F Y" }}</span>
+                        </div>
+                        <h5>Project Description</h5>
+                        <p>{{ portfolio.description }}</p>
+                        
+                        <h5>Technologies Used</h5>
+                        <div class="mb-3">
+                            {% for tech in portfolio.technologies.split %}
+                            <span class="badge bg-dark me-1">{{ tech }}</span>
+                            {% endfor %}
+                        </div>
+                        
+                        {% if portfolio.client %}
+                        <h5>Client</h5>
+                        <p>{{ portfolio.client }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Project Info</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <strong>Category:</strong><br>
+                            {{ portfolio.category.name }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Completion Date:</strong><br>
+                            {{ portfolio.completion_date|date:"F j, Y" }}
+                        </div>
+                        {% if portfolio.client %}
+                        <div class="mb-3">
+                            <strong>Client:</strong><br>
+                            {{ portfolio.client }}
+                        </div>
+                        {% endif %}
+                        <div class="mb-3">
+                            <strong>Technologies:</strong><br>
+                            {{ portfolio.technologies }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Project Links</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if portfolio.project_url %}
+                        <a href="{{ portfolio.project_url }}" target="_blank" class="btn btn-primary w-100 mb-2">
+                            <i class="fas fa-external-link-alt"></i> View Live Project
+                        </a>
+                        {% endif %}
+                        {% if portfolio.github_url %}
+                        <a href="{{ portfolio.github_url }}" target="_blank" class="btn btn-dark w-100">
+                            <i class="fab fa-github"></i> View Source Code
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Related Projects -->
+        {% if related_projects %}
+        <div class="mt-5">
+            <h3 class="mb-4">Related Projects</h3>
+            <div class="row">
+                {% for project in related_projects %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <img src="{{ project.image.url }}" class="card-img-top" alt="{{ project.title }}" style="height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ project.title }}</h5>
+                            <p class="card-text text-muted small">{{ project.category.name }}</p>
+                            <a href="{% url 'portfolio:portfolio_detail' project.slug %}" class="btn btn-sm btn-outline-primary">View Project</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
