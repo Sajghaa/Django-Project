@@ -1,0 +1,178 @@
+{% extends 'portfolio/base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section bg-gradient text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container py-5">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-6" data-aos="fade-right">
+                <h1 class="display-3 fw-bold mb-3">{{ site_info.hero_title|default:"I Create Amazing Digital Experiences" }}</h1>
+                <p class="lead mb-4">{{ site_info.hero_subtitle|default:"Creative Developer & Designer" }}</p>
+                <div class="d-flex gap-3">
+                    <a href="#contact" class="btn btn-light btn-lg">Hire Me</a>
+                    <a href="{% url 'portfolio:portfolio_list' %}" class="btn btn-outline-light btn-lg">View Work</a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center" data-aos="fade-left">
+                {% if site_info.hero_image %}
+                    <img src="{{ site_info.hero_image.url }}" alt="Hero" class="img-fluid rounded-circle" style="max-width: 400px;">
+                {% else %}
+                    <i class="fas fa-code fa-10x"></i>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-4">My Services</h2>
+            <p class="lead">What I can do for you</p>
+        </div>
+        <div class="row">
+            {% for service in services %}
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+                <div class="card h-100 text-center shadow-sm hover-shadow">
+                    <div class="card-body">
+                        <i class="{{ service.icon }} fa-3x text-primary mb-3"></i>
+                        <h4>{{ service.title }}</h4>
+                        <p>{{ service.description|truncatewords:20 }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Skills Section -->
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-4">My Skills</h2>
+            <p class="lead">Technologies I work with</p>
+        </div>
+        <div class="row">
+            {% for skill in skills %}
+            <div class="col-md-6 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>{{ skill.name }}</span>
+                    <span>{{ skill.percentage }}%</span>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: {{ skill.percentage }}%"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Featured Projects Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-4">Featured Projects</h2>
+            <p class="lead">Some of my best work</p>
+        </div>
+        <div class="row">
+            {% for project in featured_projects %}
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+                <div class="card h-100 shadow-sm">
+                    <img src="{{ project.image.url }}" class="card-img-top" alt="{{ project.title }}" style="height: 250px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ project.title }}</h5>
+                        <p class="card-text text-muted">{{ project.technologies }}</p>
+                        <p>{{ project.description|truncatewords:20 }}</p>
+                        <a href="{% url 'portfolio:portfolio_detail' project.slug %}" class="btn btn-primary">View Project</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'portfolio:portfolio_list' %}" class="btn btn-outline-primary btn-lg">View All Projects</a>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+{% if testimonials %}
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-4">Testimonials</h2>
+            <p class="lead">What people say about me</p>
+        </div>
+        <div class="row">
+            {% for testimonial in testimonials %}
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= testimonial.rating %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-warning"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <p class="card-text">"{{ testimonial.content|truncatewords:30 }}"</p>
+                        <div class="mt-3">
+                            <strong>{{ testimonial.name }}</strong>
+                            <br>
+                            <small class="text-muted">{{ testimonial.position }}{% if testimonial.company %}, {{ testimonial.company }}{% endif %}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Recent Blog Posts Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-4">Recent Blog Posts</h2>
+            <p class="lead">Latest articles and tutorials</p>
+        </div>
+        <div class="row">
+            {% for post in recent_posts %}
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+                <div class="card h-100 shadow-sm">
+                    <img src="{{ post.featured_image.url }}" class="card-img-top" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ post.title }}</h5>
+                        <p class="card-text text-muted">
+                            <small><i class="far fa-calendar-alt"></i> {{ post.created_at|date:"F j, Y" }}</small>
+                            <small class="ms-2"><i class="far fa-clock"></i> {{ post.read_time }} min read</small>
+                        </p>
+                        <p>{{ post.excerpt|truncatewords:20 }}</p>
+                        <a href="{% url 'portfolio:blog_detail' post.slug %}" class="btn btn-outline-primary">Read More</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'portfolio:blog_list' %}" class="btn btn-outline-primary btn-lg">View All Posts</a>
+        </div>
+    </div>
+</section>
+
+<!-- Contact CTA Section -->
+<section class="bg-primary text-white py-5">
+    <div class="container text-center" data-aos="zoom-in">
+        <h2 class="display-4">Let's Work Together</h2>
+        <p class="lead mb-4">Have a project in mind? Let's discuss and bring your ideas to life.</p>
+        <a href="{% url 'portfolio:contact' %}" class="btn btn-light btn-lg">Get In Touch</a>
+    </div>
+</section>
+{% endblock %}

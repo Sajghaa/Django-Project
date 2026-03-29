@@ -1,0 +1,109 @@
+{% extends 'portfolio/base.html' %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header bg-light py-5">
+    <div class="container text-center">
+        <h1 class="display-4" data-aos="fade-up">About Me</h1>
+        <p class="lead" data-aos="fade-up" data-aos-delay="100">Get to know me better</p>
+    </div>
+</section>
+
+<!-- About Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4" data-aos="fade-right">
+                {% if site_info.hero_image %}
+                    <img src="{{ site_info.hero_image.url }}" alt="About Me" class="img-fluid rounded shadow">
+                {% else %}
+                    <div class="bg-light text-center p-5 rounded">
+                        <i class="fas fa-user-circle fa-10x text-muted"></i>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <h2 class="mb-3">{{ site_info.site_name|default:"About Me" }}</h2>
+                <p class="lead">{{ site_info.site_tagline|default:"Creative Developer & Designer" }}</p>
+                <p>{{ site_info.about_text|default:"Write about yourself here. Share your journey, skills, and what makes you passionate about your work." }}</p>
+                
+                {% if site_info.resume_file %}
+                <div class="mt-4">
+                    <a href="{{ site_info.resume_file.url }}" class="btn btn-primary" download>
+                        <i class="fas fa-download"></i> Download Resume
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Skills Section -->
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-4">Technical Skills</h2>
+            <p class="lead">My proficiency in various technologies</p>
+        </div>
+        <div class="row">
+            {% for skill in skills %}
+            <div class="col-md-6 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+                <div class="d-flex justify-content-between mb-2">
+                    <span><i class="fas fa-code"></i> {{ skill.name }}</span>
+                    <span>{{ skill.percentage }}%</span>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: {{ skill.percentage }}%"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+{% if testimonials %}
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-4">What People Say</h2>
+            <p class="lead">Testimonials from clients and colleagues</p>
+        </div>
+        <div class="row">
+            {% for testimonial in testimonials %}
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= testimonial.rating %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-warning"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <p class="card-text">"{{ testimonial.content }}"</p>
+                        <hr>
+                        <div class="d-flex align-items-center">
+                            {% if testimonial.image %}
+                                <img src="{{ testimonial.image.url }}" alt="{{ testimonial.name }}" class="rounded-circle me-3" width="50" height="50">
+                            {% else %}
+                                <i class="fas fa-user-circle fa-3x me-3 text-muted"></i>
+                            {% endif %}
+                            <div>
+                                <strong>{{ testimonial.name }}</strong>
+                                <br>
+                                <small class="text-muted">{{ testimonial.position }}{% if testimonial.company %}, {{ testimonial.company }}{% endif %}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
