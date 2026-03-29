@@ -1,0 +1,189 @@
+{% extends 'portfolio/base.html' %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header bg-light py-5">
+    <div class="container text-center">
+        <h1 class="display-4" data-aos="fade-up">My Services</h1>
+        <p class="lead" data-aos="fade-up" data-aos-delay="100">What I can do for you</p>
+    </div>
+</section>
+
+<!-- Services List -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            {% for service in services %}
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+                <div class="card h-100 text-center shadow-sm hover-shadow">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="{{ service.icon }} fa-4x text-primary"></i>
+                        </div>
+                        <h3 class="card-title h4">{{ service.title }}</h3>
+                        <p class="card-text">{{ service.description }}</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pb-4">
+                        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#serviceModal{{ service.id }}">
+                            Learn More
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service Modal -->
+            <div class="modal fade" id="serviceModal{{ service.id }}" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title">{{ service.title }}</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="text-center mb-3">
+                                <i class="{{ service.icon }} fa-3x text-primary"></i>
+                            </div>
+                            <p>{{ service.description }}</p>
+                            <h6>What's included:</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Consultation & Planning</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Design & Development</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Testing & Quality Assurance</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Deployment & Launch</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> 30 Days Support</li>
+                            </ul>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="{% url 'portfolio:contact' %}" class="btn btn-primary">Request this Service</a>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p>No services added yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Work Process -->
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-4">My Work Process</h2>
+            <p class="lead">How I bring ideas to life</p>
+        </div>
+        <div class="row">
+            <div class="col-md-3 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="text-center">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-comments fa-3x"></i>
+                    </div>
+                    <h4>1. Discovery</h4>
+                    <p>Understanding your needs and requirements</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="text-center">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-pencil-ruler fa-3x"></i>
+                    </div>
+                    <h4>2. Design</h4>
+                    <p>Creating mockups and prototypes</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="text-center">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-code fa-3x"></i>
+                    </div>
+                    <h4>3. Development</h4>
+                    <p>Building and coding the solution</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="text-center">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-rocket fa-3x"></i>
+                    </div>
+                    <h4>4. Launch</h4>
+                    <p>Deploying and delivering the final product</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-4">Pricing Plans</h2>
+            <p class="lead">Choose the plan that fits your needs</p>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="card h-100 shadow-sm text-center">
+                    <div class="card-header bg-white">
+                        <h3>Basic</h3>
+                    </div>
+                    <div class="card-body">
+                        <h2 class="display-4">$499</h2>
+                        <p class="text-muted">One-time payment</p>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-check text-success"></i> 5 Pages Website</li>
+                            <li class="mb-2"><i class="fas fa-check text-success"></i> Responsive Design</li>
+                            <li class="mb-2"><i class="fas fa-check text-success"></i> Contact Form</li>
+                            <li class="mb-2"><i class="fas fa-times text-danger"></i> E-commerce</li>
+                            <li class="mb-2"><i class="fas fa-times text-danger"></i> CMS Integration</li>
+                        </ul>
+                        <a href="{% url 'portfolio:contact' %}" class="btn btn-outline-primary">Get Started</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="card h-100 shadow-sm text-center border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h3>Professional</h3>
+                        <small>Most Popular</small>
+                    </div>
+                    <div class="card-body">
+                        <h2 class="display-4">$999</h2>
+                        <p class="text-muted">One-time payment</p>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-check text-success"></i> 15 Pages Website</li>
+                            <li class="mb-2"><i class="fas fa-check text-success"></i> Responsive Design</li>
+                            <li class="mb-2"><i class="fas fa-check text-success"></i> Advanced Forms</li>
+                            <li class="mb-2"><i class="fas fa-check text-success"></i> Blog Integration</li>
+                            <li class="mb-2"><i class="fas fa-times text-danger"></i> E-commerce</li>
+                        </ul>
+                        <a href="{% url 'portfolio:contact' %}" class="btn btn-primary">Get Started</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="card h-100 shadow-sm text-center">
+                    <div class="card-header bg-white">
+                        <h3>Premium</h3>
+                    </div>
+                    <div class="card-body">
+                        <h2 class="display-4">$1999</h2>
+                        <p class="text-muted">One-time payment</p>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-check text-success"></i> Unlimited Pages</li>
+                            <li class="mb-2"><i class="fas fa-check text-success"></i> Responsive Design</li>
+                            <li class="mb-2"><i class="fas fa-check text-success"></i> E-commerce Ready</li>
+                            <li class="mb-2"><i class="fas fa-check text-success"></i> CMS Integration</li>
+                            <li class="mb-2"><i class="fas fa-check text-success"></i> SEO Optimized</li>
+                        </ul>
+                        <a href="{% url 'portfolio:contact' %}" class="btn btn-outline-primary">Get Started</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
