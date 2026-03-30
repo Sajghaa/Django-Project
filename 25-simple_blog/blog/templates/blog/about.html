@@ -1,0 +1,40 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}About - Simple Blog{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h1 class="display-5 mb-4">About This Blog</h1>
+                <div class="blog-content">
+                    <p>Welcome to the Simple Blog! This blog was created as a demonstration of a Django blog with pagination, search, and comment functionality.</p>
+                    
+                    <h3 class="mt-4">Features</h3>
+                    <ul>
+                        <li>📝 Create, edit, and delete blog posts (admin only)</li>
+                        <li>🔍 Search posts by title or content</li>
+                        <li>🏷️ Categories for organizing posts</li>
+                        <li>📄 Pagination for better navigation</li>
+                        <li>💬 Comment system for reader engagement</li>
+                        <li>📊 Post view counter</li>
+                        <li>📱 Responsive design with Bootstrap 5</li>
+                    </ul>
+                    
+                    <h3 class="mt-4">Technologies Used</h3>
+                    <ul>
+                        <li>Django 5.2 - Python Web Framework</li>
+                        <li>Bootstrap 5 - Frontend Framework</li>
+                        <li>SQLite - Database</li>
+                        <li>Font Awesome - Icons</li>
+                    </ul>
+                    
+                    <h3 class="mt-4">Contact</h3>
+                    <p>Have questions or suggestions? Feel free to reach out through the comment section on any post!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
