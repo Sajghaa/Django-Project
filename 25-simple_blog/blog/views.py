@@ -49,13 +49,13 @@ def home(request):
     search_query = ''
     selected_category = None
     selected_tag = None
-    order_by = '-published_at'
+    order_by = request.GET.get('order_by', '-published_at')  # Default value
     
     if form.is_valid():
         search_query = form.cleaned_data.get('q')
         selected_category = form.cleaned_data.get('category')
         selected_tag = form.cleaned_data.get('tag')
-        order_by = form.cleaned_data.get('order_by', '-published_at')
+        order_by = form.cleaned_data.get('order_by', '-published_at')  # Default if None
         
         if search_query:
             posts = posts.filter(
@@ -69,6 +69,11 @@ def home(request):
         
         if selected_tag:
             posts = posts.filter(tags=selected_tag)
+    
+    # Ensure order_by is valid
+    valid_order_fields = ['published_at', '-published_at', 'views', '-views', 'likes', '-likes', 'title', '-title']
+    if order_by not in valid_order_fields:
+        order_by = '-published_at'
     
     posts = posts.order_by(order_by)
     
@@ -243,7 +248,6 @@ def category_posts(request, slug):
     category = get_object_or_404(Category, slug=slug)
     posts = Post.objects.filter(category=category, status='published')
     
-    # Pagination
     paginator = Paginator(posts, 6)
     page = request.GET.get('page')
     
@@ -254,10 +258,14 @@ def category_posts(request, slug):
     except EmptyPage:
         posts = paginator.page(paginator.num_pages)
     
+    categories = Category.objects.annotate(
+        post_count=Count('posts', filter=Q(posts__status='published'))
+    ).filter(post_count__gt=0)
+    
     context = {
         'posts': posts,
         'category': category,
-        'categories': Category.objects.annotate(post_count=Count('posts')),
+        'categories': categories,
     }
     return render(request, 'blog/category_posts.html', context)
 
@@ -266,7 +274,6 @@ def tag_posts(request, slug):
     tag = get_object_or_404(Tag, slug=slug)
     posts = Post.objects.filter(tags=tag, status='published')
     
-    # Pagination
     paginator = Paginator(posts, 6)
     page = request.GET.get('page')
     
@@ -277,10 +284,14 @@ def tag_posts(request, slug):
     except EmptyPage:
         posts = paginator.page(paginator.num_pages)
     
+    popular_tags = Tag.objects.annotate(
+        post_count=Count('posts', filter=Q(posts__status='published'))
+    ).filter(post_count__gt=0).order_by('-post_count')[:10]
+    
     context = {
         'posts': posts,
         'tag': tag,
-        'popular_tags': Tag.objects.annotate(post_count=Count('posts')).filter(post_count__gt=0).order_by('-post_count')[:10],
+        'popular_tags': popular_tags,
     }
     return render(request, 'blog/tag_posts.html', context)
 
@@ -316,7 +327,7 @@ def search(request):
         q = form.cleaned_data.get('q')
         category = form.cleaned_data.get('category')
         tag = form.cleaned_data.get('tag')
-        order_by = form.cleaned_data.get('order_by')
+        order_by = form.cleaned_data.get('order_by', '-published_at')
         
         if q:
             posts = posts.filter(
@@ -333,6 +344,8 @@ def search(request):
         
         if order_by:
             posts = posts.order_by(order_by)
+        else:
+            posts = posts.order_by('-published_at')
     
     # Pagination
     paginator = Paginator(posts, 12)
