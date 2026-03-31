@@ -4,17 +4,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Simple Blog{% endblock %}</title>
+    <title>{% block title %}{{ site_info.title|default:"Simple Blog" }}{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}A simple blog built with Django featuring pagination, search, and comments.{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}django, blog, python, web development{% endblock %}">
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Prism.js for code highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
     
     <style>
+        :root {
+            --primary-color: #0d6efd;
+            --dark-bg: #1a1a2e;
+            --light-bg: #f8f9fa;
+        }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
+            background-color: var(--light-bg);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        main {
+            flex: 1;
         }
         
         .navbar-brand {
@@ -22,14 +39,41 @@
             font-size: 1.5rem;
         }
         
-        .card {
-            transition: transform 0.2s, box-shadow 0.2s;
+        .navbar-nav .nav-link {
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 5px;
+        }
+        
+        .dropdown-menu {
+            margin-top: 0.5rem;
             border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+        }
+        
+        .dropdown-item {
+            padding: 0.5rem 1.5rem;
+            transition: all 0.3s;
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .card {
+            border: none;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
         
         .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
         
         .blog-content {
@@ -41,32 +85,111 @@
             max-width: 100%;
             height: auto;
             border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+        
+        .blog-content pre {
+            background: #2d2d2d;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
             margin: 1rem 0;
         }
         
+        .blog-content code {
+            background: #f4f4f4;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .blog-content blockquote {
+            border-left: 4px solid var(--primary-color);
+            padding-left: 1.5rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: #666;
+        }
+        
         .pagination .page-link {
-            color: #0d6efd;
+            color: var(--primary-color);
         }
         
         .pagination .active .page-link {
-            background-color: #0d6efd;
-            border-color: #0d6efd;
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
             color: white;
         }
         
-        footer {
-            margin-top: auto;
+        .sidebar-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         
-        main {
-            min-height: calc(100vh - 200px);
+        .tag-cloud a {
+            display: inline-block;
+            margin: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            background: #e9ecef;
+            color: #495057;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .tag-cloud a:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .comment-reply {
+            margin-left: 2rem;
+            border-left: 2px solid #dee2e6;
+            padding-left: 1rem;
+        }
+        
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        
+        .reading-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), #00d2ff);
+            z-index: 9999;
+            transition: width 0.1s;
+        }
+        
+        @media (max-width: 768px) {
+            .blog-content {
+                font-size: 1rem;
+            }
+            
+            .comment-reply {
+                margin-left: 1rem;
+            }
         }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
+    <!-- Reading Progress Bar -->
+    <div id="readingProgress" class="reading-progress"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{% url 'blog:home' %}">
                 <i class="fas fa-blog"></i> Simple Blog
@@ -76,6 +199,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+                    <!-- Main Pages -->
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'blog:home' %}">
                             <i class="fas fa-home"></i> Home
@@ -86,29 +210,91 @@
                             <i class="fas fa-info-circle"></i> About
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'blog:search' %}">
+                            <i class="fas fa-search"></i> Search
+                        </a>
+                    </li>
+                    
+                    <!-- Admin Dropdown (only for superusers) -->
                     {% if user.is_superuser %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-cog"></i> Admin
+                            <i class="fas fa-cog"></i> Admin Panel
                         </a>
                         <ul class="dropdown-menu">
                             <li>
                                 <a class="dropdown-item" href="{% url 'blog:post_create' %}">
-                                    <i class="fas fa-plus"></i> New Post
+                                    <i class="fas fa-plus-circle"></i> Create New Post
                                 </a>
                             </li>
                             <li>
+                                <a class="dropdown-item" href="/admin/blog/category/">
+                                    <i class="fas fa-folder-plus"></i> Manage Categories
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/admin/blog/tag/">
+                                    <i class="fas fa-tags"></i> Manage Tags
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
                                 <a class="dropdown-item" href="/admin/">
-                                    <i class="fas fa-dashboard"></i> Django Admin
+                                    <i class="fas fa-dashboard"></i> Full Django Admin
                                 </a>
                             </li>
                         </ul>
                     </li>
                     {% endif %}
+                    
+                    <!-- Quick Links Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="quickLinksDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-link"></i> Quick Links
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'blog:home' %}">
+                                    <i class="fas fa-home"></i> Home
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'blog:about' %}">
+                                    <i class="fas fa-info-circle"></i> About
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'blog:search' %}">
+                                    <i class="fas fa-search"></i> Search
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="#categories-section">
+                                    <i class="fas fa-folder"></i> Categories
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#tags-section">
+                                    <i class="fas fa-tags"></i> Tags
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="#newsletter">
+                                    <i class="fas fa-envelope"></i> Newsletter
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>
     </nav>
+
+    <!-- Toast Container for Notifications -->
+    <div class="toast-container"></div>
 
     <!-- Main Content -->
     <main>
@@ -116,6 +302,7 @@
             {% if messages %}
                 {% for message in messages %}
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
@@ -128,14 +315,153 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-dark text-white py-4 mt-5">
-        <div class="container text-center">
-            <p class="mb-0">&copy; {% now "Y" %} Simple Blog. All rights reserved.</p>
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5><i class="fas fa-blog"></i> Simple Blog</h5>
+                    <p>A modern blog built with Django featuring pagination, search, comments, and more.</p>
+                    <div class="mt-3">
+                        <a href="#" class="text-white me-2"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white me-2"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-white me-2"><i class="fab fa-github"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'blog:home' %}" class="text-white-50 text-decoration-none">Home</a></li>
+                        <li><a href="{% url 'blog:about' %}" class="text-white-50 text-decoration-none">About</a></li>
+                        <li><a href="{% url 'blog:search' %}" class="text-white-50 text-decoration-none">Search</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Privacy Policy</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4" id="newsletter">
+                    <h5>Newsletter</h5>
+                    <p>Subscribe for updates and exclusive content</p>
+                    <form method="post" action="{% url 'blog:newsletter_subscribe' %}" class="d-flex">
+                        {% csrf_token %}
+                        <input type="email" name="email" class="form-control me-2" placeholder="Your email" required>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <hr class="bg-secondary">
+            <div class="text-center">
+                <small>&copy; {% now "Y" %} Simple Blog. All rights reserved. | Built with <i class="fas fa-heart text-danger"></i> Django</small>
+            </div>
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    
+    <script>
+        // Reading Progress Bar
+        window.addEventListener('scroll', function() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('readingProgress').style.width = scrolled + '%';
+        });
+        
+        // Back to Top Button
+        const backToTop = document.createElement('button');
+        backToTop.innerHTML = '<i class="fas fa-arrow-up"></i>';
+        backToTop.className = 'btn btn-primary rounded-circle position-fixed';
+        backToTop.style.bottom = '30px';
+        backToTop.style.right = '30px';
+        backToTop.style.display = 'none';
+        backToTop.style.width = '50px';
+        backToTop.style.height = '50px';
+        backToTop.style.zIndex = '999';
+        document.body.appendChild(backToTop);
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTop.style.display = 'block';
+            } else {
+                backToTop.style.display = 'none';
+            }
+        });
+        
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        
+        // Auto-hide alerts after 5 seconds
+        setTimeout(() => {
+            document.querySelectorAll('.alert').forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                setTimeout(() => bsAlert.close(), 5000);
+            });
+        }, 1000);
+        
+        // Like button AJAX
+        function likePost(slug) {
+            fetch(`/post/${slug}/like/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('likes-count').innerText = data.likes;
+                const likeBtn = document.getElementById('like-btn');
+                likeBtn.disabled = true;
+                likeBtn.innerHTML = '<i class="fas fa-heart"></i> Liked!';
+                showToast('You liked this post!', 'success');
+            });
+        }
+        
+        // Copy link function
+        function copyToClipboard() {
+            navigator.clipboard.writeText(window.location.href);
+            showToast('Link copied to clipboard!', 'success');
+        }
+        
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            const toastContainer = document.querySelector('.toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type} border-0 show`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            toastContainer.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
