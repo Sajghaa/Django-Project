@@ -108,3 +108,40 @@ class SearchForm(forms.Form):
         required=False,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
+
+class SearchForm(forms.Form):
+    q = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Search posts...'})
+    )
+    category = forms.ModelChoiceField(
+        queryset=Category.objects.all(),
+        required=False,
+        empty_label="All Categories",
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    tag = forms.ModelChoiceField(
+        queryset=Tag.objects.all(),
+        required=False,
+        empty_label="All Tags",
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    order_by = forms.ChoiceField(
+        choices=[
+            ('-published_at', 'Newest'),
+            ('published_at', 'Oldest'),
+            ('-views', 'Most Viewed'),
+            ('-likes', 'Most Liked'),
+        ],
+        required=False,
+        initial='-published_at',
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        # Ensure order_by has a default value
+        if not cleaned_data.get('order_by'):
+            cleaned_data['order_by'] = '-published_at'
+        return cleaned_data
