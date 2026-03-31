@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8">
+    <div class="col-lg-10">
         <div class="card shadow">
             <div class="card-header bg-primary text-white">
                 <h3 class="mb-0">{{ title }}</h3>
@@ -15,7 +15,7 @@
                     
                     {% for field in form %}
                     <div class="mb-3">
-                        <label for="{{ field.id_for_label }}" class="form-label">
+                        <label for="{{ field.id_for_label }}" class="form-label fw-bold">
                             {{ field.label }}
                             {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
                         </label>
@@ -24,7 +24,7 @@
                         <small class="form-text text-muted">{{ field.help_text }}</small>
                         {% endif %}
                         {% if field.errors %}
-                        <div class="text-danger">
+                        <div class="text-danger mt-1">
                             {% for error in field.errors %}
                                 <small><i class="fas fa-exclamation-circle"></i> {{ error }}</small><br>
                             {% endfor %}
@@ -33,8 +33,21 @@
                     </div>
                     {% endfor %}
                     
-                    <div class="d-flex justify-content-between">
-                        <a href="{% url 'blog:home' %}" class="btn btn-secondary">Cancel</a>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> <strong>Markdown Supported!</strong> You can use:
+                        <ul class="mb-0 mt-2">
+                            <li><code># Heading 1</code>, <code>## Heading 2</code> for headings</li>
+                            <li><code>**bold**</code> for bold text, <code>*italic*</code> for italic</li>
+                            <li><code>[Link text](url)</code> for links</li>
+                            <li><code>![Alt text](image-url)</code> for images</li>
+                            <li><code>```python\ncode\n```</code> for code blocks</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'blog:home' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save"></i> {{ title }}
                         </button>
@@ -44,4 +57,23 @@
         </div>
     </div>
 </div>
+
+<style>
+    /* Style for form fields */
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.25);
+    }
+    
+    textarea.form-control {
+        font-family: monospace;
+        font-size: 14px;
+    }
+</style>
 {% endblock %}
