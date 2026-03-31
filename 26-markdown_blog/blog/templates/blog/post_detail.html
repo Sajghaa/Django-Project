@@ -1,0 +1,67 @@
+{% extends 'blog/base.html' %}
+{% block title %}{{ post.title }} - Markdown Blog{% endblock %}
+
+{% block content %}
+<article>
+    <div class="row">
+        <div class="col-md-8">
+            <h1 class="mb-3">{{ post.title }}</h1>
+            <p class="text-muted">
+                By {{ post.author.username }} | 
+                {{ post.published_at|date:"F j, Y" }} | 
+                Category: <a href="{{ post.category.get_absolute_url }}">{{ post.category.name }}</a> |
+                Views: {{ post.views }}
+            </p>
+            
+            {% if post.featured_image %}
+            <img src="{{ post.featured_image.url }}" class="img-fluid mb-4" alt="{{ post.title }}">
+            {% endif %}
+            
+            <div class="markdown-content">
+                {{ markdown_content|safe }}
+            </div>
+            
+            {% if user == post.author %}
+            <div class="mt-4">
+                <a href="{% url 'blog:post_update' post.pk %}" class="btn btn-warning">Edit Post</a>
+                <a href="{% url 'blog:post_delete' post.pk %}" class="btn btn-danger">Delete Post</a>
+            </div>
+            {% endif %}
+            
+            <hr>
+            
+            <h3>Comments ({{ comments.count }})</h3>
+            {% for comment in comments %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">{{ comment.name }} - {{ comment.created_at|date:"F j, Y" }}</h6>
+                    <p class="card-text">{{ comment.content }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <p>No comments yet.</p>
+            {% endfor %}
+            
+            <h4>Leave a Comment</h4>
+            <form method="post">
+                {% csrf_token %}
+                {{ comment_form.as_p }}
+                <button type="submit" class="btn btn-primary">Submit Comment</button>
+            </form>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Table of Contents</h4>
+                </div>
+                <div class="card-body">
+                    <div class="toc">
+                        {{ markdown_content|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</article>
+{% endblock %}
