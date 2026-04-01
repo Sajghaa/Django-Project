@@ -1,0 +1,1 @@
+Personal notes taking application for creating, editing, and organizing notes with rich text support.
