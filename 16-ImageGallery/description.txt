@@ -1,0 +1,1 @@
+Image gallery app for uploading, viewing, tagging, and sharing images in a grid layout.

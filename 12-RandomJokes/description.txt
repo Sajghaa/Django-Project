@@ -1,0 +1,1 @@
+Random jokes generator pulling from API or database, categorized by type with favorites feature.
