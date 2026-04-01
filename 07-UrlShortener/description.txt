@@ -1,0 +1,1 @@
+URL shortening service generating short links with click tracking, QR codes, and analytics dashboard.
