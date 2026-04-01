@@ -1,0 +1,1 @@
+Contact form handler with form validation, email sending capabilities, and admin dashboard for submissions.
