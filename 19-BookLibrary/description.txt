@@ -1,0 +1,1 @@
+Digital book library manager with book catalog, borrowing system, search, and recommendations.

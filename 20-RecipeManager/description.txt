@@ -1,0 +1,1 @@
+Recipe management system for storing, searching, rating, and sharing cooking recipes with ingredients lists.

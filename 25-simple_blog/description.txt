@@ -1,0 +1,1 @@
+Minimalist blog engine with post creation, markdown support, and RSS feed generation.

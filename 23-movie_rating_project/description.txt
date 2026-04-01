@@ -1,0 +1,1 @@
+Movie rating and review platform allowing users to rate, review movies, and see top-rated lists.

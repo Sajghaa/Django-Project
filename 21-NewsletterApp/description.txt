@@ -1,0 +1,1 @@
+Newsletter subscription app with email collection, admin management, and Mailchimp integration.

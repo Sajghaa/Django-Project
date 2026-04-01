@@ -1,0 +1,1 @@
+Employee CRUD application for managing staff records, departments, salaries, and search filters.

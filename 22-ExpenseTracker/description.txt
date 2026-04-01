@@ -1,0 +1,1 @@
+Personal expense tracking tool categorizing spends, generating reports, and budget planning.
