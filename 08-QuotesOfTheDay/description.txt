@@ -1,0 +1,1 @@
+Daily inspirational quotes application displaying random or scheduled quotes with categories and favorites.
