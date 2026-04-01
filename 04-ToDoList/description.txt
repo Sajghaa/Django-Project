@@ -1,0 +1,1 @@
+Task management ToDo list app allowing users to create, edit, delete, and mark tasks as complete.
