@@ -1,0 +1,1 @@
+Simple blog application with CRUD operations for posts, categories, comments, and search functionality.
