@@ -1,0 +1,1 @@
+Personal portfolio website built with Django showcasing projects, skills, and contact information with responsive design.
