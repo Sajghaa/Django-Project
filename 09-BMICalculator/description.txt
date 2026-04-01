@@ -1,0 +1,1 @@
+Body Mass Index (BMI) calculator tool with health category analysis and personalized recommendations.
