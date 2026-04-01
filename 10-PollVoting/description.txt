@@ -1,0 +1,1 @@
+Interactive polling and voting application where users can create polls, vote, and view real-time results.
