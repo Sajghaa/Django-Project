@@ -3,6 +3,8 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q, Sum
+from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth.forms import AuthenticationForm
 from .models import Employee, Department, Position
 from .forms import EmployeeForm, EmployeeSearchForm
 
@@ -117,3 +119,30 @@ def employee_delete(request, pk):
         return redirect('employees:employee_list')
     
     return render(request, 'employees/employee_confirm_delete.html', {'employee': employee})
+
+
+def login_view(request):
+    """Custom login view"""
+    if request.user.is_authenticated:
+        return redirect('employees:employee_list')
+    
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            
+            if user is not None:
+                auth_login(request, user)
+                messages.success(request, f'Welcome back, {username}!')
+                next_url = request.GET.get('next', 'employees:employee_list')
+                return redirect(next_url)
+            else:
+                messages.error(request, 'Invalid username or password.')
+        else:
+            messages.error(request, 'Invalid username or password.')
+    else:
+        form = AuthenticationForm()
+    
+    return render(request, 'employees/login.html', {'form': form})
