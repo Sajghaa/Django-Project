@@ -1,0 +1,62 @@
+{% extends 'employees/base.html' %}
+
+{% block title %}Login - Employee Management{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center">
+                <h3 class="mb-0">
+                    <i class="fas fa-sign-in-alt"></i> Employee Login
+                </h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" name="username" id="username" class="form-control" required autofocus>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" name="password" id="password" class="form-control" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </form>
+                
+                <hr>
+                
+                <div class="text-center">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle"></i> Demo credentials:<br>
+                        <strong>Username:</strong> admin<br>
+                        <strong>Password:</strong> admin123
+                    </small>
+                </div>
+                
+                <div class="text-center mt-3">
+                    <a href="{% url 'employees:employee_list' %}" class="btn btn-link">
+                        <i class="fas fa-home"></i> Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body text-center">
+                <h6><i class="fas fa-lock"></i> Access Information</h6>
+                <p class="small text-muted mb-0">
+                    Only authorized personnel can access the employee management system.<br>
+                    Contact your administrator if you need access.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
