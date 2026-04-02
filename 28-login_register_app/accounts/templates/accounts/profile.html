@@ -1,0 +1,114 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="dashboard-card text-center">
+            {% if user.profile_picture %}
+            <img src="{{ user.profile_picture.url }}" alt="Profile" class="profile-avatar mb-3">
+            {% else %}
+            <div class="profile-avatar bg-primary d-flex align-items-center justify-content-center mx-auto mb-3">
+                <i class="fas fa-user fa-4x text-white"></i>
+            </div>
+            {% endif %}
+            <h3>{{ user.get_full_name }}</h3>
+            <p class="text-muted">@{{ user.username }}</p>
+            <p class="text-muted">{{ user.email }}</p>
+            
+            <div class="d-grid gap-2 mt-3">
+                <a href="{% url 'accounts:profile_edit' %}" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </a>
+                <a href="{% url 'accounts:change_password' %}" class="btn btn-outline-warning">
+                    <i class="fas fa-key"></i> Change Password
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="dashboard-card">
+            <h4><i class="fas fa-user"></i> Personal Information</h4>
+            <hr>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="text-muted">Full Name</label>
+                    <p class="fw-bold">{{ user.get_full_name|default:"Not provided" }}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="text-muted">Username</label>
+                    <p class="fw-bold">{{ user.username }}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="text-muted">Email</label>
+                    <p>{{ user.email }}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="text-muted">Phone</label>
+                    <p>{{ user.phone|default:"Not provided" }}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="text-muted">Date of Birth</label>
+                    <p>{{ user.date_of_birth|default:"Not provided" }}</p>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label class="text-muted">Bio</label>
+                    <p>{{ user.bio|default:"No bio provided" }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="dashboard-card mt-4">
+            <h4><i class="fas fa-map-marker-alt"></i> Address Information</h4>
+            <hr>
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <label class="text-muted">Address</label>
+                    <p>{{ user.address|default:"Not provided" }}</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="text-muted">City</label>
+                    <p>{{ user.city|default:"Not provided" }}</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="text-muted">State</label>
+                    <p>{{ user.state|default:"Not provided" }}</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="text-muted">ZIP Code</label>
+                    <p>{{ user.zip_code|default:"Not provided" }}</p>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label class="text-muted">Country</label>
+                    <p>{{ user.country|default:"Not provided" }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="dashboard-card mt-4">
+            <h4><i class="fas fa-link"></i> Social Links</h4>
+            <hr>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="text-muted">Website</label>
+                    <p>{% if user.website %}<a href="{{ user.website }}" target="_blank">{{ user.website }}</a>{% else %}Not provided{% endif %}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="text-muted">GitHub</label>
+                    <p>{% if user.github %}<a href="{{ user.github }}" target="_blank">{{ user.github }}</a>{% else %}Not provided{% endif %}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="text-muted">LinkedIn</label>
+                    <p>{% if user.linkedin %}<a href="{{ user.linkedin }}" target="_blank">{{ user.linkedin }}</a>{% else %}Not provided{% endif %}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="text-muted">Twitter</label>
+                    <p>{% if user.twitter %}<a href="{{ user.twitter }}" target="_blank">{{ user.twitter }}</a>{% else %}Not provided{% endif %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

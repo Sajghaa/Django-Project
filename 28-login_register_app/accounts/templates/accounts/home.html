@@ -1,0 +1,61 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Welcome - Login/Register App{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-8 text-center">
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fas fa-rocket fa-4x mb-3"></i>
+                <h1 class="display-4 mb-3">Welcome to AuthApp</h1>
+                <p class="lead mb-0">A complete authentication system with registration, login, profile management, and password reset</p>
+            </div>
+            <div class="auth-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="dashboard-card text-center">
+                            <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
+                            <h4>New User?</h4>
+                            <p>Create an account to get started</p>
+                            <a href="{% url 'accounts:register' %}" class="btn btn-primary">
+                                Register Now <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="dashboard-card text-center">
+                            <i class="fas fa-sign-in-alt fa-3x text-success mb-3"></i>
+                            <h4>Existing User?</h4>
+                            <p>Sign in to your account</p>
+                            <a href="{% url 'accounts:login' %}" class="btn btn-success">
+                                Login Now <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <i class="fas fa-lock fa-2x text-primary mb-2"></i>
+                        <h6>Secure Authentication</h6>
+                        <small class="text-muted">Protected with industry-standard security</small>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <i class="fas fa-envelope fa-2x text-primary mb-2"></i>
+                        <h6>Email Verification</h6>
+                        <small class="text-muted">Verify your email for added security</small>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <i class="fas fa-key fa-2x text-primary mb-2"></i>
+                        <h6>Password Reset</h6>
+                        <small class="text-muted">Easy password recovery process</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
