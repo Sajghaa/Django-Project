@@ -1,0 +1,171 @@
+{% extends 'employees/base.html' %}
+
+{% block title %}{{ employee.get_full_name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'employees:employee_list' %}">Employees</a></li>
+                <li class="breadcrumb-item active">{{ employee.get_full_name }}</li>
+            </ol>
+        </nav>
+        
+        <div class="row">
+            <!-- Profile Section -->
+            <div class="col-md-4 mb-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        {% if employee.profile_picture %}
+                        <img src="{{ employee.profile_picture.url }}" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                        {% else %}
+                        <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 150px; height: 150px;">
+                            <i class="fas fa-user fa-4x text-white"></i>
+                        </div>
+                        {% endif %}
+                        <h3>{{ employee.get_full_name }}</h3>
+                        <p class="text-muted">{{ employee.employee_id }}</p>
+                        <div class="mb-3">
+                            <span class="status-badge {% if employee.is_active %}status-active{% else %}status-inactive{% endif %}">
+                                {{ employee.is_active|yesno:"Active,Inactive" }}
+                            </span>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'employees:employee_edit' employee.pk %}" class="btn btn-warning">
+                                <i class="fas fa-edit"></i> Edit Employee
+                            </a>
+                            <a href="{% url 'employees:employee_delete' employee.pk %}" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Delete Employee
+                            </a>
+                            <a href="{% url 'employees:employee_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to List
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Details Section -->
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-user"></i> Personal Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted">Full Name</label>
+                                <p class="fw-bold">{{ employee.get_full_name }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted">Employee ID</label>
+                                <p class="fw-bold"><code>{{ employee.employee_id }}</code></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted">Email</label>
+                                <p><a href="mailto:{{ employee.email }}">{{ employee.email }}</a></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted">Phone</label>
+                                <p>{{ employee.phone }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted">Gender</label>
+                                <p>{{ employee.get_gender_display }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted">Date of Birth</label>
+                                <p>{{ employee.date_of_birth }} ({{ employee.age }} years)</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted">Marital Status</label>
+                                <p>{{ employee.get_marital_status_display }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-map-marker-alt"></i> Address Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>{{ employee.address }}</p>
+                        <p>{{ employee.city }}, {{ employee.state }} {{ employee.zip_code }}</p>
+                        <p>{{ employee.country }}</p>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-briefcase"></i> Employment Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted">Department</label>
+                                <p class="fw-bold">{{ employee.department.name|default:"-" }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted">Position</label>
+                                <p class="fw-bold">{{ employee.position.title|default:"-" }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted">Employment Status</label>
+                                <p>{{ employee.get_employment_status_display }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted">Hire Date</label>
+                                <p>{{ employee.hire_date }} ({{ employee.experience_years }} years)</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted">Salary</label>
+                                <p class="fw-bold text-success">${{ employee.salary|floatformat:2 }}/year</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted">Manager</label>
+                                <p>{{ employee.manager.get_full_name|default:"-" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-graduation-cap"></i> Qualifications</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="text-muted">Skills</label>
+                            <p>{{ employee.skills|linebreaks|default:"-" }}</p>
+                        </div>
+                        <div>
+                            <label class="text-muted">Education</label>
+                            <p>{{ employee.education|linebreaks|default:"-" }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-clock"></i> System Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="text-muted">Created</label>
+                                <p>{{ employee.created_at|date:"F j, Y, g:i a" }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-muted">Last Updated</label>
+                                <p>{{ employee.updated_at|date:"F j, Y, g:i a" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
