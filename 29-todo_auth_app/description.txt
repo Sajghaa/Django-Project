@@ -1,0 +1,1 @@
+This is a Django web application for managing todos with user authentication. Users can register, log in, view todo lists, and see todo details. Includes SQLite database, custom todos app with models/views/forms/templates, and static/media files.
