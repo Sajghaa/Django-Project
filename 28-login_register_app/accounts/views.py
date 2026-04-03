@@ -23,26 +23,10 @@ def register(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.is_active = True
-            user.email_verified = False
+            user.email_verified = True  # Set to True automatically
             user.save()
             
-            # Generate email verification token
-            token = user.generate_verification_token()
-            
-            # Send verification email
-            verification_url = request.build_absolute_uri(
-                reverse('accounts:verify_email', kwargs={'token': token})
-            )
-            
-            send_mail(
-                subject='Verify Your Email Address',
-                message=f'Hello {user.username},\n\nPlease click the link below to verify your email address:\n\n{verification_url}\n\nThank you for registering!',
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
-                fail_silently=True,
-            )
-            
-            messages.success(request, 'Registration successful! Please check your email to verify your account.')
+            messages.success(request, 'Registration successful! You can now log in.')
             return redirect('accounts:login')
     else:
         form = RegistrationForm()
