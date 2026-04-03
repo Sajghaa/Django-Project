@@ -38,12 +38,7 @@
 | 26 | [26-markdown_blog](26-markdown_blog) | Markdown-powered blog with syntax highlighting, tags, comments, and preview functionality. | Completed | ✅ |
 | 27 | [27-EmployeesCrud](27-EmployeesCrud) | Employee CRUD application for managing staff records, departments, salaries, and search filters. | Completed | ✅ |
 | 28 | [28-login_register_app](28-login_register_app) | Simple, beginner-friendly project demonstrating Django's built-in auth system.
-
-This is a Django web application focused on user authentication. Key features include:
-
-User Registration: Allows new users to create accounts with secure password hashing.
-User Login/Logout: Handles authentication sessions with login/logout functionality.
-Account Management: Likely includes profile views or basic user dashboard via the accounts/ app. | Completed | ✅ |
+This is a Django web application focused on user authentication. | Completed | ✅ |
 | 29 | [29-todo_auth_app](29-todo_auth_app) | This is a Django web application for managing todos with user authentication. Users can register, log in, view todo lists, and see todo details. Includes SQLite database, custom todos app with models/views/forms/templates, and static/media files. | Completed | ✅ |
 
 ---
