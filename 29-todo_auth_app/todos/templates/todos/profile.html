@@ -1,0 +1,76 @@
+{% extends 'todos/base.html' %}
+
+{% block title %}Profile - TodoApp{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-user-circle fa-5x text-primary mb-3"></i>
+                <h3>{{ user.username }}</h3>
+                <p class="text-muted">{{ user.email }}</p>
+                <p class="text-muted">Member since: {{ user.date_joined|date:"F j, Y" }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-line"></i> Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="text-muted">Total Tasks</label>
+                            <h3>{{ stats.total_tasks }}</h3>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Completed Tasks</label>
+                            <h3 class="text-success">{{ stats.completed_tasks }}</h3>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Pending Tasks</label>
+                            <h3 class="text-warning">{{ stats.pending_tasks }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="text-muted">Categories</label>
+                            <h3>{{ stats.categories }}</h3>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Completion Rate</label>
+                            <h3 class="text-info">{{ stats.completion_rate }}%</h3>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-success" style="width: {{ stats.completion_rate }}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-history"></i> Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                {% for activity in recent_activity %}
+                <div class="mb-3 pb-2 border-bottom">
+                    <div class="d-flex justify-content-between">
+                        <strong>{{ activity.action }}</strong>
+                        <small class="text-muted">{{ activity.created_at|timesince }} ago</small>
+                    </div>
+                    <p class="mb-0">{{ activity.new_value|truncatechars:100 }}</p>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center">No recent activity.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
