@@ -1,0 +1,63 @@
+{% extends 'todos/base.html' %}
+
+{% block title %}{{ todo.title }} - TodoApp{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">{{ todo.title }}</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h5>Description</h5>
+                    <p>{{ todo.description|default:"No description provided." }}</p>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong><i class="fas fa-tag"></i> Category:</strong> {{ todo.category.name|default:"Uncategorized" }}</p>
+                        <p><strong><i class="fas fa-flag"></i> Priority:</strong> 
+                            <span class="badge bg-{{ todo.priority_color }}">{{ todo.get_priority_display }}</span>
+                        </p>
+                        <p><strong><i class="fas fa-calendar"></i> Created:</strong> {{ todo.created_at|date:"M d, Y H:i" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong><i class="fas fa-chart-line"></i> Status:</strong> 
+                            <span class="badge bg-{{ todo.status_color }}">{{ todo.get_status_display }}</span>
+                        </p>
+                        <p><strong><i class="fas fa-clock"></i> Due Date:</strong> 
+                            {{ todo.due_date|date:"M d, Y H:i"|default:"Not set" }}
+                        </p>
+                        {% if todo.completed_at %}
+                        <p><strong><i class="fas fa-check-circle"></i> Completed:</strong> {{ todo.completed_at|date:"M d, Y H:i" }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'todos:todo_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                    <div>
+                        {% if todo.status != 'completed' %}
+                        <a href="{% url 'todos:todo_complete' todo.pk %}" class="btn btn-success">
+                            <i class="fas fa-check"></i> Mark Complete
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'todos:todo_edit' todo.pk %}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a href="{% url 'todos:todo_delete' todo.pk %}" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Delete
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
