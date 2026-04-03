@@ -1,8 +1,3 @@
 
 Simple, beginner-friendly project demonstrating Django's built-in auth system.
-
-This is a Django web application focused on user authentication. Key features include:
-
-User Registration: Allows new users to create accounts with secure password hashing.
-User Login/Logout: Handles authentication sessions with login/logout functionality.
-Account Management: Likely includes profile views or basic user dashboard via the accounts/ app.
+This is a Django web application focused on user authentication. 
