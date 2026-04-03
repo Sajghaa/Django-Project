@@ -1,0 +1,167 @@
+{% extends 'todos/base.html' %}
+
+{% block title %}My Tasks - TodoApp{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-tasks"></i> My Tasks</h1>
+            <a href="{% url 'todos:todo_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add New Task
+            </a>
+        </div>
+        
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-list text-primary"></i>
+                    <h3>{{ stats.total }}</h3>
+                    <p>Total Tasks</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-check-circle text-success"></i>
+                    <h3>{{ stats.completed }}</h3>
+                    <p>Completed</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-clock text-warning"></i>
+                    <h3>{{ stats.pending }}</h3>
+                    <p>Pending</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-exclamation-triangle text-danger"></i>
+                    <h3>{{ stats.overdue }}</h3>
+                    <p>Overdue</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filters -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <input type="text" name="search" class="form-control" placeholder="Search tasks..." value="{{ search_query }}">
+                    </div>
+                    <div class="col-md-2">
+                        <select name="status" class="form-control">
+                            <option value="">All Status</option>
+                            <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="in_progress" {% if status_filter == 'in_progress' %}selected{% endif %}>In Progress</option>
+                            <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select name="priority" class="form-control">
+                            <option value="">All Priority</option>
+                            <option value="low" {% if priority_filter == 'low' %}selected{% endif %}>Low</option>
+                            <option value="medium" {% if priority_filter == 'medium' %}selected{% endif %}>Medium</option>
+                            <option value="high" {% if priority_filter == 'high' %}selected{% endif %}>High</option>
+                            <option value="urgent" {% if priority_filter == 'urgent' %}selected{% endif %}>Urgent</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="category" class="form-control">
+                            <option value="">All Categories</option>
+                            {% for cat in categories %}
+                            <option value="{{ cat.slug }}" {% if category_filter == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">Filter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Todo List -->
+        {% for todo in todos %}
+        <div class="card mb-3 todo-item priority-{{ todo.priority }}">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-7">
+                        <h5 class="card-title {% if todo.status == 'completed' %}text-decoration-line-through{% endif %}">
+                            {{ todo.title }}
+                        </h5>
+                        <p class="card-text text-muted mb-1">
+                            <small>
+                                <i class="fas fa-tag"></i> {{ todo.category.name|default:"Uncategorized" }} |
+                                <i class="fas fa-flag"></i> {{ todo.get_priority_display }} |
+                                <i class="fas fa-calendar"></i> Due: {{ todo.due_date|date:"M d, Y"|default:"No date" }}
+                            </small>
+                        </p>
+                        {% if todo.is_overdue %}
+                        <span class="badge bg-danger">Overdue!</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-5 text-end">
+                        <span class="badge bg-{{ todo.status_color }} me-2">{{ todo.get_status_display }}</span>
+                        
+                        {% if todo.status != 'completed' %}
+                        <a href="{% url 'todos:todo_complete' todo.pk %}" class="btn btn-sm btn-success">
+                            <i class="fas fa-check"></i> Complete
+                        </a>
+                        {% endif %}
+                        
+                        <a href="{% url 'todos:todo_detail' todo.pk %}" class="btn btn-sm btn-info">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                        <a href="{% url 'todos:todo_edit' todo.pk %}" class="btn btn-sm btn-warning">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a href="{% url 'todos:todo_delete' todo.pk %}" class="btn btn-sm btn-danger">
+                            <i class="fas fa-trash"></i> Delete
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-5">
+            <i class="fas fa-check-circle fa-4x text-muted mb-3"></i>
+            <h3>No tasks yet</h3>
+            <p>Create your first task to get started!</p>
+            <a href="{% url 'todos:todo_create' %}" class="btn btn-primary">Create Task</a>
+        </div>
+        {% endfor %}
+        
+        <!-- Pagination -->
+        {% if todos.has_other_pages %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if todos.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ todos.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+                        Previous
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% for num in todos.paginator.page_range %}
+                <li class="page-item {% if todos.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+                </li>
+                {% endfor %}
+                
+                {% if todos.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ todos.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+                        Next
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
