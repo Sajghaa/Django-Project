@@ -99,8 +99,8 @@ class LoginForm(AuthenticationForm):
     def confirm_login_allowed(self, user):
         if not user.is_active:
             raise ValidationError('This account is inactive.', code='inactive')
-        if not user.email_verified:
-            raise ValidationError('Please verify your email before logging in.', code='email_not_verified')
+        #if not user.email_verified:
+         #   raise ValidationError('Please verify your email before logging in.', code='email_not_verified')
 
 class UserProfileForm(forms.ModelForm):
     """User Profile Edit Form"""
