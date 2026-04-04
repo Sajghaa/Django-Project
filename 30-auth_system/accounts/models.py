@@ -5,6 +5,7 @@ from django.core.validators import RegexValidator
 from .managers import CustomUserManager
 import random
 import string
+from datetime import timedelta  
 
 class User(AbstractBaseUser, PermissionsMixin):
     """
@@ -133,7 +134,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         """Increment failed login attempts"""
         self.login_attempts += 1
         if self.login_attempts >= 5:
-            self.locked_until = timezone.now() + timezone.timedelta(minutes=30)
+            self.locked_until = timezone.now() + timedelta(minutes=30)
         self.save()
     
     def reset_login_attempts(self):
