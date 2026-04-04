@@ -1,0 +1,23 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Verification Email Sent{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card text-center">
+            <div class="card-body p-5">
+                <i class="fas fa-envelope fa-4x text-primary mb-4"></i>
+                <h3>Check Your Email</h3>
+                <p>We've sent a verification link to your email address.</p>
+                <p class="text-muted">Please check your inbox and click the link to verify your account.</p>
+                <hr>
+                <p class="small text-muted">Didn't receive the email? 
+                    <a href="{% url 'accounts:resend_verification' %}">Click here to resend</a>
+                </p>
+                <a href="{% url 'accounts:login' %}" class="btn btn-primary">Back to Login</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

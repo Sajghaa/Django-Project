@@ -1,0 +1,60 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card text-center">
+            <div class="card-body">
+                {% if user.profile_picture %}
+                <img src="{{ user.profile_picture.url }}" class="profile-avatar mb-3">
+                {% else %}
+                <div class="profile-avatar bg-primary d-flex align-items-center justify-content-center mx-auto mb-3">
+                    <i class="fas fa-user fa-4x text-white"></i>
+                </div>
+                {% endif %}
+                <h3>{{ user.get_full_name|default:user.username }}</h3>
+                <p class="text-muted">{{ user.email }}</p>
+                <p class="text-muted">Member since: {{ user.date_joined|date:"F j, Y" }}</p>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'accounts:profile_edit' %}" class="btn btn-primary">Edit Profile</a>
+                    <a href="{% url 'accounts:change_password' %}" class="btn btn-outline-warning">Change Password</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Personal Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted">Full Name</label>
+                        <p>{{ user.get_full_name|default:"Not provided" }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted">Username</label>
+                        <p>{{ user.username }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted">Email</label>
+                        <p>{{ user.email }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted">Phone</label>
+                        <p>{{ user.phone|default:"Not provided" }}</p>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label class="text-muted">Bio</label>
+                        <p>{{ user.bio|default:"No bio provided" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

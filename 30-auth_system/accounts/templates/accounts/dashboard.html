@@ -1,0 +1,133 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Dashboard - Auth System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card text-center mb-4">
+            <div class="card-body">
+                <h1 class="display-4">Welcome, {{ user.get_full_name|default:user.username }}! 👋</h1>
+                <p class="lead">You are logged into your account.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-user-circle fa-4x text-primary mb-3"></i>
+                <h4>Profile</h4>
+                <p>View and manage your profile information</p>
+                <a href="{% url 'accounts:profile' %}" class="btn btn-outline-primary">
+                    View Profile <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-edit fa-4x text-success mb-3"></i>
+                <h4>Edit Profile</h4>
+                <p>Update your personal information</p>
+                <a href="{% url 'accounts:profile_edit' %}" class="btn btn-outline-success">
+                    Edit Profile <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-key fa-4x text-warning mb-3"></i>
+                <h4>Security</h4>
+                <p>Change your password</p>
+                <a href="{% url 'accounts:change_password' %}" class="btn btn-outline-warning">
+                    Change Password <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Account Information</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="35%">Email:</th>
+                        <td>{{ user.email }}</td>
+                    </tr>
+                    <tr>
+                        <th>Username:</th>
+                        <td>{{ user.username }}</td>
+                    </tr>
+                    <tr>
+                        <th>Full Name:</th>
+                        <td>{{ user.get_full_name|default:"Not provided" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Account Type:</th>
+                        <td><span class="badge bg-primary">{{ user.get_account_type_display }}</span></td>
+                    </tr>
+                    <tr>
+                        <th>Email Verified:</th>
+                        <td>
+                            {% if user.email_verified %}
+                            <span class="badge bg-success"><i class="fas fa-check"></i> Verified</span>
+                            {% else %}
+                            <span class="badge bg-warning"><i class="fas fa-times"></i> Not Verified</span>
+                            <a href="{% url 'accounts:resend_verification' %}" class="btn btn-link btn-sm">Resend</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Member Since:</th>
+                        <td>{{ user.date_joined|date:"F j, Y" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Last Login:</th>
+                        <td>{{ user.last_login|date:"F j, Y g:i A" }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-history"></i> Recent Login History</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for login in recent_logins %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <i class="fas fa-clock"></i> {{ login.login_time|date:"M d, Y H:i" }}
+                            </div>
+                            <div>
+                                <i class="fas fa-map-marker-alt"></i> {{ login.ip_address }}
+                            </div>
+                        </div>
+                        <small class="text-muted">{{ login.user_agent|truncatechars:60 }}</small>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted text-center">No login history available.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
