@@ -2,7 +2,7 @@
 
 > A curated collection of Django projects demonstrating Django mastery through real-world applications.
 
-**Progress:** 29 / 100 completed
+**Progress:** 30 / 100 completed
 
 ---
 
@@ -40,6 +40,7 @@
 | 28 | [28-login_register_app](28-login_register_app) | Simple, beginner-friendly project demonstrating Django's built-in auth system.
 This is a Django web application focused on user authentication. | Completed | ✅ |
 | 29 | [29-todo_auth_app](29-todo_auth_app) | This is a Django web application for managing todos with user authentication. Users can register, log in, view todo lists, and see todo details. Includes SQLite database, custom todos app with models/views/forms/templates, and static/media files. | Completed | ✅ |
+| 30 | [30-auth_system](30-auth_system) | No description yet | Completed | ✅ |
 
 ---
 
