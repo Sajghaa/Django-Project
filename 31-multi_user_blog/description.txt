@@ -1,0 +1,1 @@
+A simple a Multi-User Blog where authors can create, edit, and manage their own posts, and readers can read and comment.
