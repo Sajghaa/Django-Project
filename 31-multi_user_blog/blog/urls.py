@@ -12,16 +12,16 @@ urlpatterns = [
     path('login/', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),
     
-    # Posts
-    path('posts/', views.post_list, name='post_list'),
-    path('post/<slug:slug>/', views.post_detail, name='post_detail'),
+    # Post URLs - SPECIFIC patterns FIRST
     path('post/create/', views.post_create, name='post_create'),
     path('post/<slug:slug>/edit/', views.post_edit, name='post_edit'),
     path('post/<slug:slug>/delete/', views.post_delete, name='post_delete'),
-    
-    # Interactions
     path('post/<slug:slug>/like/', views.like_post, name='like_post'),
     path('post/<slug:slug>/bookmark/', views.bookmark_post, name='bookmark_post'),
+    path('post/<slug:slug>/', views.post_detail, name='post_detail'),
+    
+    # Posts list
+    path('posts/', views.post_list, name='post_list'),
     
     # User Dashboard
     path('dashboard/', views.dashboard, name='dashboard'),
