@@ -1,0 +1,203 @@
+{% load static %}
+<div class="comments-section">
+    <h4 class="mb-4">
+        <i class="fas fa-comments"></i> 
+        Comments ({{ comments|length }})
+    </h4>
+
+    <!-- Comment Form -->
+    {% if user.is_authenticated %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Leave a Comment</h5>
+            <form method="post" action="{% url 'comments:add_comment' content_type object_id %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <textarea name="content" class="form-control" rows="3" placeholder="Write your comment..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Post Comment
+                </button>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <a href="/admin/login/?next={{ request.path }}">Login</a> to leave a comment.
+    </div>
+    {% endif %}
+
+    <!-- Comments Tree -->
+    <div class="comments-tree">
+        {% for comment in comments %}
+        <div class="comment-item" id="comment-{{ comment.id }}">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="d-flex align-items-center">
+                            <div class="comment-avatar me-2">
+                                {% if comment.author.profile.avatar %}
+                                <img src="{{ comment.author.profile.avatar.url }}" width="40" height="40" class="rounded-circle">
+                                {% else %}
+                                <i class="fas fa-user-circle fa-2x text-secondary"></i>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <strong>{{ comment.author.username }}</strong>
+                                <small class="text-muted ms-2">
+                                    {{ comment.created_at|timesince }} ago
+                                </small>
+                                {% if comment.is_edited %}
+                                <small class="text-muted">(edited)</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-outline-danger like-btn" data-id="{{ comment.id }}">
+                                <i class="fas fa-heart"></i> 
+                                <span class="likes-count">{{ comment.likes }}</span>
+                            </button>
+                            {% if user.is_authenticated and user != comment.author %}
+                            <button class="btn btn-sm btn-outline-warning report-btn" data-id="{{ comment.id }}">
+                                <i class="fas fa-flag"></i>
+                            </button>
+                            {% endif %}
+                            {% if user == comment.author or user.is_superuser %}
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'comments:edit_comment' comment.id %}">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="{% url 'comments:delete_comment' comment.id %}">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="comment-content mt-2">
+                        {{ comment.content_html|safe|linebreaks }}
+                    </div>
+                    
+                    <div class="comment-actions mt-2">
+                        <button class="btn btn-sm btn-link reply-toggle" data-id="{{ comment.id }}">
+                            <i class="fas fa-reply"></i> Reply
+                        </button>
+                    </div>
+                    
+                    <!-- Reply Form (hidden initially) -->
+                    <div class="reply-form-container mt-2 d-none" id="reply-form-{{ comment.id }}">
+                        <form method="post" action="{% url 'comments:add_reply' comment.id %}">
+                            {% csrf_token %}
+                            <div class="mb-2">
+                                <textarea name="content" class="form-control" rows="2" placeholder="Write your reply..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-primary">Post Reply</button>
+                            <button type="button" class="btn btn-sm btn-secondary cancel-reply" data-id="{{ comment.id }}">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Replies -->
+            {% if comment.replies.exists %}
+            <div class="replies ms-4 ps-3 border-start">
+                {% for reply in comment.replies.all %}
+                <div class="comment-item" id="comment-{{ reply.id }}">
+                    <div class="card mb-2">
+                        <div class="card-body py-2">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong>{{ reply.author.username }}</strong>
+                                    <small class="text-muted ms-2">{{ reply.created_at|timesince }} ago</small>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-danger like-btn" data-id="{{ reply.id }}">
+                                        <i class="fas fa-heart"></i> 
+                                        <span class="likes-count">{{ reply.likes }}</span>
+                                    </button>
+                                    {% if user == reply.author or user.is_superuser %}
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'comments:edit_comment' reply.id %}">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item text-danger" href="{% url 'comments:delete_comment' reply.id %}">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="comment-content mt-1">
+                                {{ reply.content_html|safe|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="text-center py-4">
+            <i class="fas fa-comments fa-3x text-muted mb-2"></i>
+            <p class="text-muted">No comments yet. Be the first to comment!</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.like-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const commentId = this.dataset.id;
+        fetch(`/comments/like/${commentId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            this.querySelector('.likes-count').textContent = data.likes_count;
+            if (data.liked) {
+                this.classList.add('active');
+            } else {
+                this.classList.remove('active');
+            }
+        });
+    });
+});
+
+document.querySelectorAll('.reply-toggle').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const replyForm = document.getElementById(`reply-form-${this.dataset.id}`);
+        replyForm.classList.toggle('d-none');
+    });
+});
+
+document.querySelectorAll('.cancel-reply').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById(`reply-form-${this.dataset.id}`).classList.add('d-none');
+    });
+});
+</script>
