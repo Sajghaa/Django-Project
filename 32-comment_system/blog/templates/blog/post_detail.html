@@ -1,0 +1,23 @@
+{% extends 'comments/base.html' %}
+{% load comments_tags %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <article class="card">
+            <div class="card-body">
+                <h1 class="card-title">{{ post.title }}</h1>
+                <p class="text-muted">
+                    Published on {{ post.created_at|date:"F j, Y" }}
+                </p>
+                <div class="card-text mt-4">
+                    {{ post.content|linebreaks }}
+                </div>
+            </div>
+        </article>
+        
+        <!-- Comments Section -->
+        {% render_comments post %}
+    </div>
+</div>
+{% endblock %}
