@@ -1,0 +1,1 @@
+ a Comment System that can be integrated into any Django project - a fully-featured, reusable commenting system with nested replies, moderation, likes, and notifications.
