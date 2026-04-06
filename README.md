@@ -2,7 +2,7 @@
 
 > A curated collection of Django projects demonstrating Django mastery through real-world applications.
 
-**Progress:** 31 / 100 completed
+**Progress:** 32 / 100 completed
 
 ---
 
@@ -42,6 +42,7 @@ This is a Django web application focused on user authentication. | Completed | �
 | 29 | [29-todo_auth_app](29-todo_auth_app) | This is a Django web application for managing todos with user authentication. Users can register, log in, view todo lists, and see todo details. Includes SQLite database, custom todos app with models/views/forms/templates, and static/media files. | Completed | ✅ |
 | 30 | [30-auth_system](30-auth_system) | No description yet | Completed | ✅ |
 | 31 | [31-multi_user_blog](31-multi_user_blog) | A simple a Multi-User Blog where authors can create, edit, and manage their own posts, and readers can read and comment. | Completed | ✅ |
+| 32 | [32-comment_system](32-comment_system) | a Comment System that can be integrated into any Django project - a fully-featured, reusable commenting system with nested replies, moderation, likes, and notifications. | Completed | ✅ |
 
 ---
 
