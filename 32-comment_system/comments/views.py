@@ -51,29 +51,33 @@ def get_comments_for_object(request, content_type, object_id, template='comments
     return render(request, template, context)
 
 @login_required
-def add_comment(request, content_type, object_id):
+def add_comment(request, app_label, model_name, object_id):
     """Add a new comment"""
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
-            content_type_obj = ContentType.objects.get(app_label=content_type, model=content_type)
+            try:
+                content_type = ContentType.objects.get(app_label=app_label, model=model_name)
+            except ContentType.DoesNotExist:
+                messages.error(request, 'Invalid content type.')
+                return redirect('/')
             
             comment = form.save(commit=False)
             comment.author = request.user
-            comment.content_type = content_type_obj
+            comment.content_type = content_type
             comment.object_id = object_id
             comment.user_ip = get_client_ip(request)
             comment.user_agent = request.META.get('HTTP_USER_AGENT', '')[:500]
             comment.save()
             
-            # Auto-approve for trusted users (optional)
+            # Auto-approve for trusted users
             if request.user.is_superuser or request.user.has_perm('comments.auto_approve_comments'):
                 comment.approve()
             
             messages.success(request, 'Your comment has been posted!')
             
             # Get the original object URL
-            obj = content_type_obj.get_object_for_this_type(id=object_id)
+            obj = content_type.get_object_for_this_type(id=object_id)
             if hasattr(obj, 'get_absolute_url'):
                 return redirect(obj.get_absolute_url())
     
