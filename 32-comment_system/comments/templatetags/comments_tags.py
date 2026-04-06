@@ -1,5 +1,6 @@
 from django import template
 from django.contrib.contenttypes.models import ContentType
+from comments.forms import CommentForm, CommentReplyForm
 from comments.models import Comment
 
 register = template.Library()
@@ -20,12 +21,13 @@ def render_comments(context, obj):
     
     return {
         'comments': comments,
-        'content_type': content_type.app_label,
+        'app_label': content_type.app_label,
+        'model_name': content_type.model,
         'object_id': obj.id,
         'object': obj,
         'user': context['request'].user,
-        'comment_form': context.get('comment_form'),
-        'reply_form': context.get('reply_form'),
+        'comment_form': CommentForm(),
+        'reply_form': CommentReplyForm(),
     }
 
 @register.inclusion_tag('comments/comment_count.html')
