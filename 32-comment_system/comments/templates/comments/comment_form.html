@@ -1,0 +1,79 @@
+{% extends 'comments/base.html' %}
+
+{% block title %}Add Comment{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0"><i class="fas fa-comment"></i> Add Comment</h3>
+            </div>
+            <div class="card-body">
+                {% if comment.parent %}
+                <div class="alert alert-secondary mb-3">
+                    <strong>Replying to {{ comment.parent.author.username }}:</strong>
+                    <p class="mb-0 mt-2">{{ comment.parent.content|truncatewords:30 }}</p>
+                </div>
+                {% endif %}
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% if field.errors %}
+                        <div class="text-danger small mt-1">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Markdown supported:</strong> You can use **bold**, *italic*, `code`, and [links](https://example.com)
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Post Comment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="fas fa-question-circle"></i> Formatting Tips</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Text Formatting</h6>
+                        <ul class="small">
+                            <li><code>**bold**</code> → <strong>bold</strong></li>
+                            <li><code>*italic*</code> → <em>italic</em></li>
+                            <li><code>***bold italic***</code> → <strong><em>bold italic</em></strong></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Code & Links</h6>
+                        <ul class="small">
+                            <li><code>`code`</code> → <code>code</code></li>
+                            <li><code>[Link](https://example.com)</code> → <a href="#">Link</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
