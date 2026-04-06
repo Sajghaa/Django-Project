@@ -327,3 +327,8 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
+
+def comment_detail(request, comment_id):
+    """View single comment details"""
+    comment = get_object_or_404(Comment, id=comment_id)
+    return render(request, 'comments/comment_detail.html', {'comment': comment})
