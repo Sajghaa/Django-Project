@@ -1,0 +1,286 @@
+{% extends 'comments/base.html' %}
+
+{% block title %}Moderation Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="display-5 mb-4">
+            <i class="fas fa-shield-alt"></i> Moderation Dashboard
+        </h1>
+        
+        <!-- Search Form -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-4">
+                        {{ form.q }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ form.status }}
+                    </div>
+                    <div class="col-md-2">
+                        {{ form.date_from }}
+                    </div>
+                    <div class="col-md-2">
+                        {{ form.date_to }}
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Pending Comments -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0">
+                    <i class="fas fa-clock"></i> Pending Moderation ({{ pending_comments.paginator.count }})
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Comment</th>
+                                <th>Author</th>
+                                <th>Content Type</th>
+                                <th>Created</th>
+                                <th>IP</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for comment in pending_comments %}
+                            <tr>
+                                <td>
+                                    <div class="comment-preview">
+                                        {{ comment.content|truncatewords:20|safe }}
+                                    </div>
+                                    <small class="text-muted">
+                                        <a href="{{ comment.content_object.get_absolute_url }}#comment-{{ comment.id }}" target="_blank">
+                                            View on page
+                                        </a>
+                                    </small>
+                                </td>
+                                <td>
+                                    <strong>{{ comment.author.username }}</strong><br>
+                                    <small class="text-muted">{{ comment.author.email }}</small>
+                                </td>
+                                <td>
+                                    {{ comment.content_type.app_label }}.{{ comment.content_type.model }}
+                                </td>
+                                <td>{{ comment.created_at|date:"M d, Y H:i" }}</td>
+                                <td>{{ comment.user_ip|default:"N/A" }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'comments:moderate_comment' comment.id 'approve' %}" 
+                                           class="btn btn-success">
+                                            <i class="fas fa-check"></i> Approve
+                                        </a>
+                                        <a href="{% url 'comments:moderate_comment' comment.id 'spam' %}" 
+                                           class="btn btn-warning">
+                                            <i class="fas fa-ban"></i> Spam
+                                        </a>
+                                        <a href="{% url 'comments:moderate_comment' comment.id 'delete' %}" 
+                                           class="btn btn-danger">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4">
+                                    <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                                    <p>No pending comments!</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% if pending_comments.has_other_pages %}
+            <div class="card-footer">
+                <nav>
+                    <ul class="pagination mb-0 justify-content-center">
+                        {% if pending_comments.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?pending_page={{ pending_comments.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                                Previous
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for num in pending_comments.paginator.page_range %}
+                        <li class="page-item {% if pending_comments.number == num %}active{% endif %}">
+                            <a class="page-link" href="?pending_page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                                {{ num }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                        
+                        {% if pending_comments.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?pending_page={{ pending_comments.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                                Next
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Reported Comments -->
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-flag"></i> Reported Comments ({{ reported_comments.paginator.count }})
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Comment</th>
+                                <th>Author</th>
+                                <th>Reports</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for comment in reported_comments %}
+                            <tr>
+                                <td>
+                                    <div class="comment-preview">
+                                        {{ comment.content|truncatewords:20|safe }}
+                                    </div>
+                                    <small class="text-muted">
+                                        <a href="{{ comment.content_object.get_absolute_url }}#comment-{{ comment.id }}" target="_blank">
+                                            View on page
+                                        </a>
+                                    </small>
+                                 </td>
+                                <td>
+                                    <strong>{{ comment.author.username }}</strong><br>
+                                    <small class="text-muted">{{ comment.author.email }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-danger">{{ comment.reports }} reports</span>
+                                    <button class="btn btn-link btn-sm view-reports" data-id="{{ comment.id }}">
+                                        View details
+                                    </button>
+                                </td>
+                                <td>{{ comment.created_at|date:"M d, Y H:i" }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'comments:moderate_comment' comment.id 'approve' %}" 
+                                           class="btn btn-success">
+                                            <i class="fas fa-check"></i> Keep
+                                        </a>
+                                        <a href="{% url 'comments:moderate_comment' comment.id 'delete' %}" 
+                                           class="btn btn-danger">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4">
+                                    <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                                    <p>No reported comments!</p>
+                                 </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% if reported_comments.has_other_pages %}
+            <div class="card-footer">
+                <nav>
+                    <ul class="pagination mb-0 justify-content-center">
+                        {% if reported_comments.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?reported_page={{ reported_comments.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                                Previous
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for num in reported_comments.paginator.page_range %}
+                        <li class="page-item {% if reported_comments.number == num %}active{% endif %}">
+                            <a class="page-link" href="?reported_page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                                {{ num }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                        
+                        {% if reported_comments.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?reported_page={{ reported_comments.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                                Next
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Report Details Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Report Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="reportDetails">
+                <!-- Reports will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.view-reports').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        const commentId = this.dataset.id;
+        const response = await fetch(`/api/comments/${commentId}/reports/`);
+        const reports = await response.json();
+        
+        const modalBody = document.getElementById('reportDetails');
+        modalBody.innerHTML = '<ul class="list-group">' + 
+            reports.map(report => `
+                <li class="list-group-item">
+                    <strong>${report.reporter}</strong><br>
+                    <small>Reason: ${report.reason}</small><br>
+                    <small class="text-muted">${report.details || 'No additional details'}</small>
+                    <br>
+                    <small>Reported: ${new Date(report.created_at).toLocaleString()}</small>
+                </li>
+            `).join('') + 
+            '</ul>';
+        
+        new bootstrap.Modal(document.getElementById('reportModal')).show();
+    });
+});
+</script>
+{% endblock %}
