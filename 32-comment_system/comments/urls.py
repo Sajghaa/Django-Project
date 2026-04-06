@@ -9,6 +9,7 @@ urlpatterns = [
     path('edit/<int:comment_id>/', views.edit_comment, name='edit_comment'),
     path('delete/<int:comment_id>/', views.delete_comment, name='delete_comment'),
     path('reply/<int:comment_id>/', views.add_reply, name='add_reply'),
+       path('<int:comment_id>/', views.comment_detail, name='comment_detail'),
     
     # Interactions
     path('like/<int:comment_id>/', views.like_comment, name='like_comment'),
