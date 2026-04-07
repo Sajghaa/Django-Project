@@ -12,37 +12,35 @@
             <div class="card-body">
                 <div class="alert alert-secondary mb-3">
                     <strong>Comment by {{ comment.author.username }}:</strong>
-                    <p class="mb-0 mt-2">{{ comment.content|truncatewords:30 }}</p>
+                    <p class="mb-0 mt-1">{{ comment.content|truncatewords:30 }}</p>
                 </div>
                 
                 <form method="post">
                     {% csrf_token %}
-                    
-                    {% for field in form %}
                     <div class="mb-3">
-                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.help_text %}
-                        <small class="form-text text-muted">{{ field.help_text }}</small>
-                        {% endif %}
-                        {% if field.errors %}
-                        <div class="text-danger small">{{ field.errors }}</div>
-                        {% endif %}
+                        <label class="form-label">Reason for reporting</label>
+                        <select name="reason" class="form-control" required>
+                            <option value="">Select a reason</option>
+                            <option value="spam">Spam or advertising</option>
+                            <option value="offensive">Offensive language</option>
+                            <option value="harassment">Harassment or bullying</option>
+                            <option value="hate_speech">Hate speech</option>
+                            <option value="misinformation">Misinformation</option>
+                            <option value="other">Other</option>
+                        </select>
                     </div>
-                    {% endfor %}
+                    <div class="mb-3">
+                        <label class="form-label">Additional details (optional)</label>
+                        <textarea name="details" class="form-control" rows="3" placeholder="Please provide more details..."></textarea>
+                    </div>
                     
                     <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i> 
-                        Your report will be reviewed by a moderator. False reports may result in account restrictions.
+                        <i class="fas fa-info-circle"></i> Your report will be reviewed by a moderator.
                     </div>
                     
                     <div class="d-flex justify-content-between">
-                        <a href="{{ comment.content_object.get_absolute_url }}" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Cancel
-                        </a>
-                        <button type="submit" class="btn btn-warning">
-                            <i class="fas fa-flag"></i> Submit Report
-                        </button>
+                        <a href="{% url 'comments:comment_detail' comment.id %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-warning">Submit Report</button>
                     </div>
                 </form>
             </div>
