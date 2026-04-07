@@ -259,6 +259,7 @@ def subscribe_to_thread(request, content_type, object_id):
     return redirect('/')
 
 @user_passes_test(is_moderator)
+@user_passes_test(is_moderator)
 def moderation_dashboard(request):
     """Moderation dashboard for managing comments"""
     # Get all pending comments
@@ -291,17 +292,17 @@ def moderation_dashboard(request):
             reported_comments = reported_comments.filter(created_at__date__lte=date_to)
     
     # Pagination
-    pending_paginator = Paginator(pending_comments, 20)
-    pending_page = request.GET.get('pending_page')
-    pending_comments = pending_paginator.get_page(pending_page)
+    pending_paginator = Paginator(pending_comments, 10)
+    pending_page = request.GET.get('pending_page', 1)
+    pending_comments_page = pending_paginator.get_page(pending_page)
     
-    reported_paginator = Paginator(reported_comments, 20)
-    reported_page = request.GET.get('reported_page')
-    reported_comments = reported_paginator.get_page(reported_page)
+    reported_paginator = Paginator(reported_comments, 10)
+    reported_page = request.GET.get('reported_page', 1)
+    reported_comments_page = reported_paginator.get_page(reported_page)
     
     context = {
-        'pending_comments': pending_comments,
-        'reported_comments': reported_comments,
+        'pending_comments': pending_comments_page,
+        'reported_comments': reported_comments_page,
         'form': form,
     }
     return render(request, 'comments/moderation.html', context)
@@ -336,3 +337,23 @@ def comment_detail(request, comment_id):
     """View single comment details"""
     comment = get_object_or_404(Comment, id=comment_id)
     return render(request, 'comments/comment_detail.html', {'comment': comment})
+
+
+
+def get_comment_reports_api(request, comment_id):
+    """API endpoint to get reports for a comment (AJAX)"""
+    comment = get_object_or_404(Comment, id=comment_id)
+    reports = CommentReport.objects.filter(comment=comment).values(
+        'reporter__username', 'reason', 'details', 'created_at'
+    )
+    
+    data = []
+    for report in reports:
+        data.append({
+            'reporter': report['reporter__username'],
+            'reason': report['reason'],
+            'details': report['details'],
+            'created_at': report['created_at'].isoformat()
+        })
+    
+    return JsonResponse(data, safe=False)
