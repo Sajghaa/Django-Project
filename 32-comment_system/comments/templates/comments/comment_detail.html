@@ -10,159 +10,45 @@
                 <h3 class="mb-0"><i class="fas fa-comment"></i> Comment Detail</h3>
             </div>
             <div class="card-body">
-                <!-- Comment Information -->
-                <div class="mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <div class="d-flex align-items-center">
-                            <div class="comment-avatar me-2">
-                                {% if comment.author.profile.avatar %}
-                                <img src="{{ comment.author.profile.avatar.url }}" width="40" height="40" class="rounded-circle">
-                                {% else %}
-                                <i class="fas fa-user-circle fa-2x text-secondary"></i>
-                                {% endif %}
-                            </div>
-                            <div>
-                                <strong>{{ comment.author.username }}</strong>
-                                <small class="text-muted ms-2">
-                                    {{ comment.created_at|date:"F j, Y, g:i a" }}
-                                </small>
-                                {% if comment.is_edited %}
-                                <span class="badge bg-secondary ms-2">Edited</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="comment-stats">
-                            <span class="badge bg-danger me-1">
-                                <i class="fas fa-heart"></i> {{ comment.likes }}
-                            </span>
-                            <span class="badge bg-warning">
-                                <i class="fas fa-flag"></i> {{ comment.reports }}
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <div class="comment-content mt-3 p-3 bg-light rounded">
-                        {{ comment.content_html|safe|linebreaks }}
-                    </div>
+                <div class="mb-3">
+                    <strong>{{ comment.author.username }}</strong>
+                    <small class="text-muted ms-2">{{ comment.created_at|date:"F j, Y, g:i a" }}</small>
+                    {% if comment.is_edited %}
+                    <span class="badge bg-secondary">Edited</span>
+                    {% endif %}
                 </div>
                 
-                <!-- Parent Comment (if this is a reply) -->
+                <div class="comment-content p-3 bg-light rounded mb-3">
+                    {{ comment.content_html|safe|linebreaks }}
+                </div>
+                
+                <div class="text-muted small mb-3">
+                    <i class="fas fa-heart text-danger"></i> {{ comment.likes }} likes |
+                    <i class="fas fa-flag"></i> {{ comment.reports }} reports
+                </div>
+                
                 {% if comment.parent %}
                 <div class="alert alert-secondary">
-                    <h6><i class="fas fa-reply"></i> In reply to {{ comment.parent.author.username }}</h6>
-                    <p class="mb-0">{{ comment.parent.content|truncatewords:50 }}</p>
-                    <a href="{% url 'comments:comment_detail' comment.parent.id %}" class="btn btn-link btn-sm mt-2">
-                        View parent comment →
+                    <strong>In reply to {{ comment.parent.author.username }}</strong>
+                    <p class="mb-0 mt-1">{{ comment.parent.content|truncatewords:30 }}</p>
+                </div>
+                {% endif %}
+                
+                <div class="btn-group w-100">
+                    <a href="{{ comment.content_object.get_absolute_url }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Content
                     </a>
-                </div>
-                {% endif %}
-                
-                <!-- Replies (if this comment has replies) -->
-                {% if comment.replies.exists %}
-                <div class="mt-4">
-                    <h5 class="mb-3">
-                        <i class="fas fa-reply-all"></i> Replies ({{ comment.reply_count }})
-                    </h5>
-                    <div class="replies-list">
-                        {% for reply in comment.replies.all %}
-                        <div class="card mb-2">
-                            <div class="card-body py-2">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <strong>{{ reply.author.username }}</strong>
-                                        <small class="text-muted ms-2">{{ reply.created_at|timesince }} ago</small>
-                                    </div>
-                                    <a href="{% url 'comments:comment_detail' reply.id %}" class="btn btn-sm btn-outline-primary">
-                                        View
-                                    </a>
-                                </div>
-                                <p class="mb-0 mt-1 small">{{ reply.content|truncatewords:30 }}</p>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-                
-                <!-- Related Content -->
-                <div class="mt-4 pt-3 border-top">
-                    <h6><i class="fas fa-link"></i> Comment on:</h6>
-                    <div class="card bg-light">
-                        <div class="card-body">
-                            <strong>{{ comment.content_object }}</strong>
-                            <p class="mb-0 small text-muted">
-                                Type: {{ comment.content_type.app_label }}.{{ comment.content_type.model }}
-                                | ID: {{ comment.object_id }}
-                            </p>
-                            <a href="{{ comment.content_object.get_absolute_url }}" class="btn btn-sm btn-primary mt-2">
-                                <i class="fas fa-external-link-alt"></i> View Content
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Actions -->
-                <div class="mt-4 pt-3 border-top">
-                    <div class="btn-group w-100">
-                        {% if user == comment.author %}
-                        <a href="{% url 'comments:edit_comment' comment.id %}" class="btn btn-warning">
-                            <i class="fas fa-edit"></i> Edit
-                        </a>
-                        <a href="{% url 'comments:delete_comment' comment.id %}" class="btn btn-danger">
-                            <i class="fas fa-trash"></i> Delete
-                        </a>
-                        {% endif %}
-                        
-                        {% if user.is_authenticated and user != comment.author %}
-                        <button class="btn btn-outline-danger like-btn" data-id="{{ comment.id }}">
-                            <i class="fas fa-heart"></i> 
-                            <span class="likes-count">{{ comment.likes }}</span> Likes
-                        </button>
-                        <a href="{% url 'comments:report_comment' comment.id %}" class="btn btn-outline-warning">
-                            <i class="fas fa-flag"></i> Report
-                        </a>
-                        {% endif %}
-                        
-                        <a href="{% url 'comments:add_reply' comment.id %}" class="btn btn-outline-primary">
-                            <i class="fas fa-reply"></i> Reply
-                        </a>
-                    </div>
+                    {% if user == comment.author or user.is_superuser %}
+                    <a href="{% url 'comments:edit_comment' comment.id %}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a href="{% url 'comments:delete_comment' comment.id %}" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Delete
+                    </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
-        
-        <!-- Back to content -->
-        <div class="text-center mt-4">
-            <a href="{{ comment.content_object.get_absolute_url }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to {{ comment.content_object }}
-            </a>
-        </div>
     </div>
 </div>
-
-<script>
-// Like button AJAX
-document.querySelectorAll('.like-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const commentId = this.dataset.id;
-        fetch(`/comments/like/${commentId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            this.querySelector('.likes-count').textContent = data.likes_count;
-            if (data.liked) {
-                this.classList.add('active');
-            } else {
-                this.classList.remove('active');
-            }
-        });
-    });
-});
-</script>
 {% endblock %}
