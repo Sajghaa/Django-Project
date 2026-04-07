@@ -21,4 +21,7 @@ urlpatterns = [
     # Moderation
     path('moderation/', views.moderation_dashboard, name='moderation_dashboard'),
     path('moderate/<int:comment_id>/<str:action>/', views.moderate_comment, name='moderate_comment'),
+
+    # API endpoints
+    path('api/comments/<int:comment_id>/reports/', views.get_comment_reports_api, name='api_comment_reports'),
 ]
