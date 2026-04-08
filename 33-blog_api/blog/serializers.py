@@ -69,7 +69,6 @@ class PostDetailSerializer(serializers.ModelSerializer):
     """Post detail serializer (full fields)"""
     author_name = serializers.CharField(source='author.username', read_only=True)
     author_email = serializers.EmailField(source='author.email', read_only=True)
-    author_bio = serializers.CharField(source='author.profile.bio', read_only=True, default='')
     category_name = serializers.CharField(source='category.name', read_only=True)
     tags_list = TagSerializer(many=True, read_only=True, source='tags')
     comments = CommentSerializer(many=True, read_only=True)
