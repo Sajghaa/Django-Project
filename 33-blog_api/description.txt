@@ -1,0 +1,2 @@
+
+This is a Django-based web application that provides a RESTful API for managing a simple task list. It uses Django REST framework for building the API and Django-filter for filtering the tasks. The API is documented with drf-yasg. The application uses SQLite as the database backend.
