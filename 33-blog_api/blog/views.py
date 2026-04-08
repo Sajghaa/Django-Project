@@ -93,11 +93,6 @@ class PostViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_401_UNAUTHORIZED
             )
         
-        # Check if user already liked
-        if request.data.get('action') == 'unlike':
-            # Unlike logic would go here
-            pass
-        
         post.likes += 1
         post.save()
         
@@ -138,6 +133,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     """ViewSet for comments"""
+    queryset = Comment.objects.all()  # ADD THIS LINE - missing queryset
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsCommentAuthorOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
