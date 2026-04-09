@@ -1,0 +1,84 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Order Confirmation - E-Shop{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card text-center">
+            <div class="card-body p-5">
+                <i class="fas fa-check-circle fa-5x text-success mb-4"></i>
+                <h1 class="display-4">Thank You!</h1>
+                <p class="lead">Your order has been placed successfully.</p>
+                
+                <div class="alert alert-info mt-4">
+                    <strong>Order Number:</strong> {{ order.order_number }}
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6 text-start">
+                        <h5>Shipping Information</h5>
+                        <p>
+                            {{ order.full_name }}<br>
+                            {{ order.address }}<br>
+                            {{ order.city }}, {{ order.state }} {{ order.zip_code }}<br>
+                            {{ order.country }}<br>
+                            Phone: {{ order.phone }}
+                        </p>
+                    </div>
+                    <div class="col-md-6 text-start">
+                        <h5>Order Summary</h5>
+                        <p>
+                            Order Date: {{ order.created_at|date:"F j, Y" }}<br>
+                            Payment Status: <span class="badge bg-warning">{{ order.get_payment_status_display }}</span><br>
+                            Order Status: <span class="badge bg-info">{{ order.get_status_display }}</span><br>
+                            Total Amount: <strong class="text-success">${{ order.total_amount }}</strong>
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h5>Order Items</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items.all %}
+                                <tr>
+                                    <td>{{ item.product.name }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>${{ item.price }}</td>
+                                    <td>${{ item.total_price }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{% url 'store:product_list' %}" class="btn btn-primary">
+                        Continue Shopping
+                    </a>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'store:my_orders' %}" class="btn btn-secondary">
+                        View My Orders
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="alert alert-secondary mt-3 text-center">
+            <i class="fas fa-envelope"></i> A confirmation email has been sent to {{ order.email }}
+        </div>
+    </div>
+</div>
+{% endblock %}
