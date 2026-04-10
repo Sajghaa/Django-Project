@@ -2,7 +2,7 @@
 
 > A curated collection of Django projects demonstrating Django mastery through real-world applications.
 
-**Progress:** 32 / 100 completed
+**Progress:** 34 / 100 completed
 
 ---
 
@@ -43,6 +43,8 @@ This is a Django web application focused on user authentication. | Completed | �
 | 30 | [30-auth_system](30-auth_system) | No description yet | Completed | ✅ |
 | 31 | [31-multi_user_blog](31-multi_user_blog) | A simple a Multi-User Blog where authors can create, edit, and manage their own posts, and readers can read and comment. | Completed | ✅ |
 | 32 | [32-comment_system](32-comment_system) | a Comment System that can be integrated into any Django project - a fully-featured, reusable commenting system with nested replies, moderation, likes, and notifications. | Completed | ✅ |
+| 33 | [33-blog_api](33-blog_api) | This is a Django-based web application that provides a RESTful API for managing a simple task list. It uses Django REST framework for building the API and Django-filter for filtering the tasks. The API is documented with drf-yasg. The application uses SQLite as the database backend. | Completed | ✅ |
+| 34 | [34-ecommerce_cart](34-ecommerce_cart) | No description yet | Completed | ✅ |
 
 ---
 
