@@ -1,0 +1,108 @@
+{% extends 'chat/base.html' %}
+
+{% block title %}All Rooms - Real-Time Chat{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="display-5 mb-4">All Chat Rooms</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-globe"></i> Public Rooms</h5>
+            </div>
+            <div class="card-body">
+                {% if rooms %}
+                <div class="list-group">
+                    {% for room in rooms %}
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h5 class="mb-1">
+                                    <i class="fas fa-hashtag"></i> {{ room.name }}
+                                    {% if room.room_type == 'private' %}
+                                    <span class="badge bg-warning ms-2">Private</span>
+                                    {% elif room.room_type == 'direct' %}
+                                    <span class="badge bg-info ms-2">DM</span>
+                                    {% else %}
+                                    <span class="badge bg-success ms-2">Public</span>
+                                    {% endif %}
+                                </h5>
+                                <p class="mb-1 text-muted">{{ room.description|default:"No description" }}</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-user"></i> Created by {{ room.created_by.username }} |
+                                    <i class="fas fa-users"></i> {{ room.participant_count }} members |
+                                    <i class="fas fa-calendar"></i> {{ room.created_at|date:"M d, Y" }}
+                                </small>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                {% if user in room.participants.all %}
+                                <a href="{% url 'chat:room' room.slug %}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-sign-in-alt"></i> Enter
+                                </a>
+                                <a href="{% url 'chat:leave_room' room.slug %}" class="btn btn-danger btn-sm" onclick="return confirm('Leave this room?')">
+                                    <i class="fas fa-sign-out-alt"></i> Leave
+                                </a>
+                                {% else %}
+                                <a href="{% url 'chat:join_room' room.slug %}" class="btn btn-success btn-sm">
+                                    <i class="fas fa-plus"></i> Join
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No public rooms available.</p>
+                    <a href="{% url 'chat:create_room' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create First Room
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-question-circle"></i> About Rooms</h5>
+            </div>
+            <div class="card-body">
+                <h6>Public Rooms</h6>
+                <p class="small text-muted">Anyone can join and participate in public rooms.</p>
+                
+                <h6>Private Rooms</h6>
+                <p class="small text-muted">Only invited users can join private rooms.</p>
+                
+                <h6>Direct Messages</h6>
+                <p class="small text-muted">One-on-one private conversations.</p>
+                
+                <hr>
+                <div class="text-center">
+                    <a href="{% url 'chat:create_room' %}" class="btn btn-primary w-100">
+                        <i class="fas fa-plus"></i> Create New Room
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3 shadow">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-line"></i> Quick Stats</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Total Rooms:</strong> {{ rooms.count }}</p>
+                <p><strong>Your Rooms:</strong> {{ user.chat_rooms.count }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
