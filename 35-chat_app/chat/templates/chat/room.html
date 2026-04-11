@@ -144,11 +144,18 @@
     const userName = "{{ user.username }}";
     const userId = "{{ user.id }}";
     
+    console.log("Connecting to WebSocket...");
+    
     const chatSocket = new WebSocket(
         'ws://' + window.location.host + '/ws/chat/' + roomSlug + '/'
     );
     
+    chatSocket.onopen = function(e) {
+        console.log("WebSocket connection established!");
+    };
+    
     chatSocket.onmessage = function(e) {
+        console.log("Message received:", e.data);
         const data = JSON.parse(e.data);
         
         if (data.type === 'message') {
@@ -159,8 +166,8 @@
             messageDiv.className = 'message ' + (isOwn ? 'message-own' : '');
             messageDiv.innerHTML = `
                 <div class="message-bubble">
-                    <strong>${data.username}</strong>
-                    <p class="mb-0">${data.message}</p>
+                    <strong>${escapeHtml(data.username)}</strong>
+                    <p class="mb-0">${escapeHtml(data.message)}</p>
                     <div class="message-info">
                         ${data.time_ago || data.timestamp}
                     </div>
@@ -172,7 +179,7 @@
         else if (data.type === 'typing') {
             const typingDiv = document.getElementById('typing-indicator');
             if (data.is_typing && data.username !== userName) {
-                typingDiv.innerHTML = `${data.username} is typing...`;
+                typingDiv.innerHTML = `<em>${escapeHtml(data.username)} is typing...</em>`;
             } else {
                 typingDiv.innerHTML = '';
             }
@@ -185,7 +192,7 @@
                 usersDiv.innerHTML = data.users.map(user => `
                     <div class="d-flex align-items-center mb-2">
                         <div class="online-badge"></div>
-                        <span>${user.username}</span>
+                        <span>${escapeHtml(user.username)}</span>
                         ${user.id == userId ? ' <small class="text-muted ms-2">(You)</small>' : ''}
                     </div>
                 `).join('');
@@ -194,10 +201,21 @@
     };
     
     chatSocket.onclose = function(e) {
-        console.error('Chat socket closed unexpectedly');
+        console.error('Chat socket closed unexpectedly', e);
     };
     
+    chatSocket.onerror = function(e) {
+        console.error('WebSocket error:', e);
+    };
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
     document.getElementById('chat-message-input').focus();
+    
     document.getElementById('chat-message-input').onkeyup = function(e) {
         if (e.keyCode === 13) {
             document.getElementById('chat-message-submit').click();
@@ -206,7 +224,14 @@
     
     document.getElementById('chat-message-submit').onclick = function(e) {
         const messageInputDom = document.getElementById('chat-message-input');
-        const message = messageInputDom.value;
+        const message = messageInputDom.value.trim();
+        
+        if (message === "") {
+            return;
+        }
+        
+        console.log("Sending message:", message);
+        
         chatSocket.send(JSON.stringify({
             'type': 'message',
             'message': message
