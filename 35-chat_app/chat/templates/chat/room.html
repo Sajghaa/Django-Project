@@ -138,7 +138,6 @@
         </div>
     </div>
 </div>
-
 <script>
     const roomSlug = "{{ room.slug }}";
     const userName = "{{ user.username }}";
@@ -146,16 +145,20 @@
     
     console.log("Connecting to WebSocket...");
     
-    const chatSocket = new WebSocket(
-        'ws://' + window.location.host + '/ws/chat/' + roomSlug + '/'
-    );
+    // Use wss:// for HTTPS, ws:// for HTTP
+    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+    const wsUrl = `${protocol}${window.location.host}/ws/chat/${roomSlug}/`;
+    
+    console.log("WebSocket URL:", wsUrl);
+    
+    const chatSocket = new WebSocket(wsUrl);
     
     chatSocket.onopen = function(e) {
-        console.log("WebSocket connection established!");
+        console.log("✅ WebSocket connection established!");
     };
     
     chatSocket.onmessage = function(e) {
-        console.log("Message received:", e.data);
+        console.log("📨 Message received:", e.data);
         const data = JSON.parse(e.data);
         
         if (data.type === 'message') {
@@ -175,37 +178,15 @@
             `;
             messagesDiv.appendChild(messageDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        } 
-        else if (data.type === 'typing') {
-            const typingDiv = document.getElementById('typing-indicator');
-            if (data.is_typing && data.username !== userName) {
-                typingDiv.innerHTML = `<em>${escapeHtml(data.username)} is typing...</em>`;
-            } else {
-                typingDiv.innerHTML = '';
-            }
-        }
-        else if (data.type === 'online_users') {
-            const usersDiv = document.getElementById('online-users');
-            if (data.users.length === 0) {
-                usersDiv.innerHTML = '<p class="text-muted text-center">No other users online</p>';
-            } else {
-                usersDiv.innerHTML = data.users.map(user => `
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="online-badge"></div>
-                        <span>${escapeHtml(user.username)}</span>
-                        ${user.id == userId ? ' <small class="text-muted ms-2">(You)</small>' : ''}
-                    </div>
-                `).join('');
-            }
         }
     };
     
     chatSocket.onclose = function(e) {
-        console.error('Chat socket closed unexpectedly', e);
+        console.log("❌ WebSocket closed:", e);
     };
     
     chatSocket.onerror = function(e) {
-        console.error('WebSocket error:', e);
+        console.log("⚠️ WebSocket error:", e);
     };
     
     function escapeHtml(text) {
@@ -230,7 +211,7 @@
             return;
         }
         
-        console.log("Sending message:", message);
+        console.log("📤 Sending message:", message);
         
         chatSocket.send(JSON.stringify({
             'type': 'message',
@@ -238,25 +219,6 @@
         }));
         messageInputDom.value = '';
     };
-    
-    // Typing indicator
-    let typingTimer;
-    const messageInput = document.getElementById('chat-message-input');
-    
-    messageInput.addEventListener('keypress', function() {
-        clearTimeout(typingTimer);
-        chatSocket.send(JSON.stringify({
-            'type': 'typing',
-            'is_typing': true
-        }));
-        
-        typingTimer = setTimeout(function() {
-            chatSocket.send(JSON.stringify({
-                'type': 'typing',
-                'is_typing': false
-            }));
-        }, 1000);
-    });
     
     // Auto-scroll to bottom
     const messagesDiv = document.getElementById('chat-messages');
