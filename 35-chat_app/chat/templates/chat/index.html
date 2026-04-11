@@ -1,0 +1,95 @@
+{% extends 'chat/base.html' %}
+
+{% block title %}Dashboard - Real-Time Chat{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="display-5 mb-4">Welcome, {{ user.username }}!</h1>
+    </div>
+</div>
+
+<div class="row">
+    <!-- My Rooms -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-users"></i> My Rooms</h5>
+            </div>
+            <div class="card-body">
+                {% if my_rooms %}
+                <div class="list-group">
+                    {% for room in my_rooms %}
+                    <a href="{% url 'chat:room' room.slug %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-hashtag"></i> <strong>{{ room.name }}</strong>
+                                {% if room.room_type == 'private' %}
+                                <span class="badge bg-warning ms-2">Private</span>
+                                {% elif room.room_type == 'direct' %}
+                                <span class="badge bg-info ms-2">DM</span>
+                                {% else %}
+                                <span class="badge bg-success ms-2">Public</span>
+                                {% endif %}
+                                <br>
+                                <small class="text-muted">{{ room.participant_count }} members</small>
+                            </div>
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center">You haven't joined any rooms yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Public Rooms -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-globe"></i> Public Rooms</h5>
+            </div>
+            <div class="card-body">
+                {% if public_rooms %}
+                <div class="list-group">
+                    {% for room in public_rooms %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-hashtag"></i> <strong>{{ room.name }}</strong>
+                                <br>
+                                <small class="text-muted">{{ room.participant_count }} members</small>
+                            </div>
+                            <a href="{% url 'chat:join_room' room.slug %}" class="btn btn-sm btn-primary">
+                                Join <i class="fas fa-sign-in-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No public rooms available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-body text-center">
+                <i class="fas fa-plus-circle fa-2x text-primary mb-2"></i>
+                <h5>Create Your Own Room</h5>
+                <p>Start a new conversation by creating a chat room</p>
+                <a href="{% url 'chat:create_room' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create Room
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
