@@ -7,18 +7,18 @@ from django.urls import path
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chat_app.settings')
 
-# Import routing after Django setup
+# Initialize Django ASGI application early
 django_asgi_app = get_asgi_application()
 
-from chat import routing
+from chat import consumers
 
 application = ProtocolTypeRouter({
-    'http': django_asgi_app,
-    'websocket': AllowedHostsOriginValidator(
+    "http": django_asgi_app,
+    "websocket": AllowedHostsOriginValidator(
         AuthMiddlewareStack(
-            URLRouter(
-                routing.websocket_urlpatterns
-            )
+            URLRouter([
+                path('ws/chat/<str:room_slug>/', consumers.ChatConsumer.as_asgi()),
+            ])
         )
     ),
 })
