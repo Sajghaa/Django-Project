@@ -1,0 +1,71 @@
+{% extends 'files/base.html' %}
+
+{% block title %}Download File - FileShare{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white text-center">
+                <h3 class="mb-0"><i class="fas fa-download"></i> Download File</h3>
+            </div>
+            <div class="card-body text-center">
+                <i class="fas {% if 'pdf' in file.file_type|lower %}fa-file-pdf{% elif 'image' in file.file_type|lower %}fa-file-image{% elif 'word' in file.file_type|lower %}fa-file-word{% elif 'excel' in file.file_type|lower %}fa-file-excel{% elif 'zip' in file.file_type|lower %}fa-file-archive{% else %}fa-file{% endif %} fa-5x text-primary mb-4"></i>
+                
+                <h4>{{ file.title|default:file.original_name }}</h4>
+                <p class="text-muted">{{ file.get_readable_size }} • {{ file.file_type }}</p>
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> 
+                    Your download will start automatically in <span id="countdown">5</span> seconds...
+                </div>
+                
+                <div class="progress mb-3">
+                    <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
+                </div>
+                
+                <a href="{% url 'files:download' file.id %}" id="downloadLink" class="btn btn-success btn-lg w-100">
+                    <i class="fas fa-download"></i> Download Now
+                </a>
+                
+                <hr>
+                
+                <div class="text-muted small">
+                    <p><strong>File Information:</strong></p>
+                    <p>Uploaded by: {{ file.uploaded_by.username }}</p>
+                    <p>Uploaded on: {{ file.created_at|date:"F j, Y g:i A" }}</p>
+                    {% if file.expires_at %}
+                    <p>Expires on: {{ file.expires_at|date:"F j, Y" }}</p>
+                    {% endif %}
+                    <p>Downloads remaining: {% if file.max_downloads > 0 %}{{ file.max_downloads|add:"-"|add:file.download_count }}{% else %}Unlimited{% endif %}</p>
+                </div>
+                
+                <a href="{% url 'files:home' %}" class="btn btn-secondary mt-3">
+                    <i class="fas fa-home"></i> Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let countdown = 5;
+    const countdownElement = document.getElementById('countdown');
+    const progressBar = document.getElementById('progress-bar');
+    const downloadLink = document.getElementById('downloadLink');
+    
+    const interval = setInterval(function() {
+        countdown--;
+        countdownElement.textContent = countdown;
+        progressBar.style.width = ((5 - countdown) / 5 * 100) + '%';
+        
+        if (countdown <= 0) {
+            clearInterval(interval);
+            progressBar.classList.remove('progress-bar-animated');
+            progressBar.classList.add('bg-success');
+            // Auto-click the download link
+            window.location.href = downloadLink.href;
+        }
+    }, 1000);
+</script>
+{% endblock %}
