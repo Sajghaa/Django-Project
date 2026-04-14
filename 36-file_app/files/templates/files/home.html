@@ -1,0 +1,67 @@
+{% extends 'files/base.html' %}
+
+{% block title %}Welcome to FileShare{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-8 text-center">
+        <div class="card shadow">
+            <div class="card-body p-5">
+                <i class="fas fa-cloud-upload-alt fa-5x text-primary mb-4"></i>
+                <h1 class="display-4">FileShare</h1>
+                <p class="lead">Secure file sharing made simple</p>
+                
+                {% if not user.is_authenticated %}
+                <div class="mt-4">
+                    <a href="{% url 'files:register' %}" class="btn btn-primary btn-lg me-2">
+                        <i class="fas fa-user-plus"></i> Get Started
+                    </a>
+                    <a href="{% url 'files:login' %}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                </div>
+                {% else %}
+                <div class="mt-4">
+                    <a href="{% url 'files:upload' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-upload"></i> Upload Files
+                    </a>
+                    <a href="{% url 'files:my_files' %}" class="btn btn-outline-primary btn-lg ms-2">
+                        <i class="fas fa-folder"></i> My Files
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-lock fa-3x text-success mb-3"></i>
+                        <h5>Secure</h5>
+                        <p>End-to-end encryption for your files</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-share-alt fa-3x text-info mb-3"></i>
+                        <h5>Easy Sharing</h5>
+                        <p>Share with anyone via link or users</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-clock fa-3x text-warning mb-3"></i>
+                        <h5>Expiration</h5>
+                        <p>Set expiry dates and download limits</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
