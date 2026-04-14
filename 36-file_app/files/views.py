@@ -284,3 +284,51 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
+
+
+
+@login_required
+def profile(request):
+    """User profile page"""
+    from django.db.models import Sum
+    
+    total_downloads = FileDownload.objects.filter(file__uploaded_by=request.user).count()
+    total_storage = File.objects.filter(uploaded_by=request.user).aggregate(total=Sum('file_size'))['total'] or 0
+    
+    context = {
+        'total_downloads': total_downloads,
+        'public_files': File.objects.filter(uploaded_by=request.user, access_type='public').count(),
+        'private_files': File.objects.filter(uploaded_by=request.user, access_type='private').count(),
+        'shared_files': File.objects.filter(uploaded_by=request.user, access_type='shared').count(),
+        'total_storage': total_storage,
+        'recent_downloads': FileDownload.objects.filter(file__uploaded_by=request.user)[:10],
+    }
+    return render(request, 'files/profile.html', context)
+
+def file_list(request):
+    """List all public files"""
+    files = File.objects.filter(access_type='public', is_active=True)
+    
+    # Search and filter
+    search_query = request.GET.get('q')
+    file_type = request.GET.get('file_type')
+    sort_by = request.GET.get('sort', '-created_at')
+    
+    if search_query:
+        files = files.filter(
+            Q(original_name__icontains=search_query) |
+            Q(title__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
+    
+    if file_type:
+        files = files.filter(file_type=file_type)
+    
+    files = files.order_by(sort_by)
+    
+    # Pagination
+    paginator = Paginator(files, 12)
+    page = request.GET.get('page')
+    files = paginator.get_page(page)
+    
+    return render(request, 'files/file_list.html', {'files': files})
