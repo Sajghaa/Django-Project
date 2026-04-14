@@ -1,0 +1,114 @@
+{% extends 'files/base.html' %}
+
+{% block title %}My Profile - FileShare{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow text-center">
+            <div class="card-body">
+                <i class="fas fa-user-circle fa-5x text-primary mb-3"></i>
+                <h3>{{ user.username }}</h3>
+                <p class="text-muted">{{ user.email }}</p>
+                <p class="text-muted">Member since: {{ user.date_joined|date:"F j, Y" }}</p>
+                <hr>
+                <div class="row">
+                    <div class="col-6">
+                        <h4>{{ user.uploaded_files.count }}</h4>
+                        <small class="text-muted">Files Uploaded</small>
+                    </div>
+                    <div class="col-6">
+                        <h4>{{ total_downloads }}</h4>
+                        <small class="text-muted">Total Downloads</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3 shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Quick Stats</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Public Files:</strong> {{ public_files }}</p>
+                <p><strong>Private Files:</strong> {{ private_files }}</p>
+                <p><strong>Shared Files:</strong> {{ shared_files }}</p>
+                <p><strong>Storage Used:</strong> {{ total_storage|filesizeformat }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-line"></i> Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>File</th>
+                                <th>Action</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for download in recent_downloads %}
+                            <tr>
+                                <td>{{ download.file.title|default:download.file.original_name|truncatechars:30 }}</td>
+                                <td>
+                                    <span class="badge bg-info">Downloaded</span>
+                                </td>
+                                <td>{{ download.downloaded_at|date:"M d, Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center">No recent activity</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3 shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-cog"></i> Account Settings</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" name="email" id="email" class="form-control" value="{{ user.email }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="first_name" class="form-label">First Name</label>
+                        <input type="text" name="first_name" id="first_name" class="form-control" value="{{ user.first_name }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="last_name" class="form-label">Last Name</label>
+                        <input type="text" name="last_name" id="last_name" class="form-control" value="{{ user.last_name }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update Profile
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-3 shadow">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="fas fa-key"></i> Change Password</h5>
+            </div>
+            <div class="card-body">
+                <a href="/admin/password_change/" class="btn btn-outline-danger">
+                    <i class="fas fa-lock"></i> Change Password
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
