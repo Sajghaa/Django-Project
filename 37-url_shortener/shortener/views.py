@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Sum
 from django.http import HttpResponseRedirect, Http404
 from django.utils import timezone
 from django.conf import settings
@@ -144,7 +144,7 @@ def dashboard(request):
     urls = paginator.get_page(page)
     
     # Get total stats
-    total_clicks = urls.object_list.aggregate(total=models.Sum('total_clicks'))['total'] or 0
+    total_clicks = urls.object_list.aggregate(total=Sum('total_clicks'))['total'] or 0
     total_urls = urls.object_list.count()
     
     context = {
@@ -164,13 +164,13 @@ def url_stats(request, short_code):
     total_clicks = url.clicks.count()
     unique_clicks = url.unique_clicks
     
-    # Get clicks by date (last 7 days)
+    # Get clicks by date (last 30 days)
     from django.db.models.functions import TruncDate
     clicks_by_date = url.clicks.filter(
         clicked_at__gte=timezone.now() - timezone.timedelta(days=30)
     ).annotate(date=TruncDate('clicked_at')).values('date').annotate(count=Count('id')).order_by('date')
     
-    dates = [item['date'].strftime('%Y-%m-%d') for item in clicks_by_date]
+    dates = [item['date'].strftime('%Y-%m-%d') if item['date'] else '' for item in clicks_by_date]
     counts = [item['count'] for item in clicks_by_date]
     
     # Get top referrers
