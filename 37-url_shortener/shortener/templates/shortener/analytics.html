@@ -1,0 +1,265 @@
+{% extends 'shortener/base.html' %}
+
+{% block title %}Analytics - {{ url.short_code }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="display-5">URL Analytics</h1>
+            <div>
+                <a href="{% url 'shortener:dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+        </div>
+        
+        <!-- URL Info Card -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong><i class="fas fa-link"></i> Short URL:</strong></p>
+                        <code class="short-url">{{ request.build_absolute_uri }}{{ url.short_code }}</code>
+                        <button class="btn btn-sm btn-outline-primary ms-2" onclick="copyToClipboard()">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong><i class="fas fa-external-link-alt"></i> Original URL:</strong></p>
+                        <p class="text-muted">{{ url.original_url|truncatechars:80 }}</p>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-4">
+                        <small><strong>Created:</strong> {{ url.created_at|date:"F j, Y" }}</small>
+                    </div>
+                    {% if url.expires_at %}
+                    <div class="col-md-4">
+                        <small><strong>Expires:</strong> {{ url.expires_at|date:"F j, Y" }}</small>
+                    </div>
+                    {% endif %}
+                    <div class="col-md-4">
+                        <small><strong>Status:</strong> 
+                            {% if url.is_active and not url.is_expired %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="stats-card bg-primary text-white">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>{{ total_clicks }}</h3>
+                    <p>Total Clicks</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stats-card bg-info text-white">
+                    <i class="fas fa-users"></i>
+                    <h3>{{ unique_clicks }}</h3>
+                    <p>Unique Visitors</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stats-card bg-success text-white">
+                    <i class="fas fa-chart-simple"></i>
+                    <h3>{% widthratio unique_clicks total_clicks 100 %}%</h3>
+                    <p>Unique Rate</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stats-card bg-warning text-white">
+                    <i class="fas fa-calendar"></i>
+                    <h3>{{ url.last_clicked_at|date:"M d"|default:"Never" }}</h3>
+                    <p>Last Click</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chart -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-line"></i> Clicks Over Time (Last 30 Days)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="clicksChart" height="100"></canvas>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Top Referrers -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-globe"></i> Top Referrers</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            {% for referrer in top_referrers %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>
+                                    {% if referrer.referrer %}
+                                        {{ referrer.referrer|truncatechars:50 }}
+                                    {% else %}
+                                        <span class="text-muted">Direct / Unknown</span>
+                                    {% endif %}
+                                </span>
+                                <span class="badge bg-primary rounded-pill">{{ referrer.count }}</span>
+                            </div>
+                            {% empty %}
+                            <p class="text-muted text-center">No referrer data yet</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Top Countries -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-map-marker-alt"></i> Top Locations</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            {% for country in top_countries %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>
+                                    {% if country.country %}
+                                        {{ country.country }}
+                                    {% else %}
+                                        <span class="text-muted">Unknown</span>
+                                    {% endif %}
+                                </span>
+                                <span class="badge bg-primary rounded-pill">{{ country.count }}</span>
+                            </div>
+                            {% empty %}
+                            <p class="text-muted text-center">No location data yet</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Devices -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-warning text-white">
+                        <h5 class="mb-0"><i class="fas fa-mobile-alt"></i> Device Breakdown</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            {% for device in devices %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>
+                                    {% if device.device_type %}
+                                        {{ device.device_type }}
+                                    {% else %}
+                                        <span class="text-muted">Unknown</span>
+                                    {% endif %}
+                                </span>
+                                <span class="badge bg-primary rounded-pill">{{ device.count }}</span>
+                            </div>
+                            {% empty %}
+                            <p class="text-muted text-center">No device data yet</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Browsers -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0"><i class="fab fa-chrome"></i> Top Browsers</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            {% for browser in browsers %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>{{ browser.browser|default:"Unknown" }}</span>
+                                <span class="badge bg-primary rounded-pill">{{ browser.count }}</span>
+                            </div>
+                            {% empty %}
+                            <p class="text-muted text-center">No browser data yet</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- QR Code -->
+        {% if qr_code %}
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="fas fa-qrcode"></i> QR Code</h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="qr-code">
+                    <img src="{{ qr_code }}" alt="QR Code" style="width: 200px;">
+                </div>
+                <p class="mt-3">Scan this QR code to access your shortened link</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Chart.js for clicks over time
+const ctx = document.getElementById('clicksChart').getContext('2d');
+const clicksChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: {{ dates|safe }},
+        datasets: [{
+            label: 'Clicks',
+            data: {{ counts|safe }},
+            borderColor: '#667eea',
+            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+            tension: 0.3,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            tooltip: {
+                mode: 'index',
+                intersect: false,
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                }
+            }
+        }
+    }
+});
+
+function copyToClipboard() {
+    const shortUrl = "{{ request.build_absolute_uri }}{{ url.short_code }}";
+    navigator.clipboard.writeText(shortUrl);
+    alert('Short URL copied to clipboard!');
+}
+</script>
+{% endblock %}
