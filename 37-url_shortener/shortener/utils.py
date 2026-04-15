@@ -1,7 +1,7 @@
 import re
 from urllib.parse import urlparse
-import user_agents
 from django.utils import timezone
+from django.db import models
 from .models import Click
 
 def validate_url(url):
@@ -23,16 +23,21 @@ def extract_domain(url):
 
 def parse_user_agent(user_agent_string):
     """Parse user agent to extract browser, OS, device type"""
-    if not user_agent_string:
+    try:
+        import user_agents
+        if not user_agent_string:
+            return {'browser': 'Unknown', 'os': 'Unknown', 'device': 'Unknown'}
+        
+        ua = user_agents.parse(user_agent_string)
+        
+        return {
+            'browser': ua.browser.family,
+            'os': ua.os.family,
+            'device': 'Mobile' if ua.is_mobile else 'Tablet' if ua.is_tablet else 'Desktop'
+        }
+    except ImportError:
+        # Fallback if user_agents not installed
         return {'browser': 'Unknown', 'os': 'Unknown', 'device': 'Unknown'}
-    
-    ua = user_agents.parse(user_agent_string)
-    
-    return {
-        'browser': ua.browser.family,
-        'os': ua.os.family,
-        'device': 'Mobile' if ua.is_mobile else 'Tablet' if ua.is_tablet else 'Desktop'
-    }
 
 def is_unique_click(url, ip_address, session_id, hours=1):
     """Check if click is unique (not from same IP in last hour)"""
