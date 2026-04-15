@@ -1,0 +1,21 @@
+{% extends 'shortener/base.html' %}
+
+{% block title %}Home - URL Shortener{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+        <h1 class="display-4">Shorten Your URLs</h1>
+        <p class="lead">Create short, memorable links and track their performance</p>
+        
+        {% if user.is_authenticated %}
+        <a href="{% url 'shortener:create' %}" class="btn btn-primary btn-lg">Create Short URL</a>
+        {% else %}
+        <div class="mt-4">
+            <a href="{% url 'shortener:register' %}" class="btn btn-primary btn-lg">Get Started</a>
+            <a href="{% url 'shortener:login' %}" class="btn btn-outline-primary btn-lg">Login</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
