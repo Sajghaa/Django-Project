@@ -1,0 +1,132 @@
+{% extends 'shortener/base.html' %}
+
+{% block title %}Dashboard - URL Shortener{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="display-5">My URLs</h1>
+            <a href="{% url 'shortener:create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create New
+            </a>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="stats-card bg-primary text-white">
+                    <i class="fas fa-link"></i>
+                    <h3>{{ total_urls }}</h3>
+                    <p>Total URLs</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stats-card bg-success text-white">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>{{ total_clicks }}</h3>
+                    <p>Total Clicks</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Search Form -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-8">
+                        {{ form.q }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ form.sort_by }}
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- URLs Table -->
+        <div class="card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Short URL</th>
+                                <th>Original URL</th>
+                                <th>Clicks</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for url in urls %}
+                            <tr>
+                                <td>
+                                    <code class="short-url">{{ request.build_absolute_uri }}{{ url.short_code }}</code>
+                                </td>
+                                <td>{{ url.original_url|truncatechars:50 }}</td>
+                                <td>{{ url.total_clicks }}</td>
+                                <td>{{ url.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'shortener:url_stats' url.short_code %}" class="btn btn-info" title="Stats">
+                                            <i class="fas fa-chart-line"></i>
+                                        </a>
+                                        <a href="{% url 'shortener:edit_url' url.short_code %}" class="btn btn-warning" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'shortener:delete_url' url.short_code %}" class="btn btn-danger" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                 </td>
+                             </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <i class="fas fa-link fa-3x text-muted mb-3"></i>
+                                    <p>No URLs created yet.</p>
+                                    <a href="{% url 'shortener:create' %}" class="btn btn-primary">
+                                        Create Your First URL
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pagination -->
+        {% if urls.has_other_pages %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if urls.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ urls.previous_page_number }}">Previous</a>
+                </li>
+                {% endif %}
+                
+                {% for num in urls.paginator.page_range %}
+                <li class="page-item {% if urls.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+                {% endfor %}
+                
+                {% if urls.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ urls.next_page_number }}">Next</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
