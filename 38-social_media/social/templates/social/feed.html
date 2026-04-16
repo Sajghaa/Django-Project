@@ -1,0 +1,121 @@
+{% extends 'social/base.html' %}
+
+{% block title %}Feed - SocialHub{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <!-- Create Post Card -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.content }}
+                    <div class="mt-2">
+                        {{ form.image }}
+                        {{ form.video }}
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2">
+                        <i class="fas fa-paper-plane"></i> Post
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Posts Feed -->
+        {% for post in posts %}
+        <div class="post-card">
+            <div class="d-flex align-items-center mb-3">
+                {% if post.user.profile.avatar %}
+                <img src="{{ post.user.profile.avatar.url }}" class="avatar me-2">
+                {% else %}
+                <i class="fas fa-user-circle fa-2x me-2 text-secondary"></i>
+                {% endif %}
+                <div>
+                    <a href="{% url 'social:profile' post.user.username %}" class="fw-bold text-dark text-decoration-none">
+                        {{ post.user.username }}
+                    </a>
+                    <small class="text-muted d-block">{{ post.created_at|timesince }} ago</small>
+                </div>
+            </div>
+            
+            <p>{{ post.content }}</p>
+            
+            {% if post.image %}
+            <img src="{{ post.image.url }}" class="img-fluid rounded mb-2" style="max-height: 500px; width: 100%; object-fit: cover;">
+            {% endif %}
+            
+            <div class="d-flex justify-content-between mt-3 pt-2 border-top">
+                <button class="btn btn-sm btn-outline-danger like-btn" data-post-id="{{ post.id }}">
+                    <i class="fas fa-heart"></i> 
+                    <span class="likes-count">{{ post.likes_count }}</span>
+                </button>
+                <a href="{% url 'social:post_detail' post.id %}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-comment"></i> {{ post.comments_count }}
+                </a>
+                <button class="btn btn-sm btn-outline-success">
+                    <i class="fas fa-share"></i> Share
+                </button>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-5">
+            <i class="fas fa-newspaper fa-4x text-muted mb-3"></i>
+            <h3>No posts yet</h3>
+            <p>Follow some users or create your first post!</p>
+        </div>
+        {% endfor %}
+        
+        <!-- Pagination -->
+        {% if posts.has_other_pages %}
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if posts.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ posts.previous_page_number }}">Previous</a>
+                </li>
+                {% endif %}
+                
+                {% for num in posts.paginator.page_range %}
+                <li class="page-item {% if posts.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+                {% endfor %}
+                
+                {% if posts.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ posts.next_page_number }}">Next</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.like-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const postId = this.dataset.postId;
+        const likesSpan = this.querySelector('.likes-count');
+        
+        fetch(`/post/${postId}/like/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            likesSpan.textContent = data.likes_count;
+            if (data.liked) {
+                this.classList.add('active');
+            } else {
+                this.classList.remove('active');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
