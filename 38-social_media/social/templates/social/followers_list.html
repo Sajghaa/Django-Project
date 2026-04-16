@@ -1,0 +1,84 @@
+{% extends 'social/base.html' %}
+
+{% block title %}{{ title }} - SocialHub{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-users"></i> {{ title }}</h4>
+            </div>
+            <div class="card-body p-0">
+                {% if users %}
+                <div class="list-group list-group-flush">
+                    {% for user in users %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                {% if user.profile.avatar %}
+                                <img src="{{ user.profile.avatar.url }}" class="avatar me-3" style="width: 50px; height: 50px;">
+                                {% else %}
+                                <i class="fas fa-user-circle fa-3x me-3 text-secondary"></i>
+                                {% endif %}
+                                <div>
+                                    <a href="{% url 'social:profile' user.username %}" class="fw-bold text-dark text-decoration-none">
+                                        {{ user.username }}
+                                    </a>
+                                    <br>
+                                    <small class="text-muted">{{ user.profile.bio|truncatechars:50 }}</small>
+                                </div>
+                            </div>
+                            {% if user != request.user %}
+                            <button class="btn btn-sm follow-btn {% if user in request.user.profile.following %}btn-outline-danger{% else %}btn-primary{% endif %}" 
+                                    data-username="{{ user.username }}">
+                                {% if user in request.user.profile.following %}
+                                Unfollow
+                                {% else %}
+                                Follow
+                                {% endif %}
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-users fa-4x text-muted mb-3"></i>
+                    <p class="text-muted">No {{ title|lower }} yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.follow-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const username = this.dataset.username;
+        
+        fetch(`/follow/${username}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.following) {
+                this.textContent = 'Unfollow';
+                this.classList.remove('btn-primary');
+                this.classList.add('btn-outline-danger');
+            } else {
+                this.textContent = 'Follow';
+                this.classList.remove('btn-outline-danger');
+                this.classList.add('btn-primary');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
