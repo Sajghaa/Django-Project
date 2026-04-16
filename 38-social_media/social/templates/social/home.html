@@ -1,0 +1,56 @@
+{% extends 'social/base.html' %}
+
+{% block title %}Welcome to SocialHub{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-8 text-center">
+        <div class="card shadow">
+            <div class="card-body p-5">
+                <i class="fas fa-users fa-5x text-primary mb-4"></i>
+                <h1 class="display-4">Welcome to SocialHub</h1>
+                <p class="lead">Connect with friends, share your moments, and discover amazing content</p>
+                
+                <div class="mt-4">
+                    <a href="{% url 'social:register' %}" class="btn btn-primary btn-lg me-2">
+                        <i class="fas fa-user-plus"></i> Get Started
+                    </a>
+                    <a href="{% url 'social:login' %}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-share-alt fa-3x text-primary mb-3"></i>
+                        <h5>Share Moments</h5>
+                        <p>Post photos, videos, and updates</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users fa-3x text-success mb-3"></i>
+                        <h5>Connect</h5>
+                        <p>Follow friends and discover new people</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-heart fa-3x text-danger mb-3"></i>
+                        <h5>Engage</h5>
+                        <p>Like and comment on posts</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
