@@ -1,0 +1,49 @@
+{% extends 'social/base.html' %}
+
+{% block title %}Notifications - SocialHub{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-bell"></i> Notifications</h4>
+            </div>
+            <div class="card-body p-0">
+                {% if notifications %}
+                <div class="list-group list-group-flush">
+                    {% for notification in notifications %}
+                    <div class="list-group-item">
+                        <div class="d-flex align-items-center">
+                            {% if notification.from_user.profile.avatar %}
+                            <img src="{{ notification.from_user.profile.avatar.url }}" class="avatar me-3" style="width: 40px; height: 40px;">
+                            {% else %}
+                            <i class="fas fa-user-circle fa-2x me-3 text-secondary"></i>
+                            {% endif %}
+                            <div>
+                                <strong>{{ notification.from_user.username }}</strong>
+                                {% if notification.notification_type == 'like' %}
+                                liked your post
+                                {% elif notification.notification_type == 'comment' %}
+                                commented on your post
+                                {% elif notification.notification_type == 'follow' %}
+                                started following you
+                                {% endif %}
+                                <br>
+                                <small class="text-muted">{{ notification.created_at|timesince }} ago</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-bell-slash fa-4x text-muted mb-3"></i>
+                    <p class="text-muted">No notifications yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
