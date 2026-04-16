@@ -1,0 +1,116 @@
+{% extends 'social/base.html' %}
+
+{% block title %}{{ profile_user.username }} - SocialHub{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <!-- Cover Photo -->
+        {% if profile_user.profile.cover_photo %}
+        <img src="{{ profile_user.profile.cover_photo.url }}" class="cover-photo rounded">
+        {% else %}
+        <div class="cover-photo bg-primary rounded"></div>
+        {% endif %}
+        
+        <!-- Profile Info -->
+        <div class="card mt-3">
+            <div class="card-body text-center">
+                {% if profile_user.profile.avatar %}
+                <img src="{{ profile_user.profile.avatar.url }}" class="profile-avatar">
+                {% else %}
+                <div class="profile-avatar bg-secondary d-flex align-items-center justify-content-center mx-auto">
+                    <i class="fas fa-user fa-3x text-white"></i>
+                </div>
+                {% endif %}
+                
+                <h3 class="mt-2">{{ profile_user.get_full_name|default:profile_user.username }}</h3>
+                <p class="text-muted">@{{ profile_user.username }}</p>
+                
+                {% if profile_user.profile.bio %}
+                <p>{{ profile_user.profile.bio }}</p>
+                {% endif %}
+                
+                <div class="d-flex justify-content-center gap-3 mb-3">
+                    <div>
+                        <strong>{{ posts.paginator.count }}</strong>
+                        <span class="text-muted">posts</span>
+                    </div>
+                    <a href="{% url 'social:followers' profile_user.username %}" class="text-decoration-none">
+                        <strong>{{ followers_count }}</strong>
+                        <span class="text-muted">followers</span>
+                    </a>
+                    <a href="{% url 'social:following' profile_user.username %}" class="text-decoration-none">
+                        <strong>{{ following_count }}</strong>
+                        <span class="text-muted">following</span>
+                    </a>
+                </div>
+                
+                {% if profile_user == user %}
+                <a href="{% url 'social:profile_edit' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </a>
+                {% else %}
+                <button class="btn btn-primary follow-btn" data-username="{{ profile_user.username }}">
+                    <i class="fas fa-user-plus"></i>
+                    <span>{% if is_following %}Unfollow{% else %}Follow{% endif %}</span>
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Posts Grid -->
+        <div class="row mt-4">
+            {% for post in posts %}
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    {% if post.image %}
+                    <img src="{{ post.image.url }}" class="card-img-top" style="height: 250px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <p>{{ post.content|truncatechars:100 }}</p>
+                        <small class="text-muted">{{ post.created_at|timesince }} ago</small>
+                        <div class="mt-2">
+                            <i class="fas fa-heart text-danger"></i> {{ post.likes_count }}
+                            <i class="fas fa-comment ms-2"></i> {{ post.comments_count }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <p>No posts yet</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.follow-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const username = this.dataset.username;
+        const btnText = this.querySelector('span');
+        
+        fetch(`/follow/${username}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.following) {
+                btnText.textContent = 'Unfollow';
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-outline-danger');
+            } else {
+                btnText.textContent = 'Follow';
+                btn.classList.remove('btn-outline-danger');
+                btn.classList.add('btn-primary');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
