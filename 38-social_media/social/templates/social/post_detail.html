@@ -1,0 +1,113 @@
+{% extends 'social/base.html' %}
+
+{% block title %}Post - SocialHub{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <!-- Post Card -->
+        <div class="post-card">
+            <div class="d-flex align-items-center mb-3">
+                {% if post.user.profile.avatar %}
+                <img src="{{ post.user.profile.avatar.url }}" class="avatar me-2">
+                {% else %}
+                <i class="fas fa-user-circle fa-2x me-2 text-secondary"></i>
+                {% endif %}
+                <div>
+                    <a href="{% url 'social:profile' post.user.username %}" class="fw-bold text-dark text-decoration-none">
+                        {{ post.user.username }}
+                    </a>
+                    <small class="text-muted d-block">{{ post.created_at|timesince }} ago</small>
+                </div>
+            </div>
+            
+            <p>{{ post.content }}</p>
+            
+            {% if post.image %}
+            <img src="{{ post.image.url }}" class="img-fluid rounded mb-2">
+            {% endif %}
+            
+            <div class="d-flex justify-content-between mt-3 pt-2 border-top">
+                <button class="btn btn-sm {% if is_liked %}btn-danger{% else %}btn-outline-danger{% endif %} like-btn" data-post-id="{{ post.id }}">
+                    <i class="fas fa-heart"></i> 
+                    <span class="likes-count">{{ post.likes_count }}</span>
+                </button>
+                <button class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-share"></i> Share
+                </button>
+            </div>
+        </div>
+        
+        <!-- Comment Form -->
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6>Add a comment</h6>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        {{ form.content }}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Comments Section -->
+        <div class="card mt-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0">Comments ({{ comments.count }})</h6>
+            </div>
+            <div class="card-body comment-section">
+                {% for comment in comments %}
+                <div class="mb-3">
+                    <div class="d-flex">
+                        {% if comment.user.profile.avatar %}
+                        <img src="{{ comment.user.profile.avatar.url }}" class="avatar me-2" style="width: 32px; height: 32px;">
+                        {% else %}
+                        <i class="fas fa-user-circle fa-2x me-2 text-secondary"></i>
+                        {% endif %}
+                        <div>
+                            <strong>{{ comment.user.username }}</strong>
+                            <small class="text-muted ms-2">{{ comment.created_at|timesince }} ago</small>
+                            <p class="mb-1">{{ comment.content }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center">No comments yet. Be the first to comment!</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.like-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const postId = this.dataset.postId;
+        const likesSpan = this.querySelector('.likes-count');
+        
+        fetch(`/post/${postId}/like/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            likesSpan.textContent = data.likes_count;
+            if (data.liked) {
+                this.classList.remove('btn-outline-danger');
+                this.classList.add('btn-danger');
+            } else {
+                this.classList.remove('btn-danger');
+                this.classList.add('btn-outline-danger');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
