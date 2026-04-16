@@ -1,0 +1,47 @@
+{% extends 'social/base.html' %}
+
+{% block title %}Explore - SocialHub{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="h3 mb-4"><i class="fas fa-compass"></i> Explore Trending Posts</h1>
+    </div>
+    
+    <div class="row">
+        {% for post in posts %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                {% if post.image %}
+                <img src="{{ post.image.url }}" class="card-img-top" style="height: 250px; object-fit: cover;">
+                {% endif %}
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-2">
+                        {% if post.user.profile.avatar %}
+                        <img src="{{ post.user.profile.avatar.url }}" class="avatar me-2" style="width: 30px; height: 30px;">
+                        {% endif %}
+                        <small>{{ post.user.username }}</small>
+                    </div>
+                    <p>{{ post.content|truncatechars:100 }}</p>
+                    <div class="d-flex justify-content-between">
+                        <span>
+                            <i class="fas fa-heart text-danger"></i> {{ post.likes_count }}
+                        </span>
+                        <span>
+                            <i class="fas fa-comment"></i> {{ post.comments_count }}
+                        </span>
+                        <a href="{% url 'social:post_detail' post.id %}" class="btn btn-sm btn-primary">View</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <i class="fas fa-compass fa-4x text-muted mb-3"></i>
+            <h3>No posts to explore</h3>
+            <p>Check back later for trending content</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
