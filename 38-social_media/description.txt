@@ -1,0 +1,1 @@
+A social media platform where users can create profiles, post content, follow others, like posts, and comment.
