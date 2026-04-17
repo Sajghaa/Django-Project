@@ -1,0 +1,106 @@
+{% extends 'bookings/base.html' %}
+
+{% block title %}Services - BookingApp{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="display-5 mb-4">Our Services</h1>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Sidebar Filters -->
+    <div class="col-md-3 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Filter Services</h5>
+            </div>
+            <div class="card-body">
+                <form method="get">
+                    <div class="mb-3">
+                        <label class="form-label">Service Type</label>
+                        {{ form.service_type }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Price Range</label>
+                        <div class="row">
+                            <div class="col-6">
+                                {{ form.min_price }}
+                            </div>
+                            <div class="col-6">
+                                {{ form.max_price }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Search</label>
+                        {{ form.search }}
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                    <a href="{% url 'bookings:service_list' %}" class="btn btn-secondary w-100 mt-2">Reset</a>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Services Grid -->
+    <div class="col-md-9">
+        <div class="row">
+            {% for service in services %}
+            <div class="col-md-4 mb-4">
+                <div class="card service-card h-100">
+                    {% if service.image %}
+                    <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.name }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                    <div class="bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="fas fa-image fa-3x text-white-50"></i>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ service.name }}</h5>
+                        <p class="card-text text-muted">{{ service.description|truncatewords:15 }}</p>
+                        <div class="price">${{ service.price }}</div>
+                        <small class="text-muted">per {% if service.service_type == 'hotel' %}night{% else %}booking{% endif %}</small>
+                    </div>
+                    <div class="card-footer bg-white border-0 pb-3">
+                        <a href="{% url 'bookings:service_detail' service.slug %}" class="btn btn-primary w-100">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
+                <h3>No services found</h3>
+                <p>Try adjusting your filters</p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if services.has_other_pages %}
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if services.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ services.previous_page_number }}">Previous</a>
+                </li>
+                {% endif %}
+                
+                {% for num in services.paginator.page_range %}
+                <li class="page-item {% if services.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+                {% endfor %}
+                
+                {% if services.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ services.next_page_number }}">Next</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
