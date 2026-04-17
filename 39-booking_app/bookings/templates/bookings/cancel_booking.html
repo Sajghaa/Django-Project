@@ -1,0 +1,39 @@
+{% extends 'bookings/base.html' %}
+
+{% block title %}Cancel Booking - BookingApp{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-danger text-white">
+                <h3 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Cancel Booking</h3>
+            </div>
+            <div class="card-body text-center">
+                <i class="fas fa-calendar-times fa-4x text-warning mb-3"></i>
+                <h4>Are you sure you want to cancel?</h4>
+                <p><strong>{{ booking.service.name }}</strong></p>
+                <p>{{ booking.start_datetime|date:"F j, Y g:i A" }}</p>
+                <p class="text-muted">Booking #: {{ booking.booking_number }}</p>
+                
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle"></i> 
+                    Cancellation policy: Free cancellation up to 24 hours before the booking.
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'bookings:booking_detail' booking.id %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Go Back
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-check"></i> Yes, Cancel Booking
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
