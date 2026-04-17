@@ -2,7 +2,7 @@
 
 > A curated collection of Django projects demonstrating Django mastery through real-world applications.
 
-**Progress:** 37 / 100 completed
+**Progress:** 38 / 100 completed
 
 ---
 
@@ -48,6 +48,7 @@ This is a Django web application focused on user authentication. | Completed | �
 | 35 | [35-chat_app](35-chat_app) | No description yet | Completed | ✅ |
 | 36 | [36-file_app](36-file_app) | No description yet | Completed | ✅ |
 | 37 | [37-url_shortener](37-url_shortener) | A clean project for Url shortener that will include validation and more | Completed | ✅ |
+| 38 | [38-social_media](38-social_media) | No description yet | Completed | ✅ |
 
 ---
 
