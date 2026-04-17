@@ -1,0 +1,116 @@
+{% extends 'bookings/base.html' %}
+
+{% block title %}Booking Confirmed - BookingApp{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg border-success">
+            <div class="card-header bg-success text-white text-center">
+                <i class="fas fa-check-circle fa-3x mb-2"></i>
+                <h2 class="mb-0">Booking Confirmed!</h2>
+            </div>
+            <div class="card-body text-center">
+                <div class="alert alert-success">
+                    <i class="fas fa-envelope"></i> 
+                    A confirmation email has been sent to your registered email address.
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6 text-start">
+                        <h5>Booking Details</h5>
+                        <p><strong>Booking Number:</strong><br>
+                        <code class="fs-4">{{ booking.booking_number }}</code></p>
+                        <p><strong>Service:</strong><br>
+                        {{ booking.service.name }}</p>
+                        <p><strong>Date & Time:</strong><br>
+                        {{ booking.start_datetime|date:"l, F j, Y" }} at {{ booking.start_datetime|date:"g:i A" }}</p>
+                        <p><strong>Duration:</strong><br>
+                        {{ booking.service.duration }} minutes</p>
+                    </div>
+                    <div class="col-md-6 text-start">
+                        <h5>Customer Information</h5>
+                        <p><strong>Name:</strong><br>
+                        {{ booking.user.get_full_name|default:booking.user.username }}</p>
+                        <p><strong>Email:</strong><br>
+                        {{ booking.user.email }}</p>
+                        <p><strong>Guests:</strong><br>
+                        {{ booking.guests_count }} person(s)</p>
+                        <p><strong>Total Amount:</strong><br>
+                        <span class="price">${{ booking.total_amount }}</span></p>
+                    </div>
+                </div>
+                
+                {% if booking.special_requests %}
+                <div class="alert alert-info mt-3">
+                    <strong>Special Requests:</strong><br>
+                    {{ booking.special_requests }}
+                </div>
+                {% endif %}
+                
+                <hr>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6><i class="fas fa-calendar-alt"></i> Add to Calendar</h6>
+                                <a href="#" class="btn btn-sm btn-outline-primary mt-2">
+                                    <i class="fab fa-google"></i> Google Calendar
+                                </a>
+                                <a href="#" class="btn btn-sm btn-outline-secondary mt-2">
+                                    <i class="fas fa-download"></i> ICS File
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6><i class="fas fa-share-alt"></i> Share Booking</h6>
+                                <div class="input-group mt-2">
+                                    <input type="text" id="shareLink" class="form-control form-control-sm" 
+                                           value="{{ request.build_absolute_uri }}" readonly>
+                                    <button class="btn btn-sm btn-primary" onclick="copyToClipboard()">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{% url 'bookings:my_bookings' %}" class="btn btn-primary">
+                        <i class="fas fa-bookmark"></i> View My Bookings
+                    </a>
+                    <a href="{% url 'bookings:service_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-search"></i> Browse More Services
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6><i class="fas fa-info-circle"></i> Important Information</h6>
+                <ul class="small text-muted">
+                    <li>Please arrive 10 minutes before your scheduled time</li>
+                    <li>Free cancellation up to 24 hours before the booking</li>
+                    <li>Contact us at support@bookingapp.com for any changes</li>
+                    <li>Keep your booking number for reference</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard() {
+    const copyText = document.getElementById('shareLink');
+    copyText.select();
+    document.execCommand('copy');
+    alert('Booking link copied to clipboard!');
+}
+</script>
+{% endblock %}
