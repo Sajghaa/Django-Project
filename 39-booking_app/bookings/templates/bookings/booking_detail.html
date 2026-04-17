@@ -1,0 +1,212 @@
+{% extends 'bookings/base.html' %}
+
+{% block title %}Booking #{{ booking.booking_number }} - BookingApp{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <!-- Status Banner -->
+        <div class="alert alert-{% if booking.status == 'confirmed' %}success{% elif booking.status == 'cancelled' %}danger{% elif booking.status == 'completed' %}info{% else %}warning{% endif %} mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas fa-{% if booking.status == 'confirmed' %}check-circle{% elif booking.status == 'cancelled' %}times-circle{% elif booking.status == 'completed' %}check-double{% else %}clock{% endif %} fa-2x me-2"></i>
+                    <strong>Status: {{ booking.get_status_display }}</strong>
+                </div>
+                {% if booking.status == 'confirmed' %}
+                <a href="{% url 'bookings:cancel_booking' booking.id %}" class="btn btn-danger btn-sm">
+                    <i class="fas fa-times"></i> Cancel Booking
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Booking Details Card -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Booking Details</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-hashtag"></i> Booking Number</h6>
+                        <p><code class="fs-5">{{ booking.booking_number }}</code></p>
+                        
+                        <h6><i class="fas fa-calendar-alt"></i> Date & Time</h6>
+                        <p>{{ booking.start_datetime|date:"l, F j, Y" }}<br>
+                        {{ booking.start_datetime|date:"g:i A" }} - {{ booking.end_datetime|date:"g:i A" }}</p>
+                        
+                        <h6><i class="fas fa-users"></i> Guests</h6>
+                        <p>{{ booking.guests_count }} person(s)</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-tag"></i> Service</h6>
+                        <p><strong>{{ booking.service.name }}</strong><br>
+                        <span class="text-muted">{{ booking.service.get_service_type_display }}</span></p>
+                        
+                        <h6><i class="fas fa-map-marker-alt"></i> Location</h6>
+                        <p>{{ booking.service.location|default:"To be confirmed" }}</p>
+                        
+                        <h6><i class="fas fa-dollar-sign"></i> Total Amount</h6>
+                        <p class="price fs-3">${{ booking.total_amount }}</p>
+                    </div>
+                </div>
+                
+                {% if booking.special_requests %}
+                <div class="mt-3">
+                    <h6><i class="fas fa-comment"></i> Special Requests</h6>
+                    <p class="bg-light p-3 rounded">{{ booking.special_requests }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Timeline -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-history"></i> Booking Timeline</h5>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-badge bg-success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h6>Booking Created</h6>
+                            <p class="text-muted">{{ booking.created_at|date:"F j, Y g:i A" }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if booking.status == 'confirmed' %}
+                    <div class="timeline-item">
+                        <div class="timeline-badge bg-primary">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h6>Booking Confirmed</h6>
+                            <p class="text-muted">{{ booking.updated_at|date:"F j, Y g:i A" }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if booking.status == 'completed' %}
+                    <div class="timeline-item">
+                        <div class="timeline-badge bg-info">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h6>Service Completed</h6>
+                            <p class="text-muted">{{ booking.end_datetime|date:"F j, Y g:i A" }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if booking.status == 'cancelled' %}
+                    <div class="timeline-item">
+                        <div class="timeline-badge bg-danger">
+                            <i class="fas fa-times"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h6>Booking Cancelled</h6>
+                            <p class="text-muted">{{ booking.cancelled_at|date:"F j, Y g:i A" }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-badge bg-secondary">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h6>Scheduled Date</h6>
+                            <p class="text-muted">{{ booking.start_datetime|date:"F j, Y g:i A" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Review Section -->
+        {% if can_review %}
+        <div class="card shadow">
+            <div class="card-header bg-warning text-white">
+                <h5 class="mb-0"><i class="fas fa-star"></i> Leave a Review</h5>
+            </div>
+            <div class="card-body text-center">
+                <p>How was your experience with {{ booking.service.name }}?</p>
+                <a href="{% url 'bookings:add_review' booking.id %}" class="btn btn-warning">
+                    <i class="fas fa-star"></i> Write a Review
+                </a>
+            </div>
+        </div>
+        {% elif booking.review %}
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-star"></i> Your Review</h5>
+            </div>
+            <div class="card-body">
+                <div class="rating-stars mb-2">
+                    {% for i in "12345"|make_list %}
+                        {% if forloop.counter <= booking.review.rating %}
+                            <i class="fas fa-star text-warning"></i>
+                        {% else %}
+                            <i class="far fa-star text-warning"></i>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <p>{{ booking.review.comment }}</p>
+                <small class="text-muted">Reviewed on {{ booking.review.created_at|date:"M d, Y" }}</small>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Action Buttons -->
+        <div class="mt-4 text-center">
+            <a href="{% url 'bookings:my_bookings' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to My Bookings
+            </a>
+            <a href="{% url 'bookings:service_detail' booking.service.slug %}" class="btn btn-primary">
+                <i class="fas fa-info-circle"></i> View Service
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.timeline-badge {
+    position: absolute;
+    left: -30px;
+    top: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.timeline-content {
+    padding-left: 20px;
+    border-left: 2px solid #e0e0e0;
+}
+
+.timeline-content h6 {
+    margin-bottom: 5px;
+}
+
+.timeline-content p {
+    margin-bottom: 0;
+}
+</style>
+{% endblock %}
