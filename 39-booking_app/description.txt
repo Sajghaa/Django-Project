@@ -1,0 +1,1 @@
+Django app for booking services, managing reservations, users, and availability efficiently.
