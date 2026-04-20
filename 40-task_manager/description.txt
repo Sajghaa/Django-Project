@@ -1,0 +1,1 @@
+A task management system where users can create, organize, prioritize, and track tasks with deadlines, reminders, and progress tracking.
