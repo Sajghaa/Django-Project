@@ -1,0 +1,21 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}TaskManager - Stay Organized{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-8 text-center">
+        <div class="card shadow">
+            <div class="card-body p-5">
+                <i class="fas fa-tasks fa-5x text-primary mb-4"></i>
+                <h1 class="display-4">TaskManager</h1>
+                <p class="lead">Stay organized, meet deadlines, and boost your productivity</p>
+                <div class="mt-4">
+                    <a href="{% url 'tasks:register' %}" class="btn btn-primary btn-lg me-2">Get Started</a>
+                    <a href="{% url 'tasks:login' %}" class="btn btn-outline-primary btn-lg">Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
