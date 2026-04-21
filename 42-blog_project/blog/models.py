@@ -78,6 +78,7 @@ class Post(models.Model):
     
     # Status & Metadata
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
+    featured = models.BooleanField(default=False)  # ← ADD THIS LINE
     views = models.PositiveIntegerField(default=0)
     likes = models.PositiveIntegerField(default=0)
     
@@ -89,6 +90,7 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     published_at = models.DateTimeField(default=timezone.now)
+    
     
     class Meta:
         ordering = ['-published_at']
