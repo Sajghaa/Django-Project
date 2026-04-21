@@ -1,0 +1,153 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Home - DjangoBlog{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="row mb-5">
+    <div class="col-12 text-center">
+        <h1 class="display-4">Welcome to DjangoBlog</h1>
+        <p class="lead">Discover amazing articles from talented authors</p>
+    </div>
+</div>
+
+<!-- Featured Posts -->
+{% if featured_posts %}
+<div class="row mb-5">
+    <div class="col-12">
+        <h2 class="mb-4">Featured Posts</h2>
+    </div>
+    <div class="row">
+        {% for post in featured_posts %}
+        <div class="col-md-4 mb-4">
+            <div class="card post-card h-100">
+                {% if post.featured_image %}
+                <img src="{{ post.featured_image.url }}" class="card-img-top post-image" alt="{{ post.title }}">
+                {% else %}
+                <div class="bg-secondary d-flex align-items-center justify-content-center post-image">
+                    <i class="fas fa-image fa-3x text-white-50"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    {% if post.category %}
+                    <a href="{% url 'blog:category_posts' post.category.slug %}" class="category-badge">
+                        {{ post.category.name }}
+                    </a>
+                    {% endif %}
+                    <h5 class="card-title mt-2">{{ post.title }}</h5>
+                    <p class="card-text text-muted">{{ post.excerpt|truncatewords:25 }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="fas fa-user"></i> {{ post.author.username }} |
+                            <i class="fas fa-calendar"></i> {{ post.published_at|date:"M d, Y" }}
+                        </small>
+                        <a href="{% url 'blog:post_detail' post.slug %}" class="btn btn-sm btn-primary">Read More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Latest Posts -->
+<div class="row">
+    <div class="col-lg-8">
+        <h2 class="mb-4">Latest Posts</h2>
+        
+        {% for post in latest_posts %}
+        <div class="card post-card">
+            <div class="row g-0">
+                {% if post.featured_image %}
+                <div class="col-md-4">
+                    <img src="{{ post.featured_image.url }}" class="img-fluid rounded-start" alt="{{ post.title }}" style="height: 200px; width: 100%; object-fit: cover;">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                {% else %}
+                <div class="col-md-12">
+                    <div class="card-body">
+                {% endif %}
+                        <div class="mb-2">
+                            {% if post.category %}
+                            <a href="{% url 'blog:category_posts' post.category.slug %}" class="category-badge">
+                                {{ post.category.name }}
+                            </a>
+                            {% endif %}
+                        </div>
+                        <h5 class="card-title">{{ post.title }}</h5>
+                        <p class="card-text text-muted">{{ post.excerpt|truncatewords:30 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-muted">
+                                    <i class="fas fa-user"></i> {{ post.author.username }} |
+                                    <i class="fas fa-calendar"></i> {{ post.published_at|date:"M d, Y" }} |
+                                    <i class="fas fa-clock"></i> {{ post.reading_time }} min read
+                                </small>
+                            </div>
+                            <a href="{% url 'blog:post_detail' post.slug %}" class="btn btn-sm btn-primary">Read More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-5">
+            <i class="fas fa-blog fa-4x text-muted mb-3"></i>
+            <h3>No posts yet</h3>
+            <p>Check back later for amazing content!</p>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Search -->
+        <div class="sidebar-card">
+            <h5><i class="fas fa-search"></i> Search</h5>
+            <form method="get" action="{% url 'blog:search' %}">
+                <div class="input-group">
+                    <input type="text" name="q" class="form-control" placeholder="Search...">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Categories -->
+        <div class="sidebar-card">
+            <h5><i class="fas fa-folder"></i> Categories</h5>
+            <div class="list-group list-group-flush">
+                {% for cat in all_categories %}
+                <a href="{% url 'blog:category_posts' cat.slug %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    {{ cat.name }}
+                    <span class="badge bg-primary rounded-pill">{{ cat.post_count }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Popular Tags -->
+        {% if popular_tags %}
+        <div class="sidebar-card">
+            <h5><i class="fas fa-tags"></i> Popular Tags</h5>
+            <div class="tag-cloud">
+                {% for tag in popular_tags %}
+                <a href="{% url 'blog:tag_posts' tag.slug %}" class="tag" style="font-size: {{ tag.post_count|add:10 }}px;">
+                    #{{ tag.name }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- About -->
+        <div class="sidebar-card">
+            <h5><i class="fas fa-info-circle"></i> About</h5>
+            <p>DjangoBlog is a community blog where authors share knowledge about web development, programming, and technology.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
