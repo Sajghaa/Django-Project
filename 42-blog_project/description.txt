@@ -1,0 +1,1 @@
+A feature-rich blog platform where authors can create posts, organize them with categories and tags, and readers can browse, search, and interact with content.
