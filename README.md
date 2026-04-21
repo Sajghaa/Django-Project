@@ -2,7 +2,7 @@
 
 > A curated collection of Django projects demonstrating Django mastery through real-world applications.
 
-**Progress:** 39 / 100 completed
+**Progress:** 40 / 100 completed
 
 ---
 
@@ -50,6 +50,7 @@ This is a Django web application focused on user authentication. | Completed | �
 | 37 | [37-url_shortener](37-url_shortener) | A clean project for Url shortener that will include validation and more | Completed | ✅ |
 | 38 | [38-social_media](38-social_media) | A social media platform where users can create profiles, post content, follow others, like posts, and comment. | Completed | ✅ |
 | 39 | [39-booking_app](39-booking_app) | Django app for booking services, managing reservations, users, and availability efficiently. | Completed | ✅ |
+| 40 | [40-task_manager](40-task_manager) | A task management system where users can create, organize, prioritize, and track tasks with deadlines, reminders, and progress tracking. | Completed | ✅ |
 
 ---
 
