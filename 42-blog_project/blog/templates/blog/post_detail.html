@@ -1,0 +1,201 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}{{ post.title }} - DjangoBlog{% endblock %}
+{% block meta_description %}{{ post.seo_description|default:post.excerpt }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <!-- Post Header -->
+        <div class="mb-4">
+            <div class="mb-3">
+                {% if post.category %}
+                <a href="{% url 'blog:category_posts' post.category.slug %}" class="category-badge">
+                    {{ post.category.name }}
+                </a>
+                {% endif %}
+                {% for tag in post.tags.all %}
+                <a href="{% url 'blog:tag_posts' tag.slug %}" class="tag">
+                    #{{ tag.name }}
+                </a>
+                {% endfor %}
+            </div>
+            
+            <h1 class="display-5 fw-bold mb-3">{{ post.title }}</h1>
+            
+            <div class="text-muted mb-4">
+                <div class="row">
+                    <div class="col-md-6">
+                        <i class="fas fa-user"></i> 
+                        <a href="{% url 'blog:author_posts' post.author.username %}" class="text-decoration-none">
+                            {{ post.author.username }}
+                        </a> |
+                        <i class="fas fa-calendar"></i> {{ post.published_at|date:"F j, Y" }} |
+                        <i class="fas fa-clock"></i> {{ post.reading_time }} min read
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <i class="fas fa-eye"></i> {{ post.views }} views |
+                        <i class="fas fa-heart text-danger"></i> <span id="likes-count">{{ post.likes }}</span> likes |
+                        <i class="fas fa-comment"></i> {{ post.comment_count }} comments
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Featured Image -->
+        {% if post.featured_image %}
+        <div class="mb-4">
+            <img src="{{ post.featured_image.url }}" class="img-fluid rounded-3 shadow" alt="{{ post.title }}">
+        </div>
+        {% endif %}
+        
+        <!-- Post Content -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body p-4">
+                <div class="post-content">
+                    {{ post.content|linebreaks }}
+                </div>
+                
+                <hr class="my-4">
+                
+                <!-- Like and Share -->
+                <div class="d-flex justify-content-between align-items-center">
+                    <button id="like-btn" class="btn btn-outline-danger {% if user_liked %}active{% endif %}" 
+                            data-slug="{{ post.slug }}">
+                        <i class="fas fa-heart"></i> 
+                        <span id="likes-count-display">{{ post.likes }}</span> Likes
+                    </button>
+                    
+                    <div>
+                        <button class="btn btn-outline-secondary" onclick="copyToClipboard()">
+                            <i class="fas fa-share-alt"></i> Share
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Author Bio -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="me-3">
+                        {% if post.author.profile.avatar %}
+                        <img src="{{ post.author.profile.avatar.url }}" class="rounded-circle" style="width: 60px; height: 60px; object-fit: cover;">
+                        {% else %}
+                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                            <i class="fas fa-user fa-2x text-white"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h5>About {{ post.author.username }}</h5>
+                        <p class="text-muted">{{ post.author.profile.bio|default:"No bio provided." }}</p>
+                        {% if post.author.profile.website %}
+                        <a href="{{ post.author.profile.website }}" target="_blank" class="me-2"><i class="fas fa-globe"></i></a>
+                        {% endif %}
+                        {% if post.author.profile.twitter %}
+                        <a href="{{ post.author.profile.twitter }}" target="_blank" class="me-2"><i class="fab fa-twitter"></i></a>
+                        {% endif %}
+                        {% if post.author.profile.github %}
+                        <a href="{{ post.author.profile.github }}" target="_blank"><i class="fab fa-github"></i></a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Related Posts -->
+        {% if related_posts %}
+        <div class="mb-5">
+            <h4 class="mb-4">Related Posts</h4>
+            <div class="row">
+                {% for related in related_posts %}
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        {% if related.featured_image %}
+                        <img src="{{ related.featured_image.url }}" class="card-img-top" alt="{{ related.title }}" style="height: 150px; object-fit: cover;">
+                        {% endif %}
+                        <div class="card-body">
+                            <h6 class="card-title">{{ related.title }}</h6>
+                            <small class="text-muted">{{ related.published_at|date:"M d, Y" }}</small>
+                            <a href="{% url 'blog:post_detail' related.slug %}" class="btn btn-sm btn-outline-primary mt-2 w-100">Read More</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Comments Section -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-comments"></i> Comments ({{ post.comment_count }})</h5>
+            </div>
+            <div class="card-body">
+                {% if user.is_authenticated %}
+                <form method="post" class="mb-4">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Leave a Comment</label>
+                        {{ form.content }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Post Comment
+                    </button>
+                </form>
+                <hr>
+                {% else %}
+                <div class="alert alert-info text-center">
+                    <a href="{% url 'blog:login' %}?next={{ request.path }}">Login</a> to leave a comment.
+                </div>
+                {% endif %}
+                
+                <!-- Comments List -->
+                {% for comment in comments %}
+                <div class="mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <strong>{{ comment.author.username }}</strong>
+                            <small class="text-muted ms-2">{{ comment.created_at|date:"M d, Y g:i A" }}</small>
+                        </div>
+                    </div>
+                    <p class="mt-2 mb-0">{{ comment.content }}</p>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center">No comments yet. Be the first to comment!</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('like-btn')?.addEventListener('click', function() {
+    const slug = this.dataset.slug;
+    fetch(`/post/${slug}/like/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('likes-count').textContent = data.likes_count;
+        document.getElementById('likes-count-display').textContent = data.likes_count;
+        if (data.liked) {
+            document.getElementById('like-btn').classList.add('active');
+        } else {
+            document.getElementById('like-btn').classList.remove('active');
+        }
+    });
+});
+
+function copyToClipboard() {
+    navigator.clipboard.writeText(window.location.href);
+    alert('Link copied to clipboard!');
+}
+</script>
+{% endblock %}
