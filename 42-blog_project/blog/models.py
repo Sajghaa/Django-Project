@@ -46,6 +46,7 @@ class Tag(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.slug:
+            from django.utils.text import slugify
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
     
