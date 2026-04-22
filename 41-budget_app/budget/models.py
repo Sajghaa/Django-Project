@@ -71,7 +71,7 @@ class Budget(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='budgets')
     month = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
     year = models.IntegerField()
-    amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], null=True, blank=True, default=0)  # Allow null
     spent_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     alert_threshold = models.IntegerField(default=80, validators=[MinValueValidator(0), MaxValueValidator(100)])
     created_at = models.DateTimeField(auto_now_add=True)
@@ -82,21 +82,23 @@ class Budget(models.Model):
         ordering = ['category__name']
     
     def __str__(self):
-        return f"{self.category.name} - {self.month}/{self.year}: ${self.amount}"
+        return f"{self.category.name} - {self.month}/{self.year}: ${self.amount if self.amount else 0}"
     
     @property
     def remaining(self):
-        return self.amount - self.spent_amount
+        if self.amount:
+            return self.amount - self.spent_amount
+        return 0
     
     @property
     def percentage_used(self):
-        if self.amount > 0:
+        if self.amount and self.amount > 0:
             return min(100, int((self.spent_amount / self.amount) * 100))
         return 0
     
     @property
     def is_exceeded(self):
-        return self.spent_amount > self.amount
+        return self.amount and self.spent_amount > self.amount
     
     def update_spent(self):
         """Update spent amount based on transactions"""
