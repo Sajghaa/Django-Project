@@ -22,7 +22,7 @@ def home(request):
         'latest_posts': latest_posts,
     }
     return render(request, 'blog/home.html', context)
-
+    
 def post_list(request):
     """List all published posts"""
     posts = Post.objects.filter(status='published')
@@ -32,13 +32,13 @@ def post_list(request):
     search_query = None
     selected_category = None
     selected_tag = None
-    sort_by = '-published_at'
+    sort_by = request.GET.get('sort_by', '-published_at')  # Default value
     
     if form.is_valid():
         search_query = form.cleaned_data.get('q')
         selected_category = form.cleaned_data.get('category')
         selected_tag = form.cleaned_data.get('tag')
-        sort_by = form.cleaned_data.get('sort_by', '-published_at')
+        sort_by = form.cleaned_data.get('sort_by') or '-published_at'  # Handle None
         
         if search_query:
             posts = posts.filter(
@@ -53,6 +53,11 @@ def post_list(request):
         
         if selected_tag:
             posts = posts.filter(tags=selected_tag)
+    
+    # Ensure sort_by is valid
+    valid_sort_fields = ['-published_at', 'published_at', '-views', '-likes', 'title']
+    if sort_by not in valid_sort_fields:
+        sort_by = '-published_at'
     
     posts = posts.order_by(sort_by)
     
@@ -69,7 +74,6 @@ def post_list(request):
         'selected_tag': selected_tag,
     }
     return render(request, 'blog/post_list.html', context)
-
 def post_detail(request, slug):
     """Single post detail view"""
     post = get_object_or_404(Post, slug=slug, status='published')
