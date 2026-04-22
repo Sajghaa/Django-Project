@@ -351,17 +351,7 @@ def budget_list(request):
     current_month = now.month
     current_year = now.year
     
-    # Get or create budgets for expense categories
-    expense_categories = Category.objects.filter(user=request.user, type='expense')
-    
-    for category in expense_categories:
-        Budget.objects.get_or_create(
-            user=request.user,
-            category=category,
-            month=current_month,
-            year=current_year
-        )
-    
+    # Only get existing budgets, don't auto-create them
     budgets = Budget.objects.filter(
         user=request.user,
         month=current_month,
