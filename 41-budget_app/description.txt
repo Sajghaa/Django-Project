@@ -1,0 +1,1 @@
+A personal finance management application where users can track income, expenses, set budgets, monitor spending categories, and visualize financial health through charts and reports.
