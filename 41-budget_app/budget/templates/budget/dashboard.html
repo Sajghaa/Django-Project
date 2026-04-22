@@ -1,0 +1,194 @@
+{% extends 'budget/base.html' %}
+{% load budget_extras %}
+
+{% block title %}Dashboard - BudgetApp{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="display-5 mb-4">Welcome back, {{ user.username }}!</h1>
+        <p class="lead">{{ current_month }}</p>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <div class="stat-card">
+            <i class="fas fa-dollar-sign text-success"></i>
+            <h3>${{ monthly_income|floatformat:2 }}</h3>
+            <p class="text-muted">Monthly Income</p>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="stat-card">
+            <i class="fas fa-shopping-cart text-danger"></i>
+            <h3>${{ monthly_expenses|floatformat:2 }}</h3>
+            <p class="text-muted">Monthly Expenses</p>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="stat-card">
+            <i class="fas fa-piggy-bank text-primary"></i>
+            <h3>${{ balance|floatformat:2 }}</h3>
+            <p class="text-muted">Net Savings</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Budget Progress -->
+    <div class="col-md-6 mb-4">
+        <div class="sidebar-card">
+            <h5><i class="fas fa-chart-line"></i> Budget Progress</h5>
+            <hr>
+            {% for budget in budgets %}
+            <div class="budget-progress">
+                <div class="d-flex justify-content-between mb-1">
+                    <span>
+                        <i class="{{ budget.category.icon }}"></i> {{ budget.category.name }}
+                    </span>
+                    <span>${{ budget.spent_amount|floatformat:2 }} / ${{ budget.amount|floatformat:2 }}</span>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar {% if budget.percentage_used >= 90 %}bg-danger{% elif budget.percentage_used >= 75 %}bg-warning{% else %}bg-success{% endif %}" 
+                         role="progressbar" style="width: {{ budget.percentage_used }}%">
+                    </div>
+                </div>
+                <small class="text-muted">{{ budget.percentage_used }}% used</small>
+            </div>
+            {% empty %}
+            <p class="text-muted">No budgets set. <a href="{% url 'budget:budget_list' %}">Set a budget</a></p>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Top Expenses -->
+    <div class="col-md-6 mb-4">
+        <div class="sidebar-card">
+            <h5><i class="fas fa-chart-pie"></i> Top Expenses</h5>
+            <hr>
+            {% for expense in top_expenses %}
+            <div class="d-flex justify-content-between mb-2">
+                <span>
+                    <i class="{{ expense.category__icon }}"></i> {{ expense.category__name }}
+                </span>
+                <span class="text-danger">${{ expense.total|floatformat:2 }}</span>
+            </div>
+            {% empty %}
+            <p class="text-muted">No expenses recorded this month</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Monthly Chart -->
+    <div class="col-md-8 mb-4">
+        <div class="sidebar-card">
+            <h5><i class="fas fa-chart-bar"></i> Income vs Expenses (Last 6 Months)</h5>
+            <canvas id="monthlyChart" height="300"></canvas>
+        </div>
+    </div>
+    
+    <!-- Savings Goals -->
+    <div class="col-md-4 mb-4">
+        <div class="sidebar-card">
+            <h5><i class="fas fa-bullseye"></i> Savings Goals</h5>
+            <hr>
+            {% for goal in savings_goals %}
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <span>{{ goal.name }}</span>
+                    <span>${{ goal.current_amount|floatformat:2 }} / ${{ goal.target_amount|floatformat:2 }}</span>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar bg-info" role="progressbar" style="width: {{ goal.percentage_complete }}%">
+                    </div>
+                </div>
+                <small class="text-muted">{{ goal.percentage_complete }}% complete</small>
+            </div>
+            {% empty %}
+            <p class="text-muted">No savings goals. <a href="{% url 'budget:goals_list' %}">Create a goal</a></p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Recent Transactions -->
+<div class="row">
+    <div class="col-12">
+        <div class="sidebar-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0"><i class="fas fa-history"></i> Recent Transactions</h5>
+                <a href="{% url 'budget:transaction_list' %}" class="btn btn-sm btn-primary">View All</a>
+            </div>
+            {% for transaction in recent_transactions %}
+            <div class="transaction-card {% if transaction.category.type == 'income' %}income{% else %}expense{% endif %}">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ transaction.category.name }}</strong>
+                        <br>
+                        <small class="text-muted">
+                            {{ transaction.transaction_date|date:"M d, Y" }}
+                            {% if transaction.description %} - {{ transaction.description|truncatechars:30 }}{% endif %}
+                        </small>
+                    </div>
+                    <div class="text-end">
+                        <strong class="{% if transaction.category.type == 'income' %}text-success{% else %}text-danger{% endif %}">
+                            {% if transaction.category.type == 'income' %}+{% else %}-{% endif %}${{ transaction.amount|floatformat:2 }}
+                        </strong>
+                        <br>
+                        <small class="text-muted">{{ transaction.get_payment_method_display }}</small>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-muted text-center">No transactions yet. <a href="{% url 'budget:transaction_add' %}">Add your first transaction</a></p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+const monthlyData = {{ monthly_data|safe }};
+
+const ctx = document.getElementById('monthlyChart').getContext('2d');
+const monthlyChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: monthlyData.map(item => item.month),
+        datasets: [
+            {
+                label: 'Income',
+                data: monthlyData.map(item => item.income),
+                backgroundColor: 'rgba(40, 167, 69, 0.5)',
+                borderColor: '#28a745',
+                borderWidth: 1
+            },
+            {
+                label: 'Expenses',
+                data: monthlyData.map(item => item.expenses),
+                backgroundColor: 'rgba(220, 53, 69, 0.5)',
+                borderColor: '#dc3545',
+                borderWidth: 1
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return '$' + value;
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
