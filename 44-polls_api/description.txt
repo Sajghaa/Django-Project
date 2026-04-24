@@ -1,0 +1,1 @@
+A RESTful API for creating and managing polls/surveys where users can create questions, provide multiple choice options, collect votes, and view results in real-time.
