@@ -1,0 +1,1 @@
+A RESTful API for a note-taking application where users can create, read, update, delete, organize, search, and share notes. This is a backend-only API that can be consumed by any frontend (React, mobile app, etc.)
