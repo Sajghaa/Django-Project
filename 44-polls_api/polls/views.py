@@ -53,7 +53,7 @@ class CustomAuthToken(ObtainAuthToken):
 
 class PollViewSet(viewsets.ModelViewSet):
     """ViewSet for polls"""
-    queryset = Poll.objects.none()  # Will be filtered by get_queryset
+    queryset = Poll.objects.none()
     permission_classes = [IsAuthenticatedOrReadOnly, IsPollCreatorOrReadOnly]
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -62,6 +62,10 @@ class PollViewSet(viewsets.ModelViewSet):
     ordering = ['-created_at']
     
     def get_queryset(self):
+        # Skip filtering for schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return Poll.objects.none()
+        
         user = self.request.user
         if user.is_authenticated:
             return Poll.objects.filter(Q(is_public=True) | Q(created_by=user))
@@ -193,12 +197,18 @@ class PollViewSet(viewsets.ModelViewSet):
 
 class QuestionViewSet(viewsets.ModelViewSet):
     """ViewSet for questions"""
-    queryset = Question.objects.none()  # Will be filtered
+    queryset = Question.objects.none()
     serializer_class = QuestionSerializer
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        return Question.objects.filter(poll__created_by=self.request.user)
+        # Skip filtering for schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return Question.objects.none()
+        
+        if self.request.user.is_authenticated:
+            return Question.objects.filter(poll__created_by=self.request.user)
+        return Question.objects.none()
     
     @action(detail=True, methods=['post'])
     def add_choice(self, request, pk=None):
@@ -211,12 +221,18 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
 class ChoiceViewSet(viewsets.ModelViewSet):
     """ViewSet for choices"""
-    queryset = Choice.objects.none()  # Will be filtered
+    queryset = Choice.objects.none()
     serializer_class = ChoiceSerializer
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        return Choice.objects.filter(question__poll__created_by=self.request.user)
+        # Skip filtering for schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return Choice.objects.none()
+        
+        if self.request.user.is_authenticated:
+            return Choice.objects.filter(question__poll__created_by=self.request.user)
+        return Choice.objects.none()
 
 def get_client_ip(request):
     """Get client IP address"""
