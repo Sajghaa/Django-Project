@@ -2,7 +2,7 @@
 
 > A curated collection of Django projects demonstrating Django mastery through real-world applications.
 
-**Progress:** 43 / 100 completed
+**Progress:** 44 / 100 completed
 
 ---
 
@@ -54,6 +54,7 @@ This is a Django web application focused on user authentication. | Completed | �
 | 41 | [41-budget_app](41-budget_app) | A personal finance management application where users can track income, expenses, set budgets, monitor spending categories, and visualize financial health through charts and reports. | Completed | ✅ |
 | 42 | [42-blog_project](42-blog_project) | A feature-rich blog platform where authors can create posts, organize them with categories and tags, and readers can browse, search, and interact with content. | Completed | ✅ |
 | 43 | [43-notes_api](43-notes_api) | A RESTful API for a note-taking application where users can create, read, update, delete, organize, search, and share notes. This is a backend-only API that can be consumed by any frontend (React, mobile app, etc.) | Completed | ✅ |
+| 44 | [44-polls_api](44-polls_api) | No description yet | Completed | ✅ |
 
 ---
 
