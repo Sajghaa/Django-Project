@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Company, JobCategory, JobSkill, Job, JobApplication, SavedJob, JobAlert
+from .models import Company, JobCategory, JobSkill, Job, JobApplication, SavedJob
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -48,7 +48,7 @@ class JobListSerializer(serializers.ModelSerializer):
     company_name = serializers.CharField(source='company.name', read_only=True)
     company_logo = serializers.ImageField(source='company.logo', read_only=True)
     salary_range = serializers.CharField(source='get_salary_range', read_only=True)
-    is_active = serializers.BooleanField(source='is_active', read_only=True)
+    is_active = serializers.BooleanField(read_only=True)
     posted_ago = serializers.SerializerMethodField()
     
     class Meta:
@@ -63,7 +63,6 @@ class JobListSerializer(serializers.ModelSerializer):
     
     def get_posted_ago(self, obj):
         from django.utils import timezone
-        from datetime import timedelta
         
         now = timezone.now()
         diff = now - obj.created_at
