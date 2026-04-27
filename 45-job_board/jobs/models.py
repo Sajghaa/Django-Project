@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.utils.text import slugify
 from django.core.validators import MinValueValidator, MaxValueValidator
+from datetime import datetime
 from decimal import Decimal
 
 class Company(models.Model):
@@ -209,3 +210,78 @@ class Job(models.Model):
     
     def __str__(self):
         return f"{self.title} at {self.company.name}"
+
+class JobApplication(models.Model):
+    """Job application model"""
+    
+    STATUS_CHOICES = (
+        ('submitted', 'Submitted'),
+        ('reviewed', 'Reviewed'),
+        ('shortlisted', 'Shortlisted'),
+        ('rejected', 'Rejected'),
+        ('hired', 'Hired'),
+        ('withdrawn', 'Withdrawn'),
+    )
+    
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='applications')
+    applicant = models.ForeignKey(User, on_delete=models.CASCADE, related_name='job_applications')
+    
+    # Application documents
+    resume = models.FileField(upload_to='resumes/')
+    cover_letter = models.TextField(blank=True)
+    portfolio_url = models.URLField(blank=True)
+    linkedin_url = models.URLField(blank=True)
+    github_url = models.URLField(blank=True)
+    
+    # Status
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='submitted')
+    notes = models.TextField(blank=True)  # Employer notes
+    
+    # Tracking
+    viewed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        unique_together = ['job', 'applicant']
+    
+    def __str__(self):
+        return f"{self.applicant.username} applied for {self.job.title}"
+
+class SavedJob(models.Model):
+    """Saved jobs for users"""
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='saved_jobs')
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='saved_by')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['user', 'job']
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.user.username} saved {self.job.title}"
+
+class JobAlert(models.Model):
+    """Job alerts for users"""
+    
+    FREQUENCY_CHOICES = (
+        ('daily', 'Daily'),
+        ('weekly', 'Weekly'),
+    )
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='job_alerts')
+    keyword = models.CharField(max_length=200, blank=True)
+    location = models.CharField(max_length=200, blank=True)
+    employment_type = models.CharField(max_length=20, choices=Job.EMPLOYMENT_TYPES, blank=True, null=True)
+    remote_type = models.CharField(max_length=10, choices=Job.REMOTE_TYPES, blank=True, null=True)
+    frequency = models.CharField(max_length=10, choices=FREQUENCY_CHOICES, default='weekly')
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"Job alert for {self.user.username}"
