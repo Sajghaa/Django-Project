@@ -1,0 +1,1 @@
+A platform where employers can post job listings and job seekers can search, filter, and apply for jobs. Includes user roles (employer, job seeker, admin), job management, applications, and analytics.
