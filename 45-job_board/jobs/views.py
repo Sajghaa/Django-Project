@@ -113,7 +113,7 @@ class JobSkillViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
     ordering = ['name']
-
+    
 class JobViewSet(viewsets.ModelViewSet):
     """ViewSet for jobs"""
     queryset = Job.objects.none()
@@ -129,98 +129,16 @@ class JobViewSet(viewsets.ModelViewSet):
         if getattr(self, 'swagger_fake_view', False):
             return Job.objects.none()
         
+        # For unauthenticated users, show only active jobs
+        if not self.request.user.is_authenticated:
+            return Job.objects.filter(status='active')
+        
         # Employers see all their jobs, job seekers see only active jobs
-        if self.request.user.is_authenticated and hasattr(self.request.user, 'company'):
+        if hasattr(self.request.user, 'company'):
             return Job.objects.filter(company__user=self.request.user)
         return Job.objects.filter(status='active')
-    
-    def get_serializer_class(self):
-        if self.action == 'list':
-            return JobListSerializer
-        elif self.action in ['create', 'update', 'partial_update']:
-            return JobCreateUpdateSerializer
-        return JobDetailSerializer
-    
-    def perform_create(self, serializer):
-        company = get_object_or_404(Company, user=self.request.user)
-        serializer.save(company=company, posted_by=self.request.user, status='pending')
-    
-    @action(detail=True, methods=['post'])
-    def activate(self, request, pk=None):
-        """Activate job (admin only)"""
-        job = self.get_object()
-        if request.user.is_staff:
-            job.status = 'active'
-            job.save()
-            return Response({'status': 'activated'})
-        return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
-    
-    @action(detail=True, methods=['post'])
-    def close(self, request, pk=None):
-        """Close job posting"""
-        job = self.get_object()
-        job.status = 'closed'
-        job.save()
-        return Response({'status': 'closed'})
-    
-    @action(detail=True, methods=['post'])
-    def view(self, request, pk=None):
-        """Increment view count"""
-        job = self.get_object()
-        job.views_count += 1
-        job.save()
-        return Response({'views_count': job.views_count})
-    
-    @action(detail=True, methods=['get'])
-    def apply(self, request, pk=None):
-        """Get application form data"""
-        job = self.get_object()
-        return Response({
-            'job_title': job.title,
-            'company_name': job.company.name,
-            'questions': []  # Can be extended for custom questions
-        })
-    
-    @action(detail=True, methods=['post'])
-    def submit_application(self, request, pk=None):
-        """Submit job application"""
-        job = self.get_object()
-        
-        # Check if already applied
-        if JobApplication.objects.filter(job=job, applicant=request.user).exists():
-            return Response({'error': 'You have already applied for this job'},
-                          status=status.HTTP_400_BAD_REQUEST)
-        
-        serializer = JobApplicationCreateSerializer(data=request.POST, files=request.FILES)
-        serializer.is_valid(raise_exception=True)
-        
-        application = serializer.save(job=job, applicant=request.user)
-        
-        # Update application count
-        job.applications_count += 1
-        job.save()
-        
-        return Response(JobApplicationSerializer(application).data,
-                       status=status.HTTP_201_CREATED)
-    
-    @action(detail=True, methods=['post'])
-    def save(self, request, pk=None):
-        """Save job to user's saved list"""
-        job = self.get_object()
-        saved, created = SavedJob.objects.get_or_create(user=request.user, job=job)
-        
-        if created:
-            return Response({'saved': True})
-        return Response({'saved': False, 'message': 'Already saved'})
-    
-    @action(detail=True, methods=['delete'])
-    def unsave(self, request, pk=None):
-        """Remove job from saved list"""
-        job = self.get_object()
-        SavedJob.objects.filter(user=request.user, job=job).delete()
-        return Response({'saved': False})
 
-class JobApplicationViewSet(viewsets.ReadOnlyModelViewSet):
+class JobApplicationViewSet(viewsets.ModelViewSet):
     """ViewSet for job applications"""
     queryset = JobApplication.objects.none()
     serializer_class = JobApplicationSerializer
@@ -258,8 +176,9 @@ class JobApplicationViewSet(viewsets.ReadOnlyModelViewSet):
         
         return Response({'status': application.status})
 
-class SavedJobViewSet(viewsets.ReadOnlyModelViewSet):
+class SavedJobViewSet(viewsets.ModelViewSet):
     """ViewSet for saved jobs"""
+    queryset = SavedJob.objects.none()
     serializer_class = SavedJobSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = CustomPagination
