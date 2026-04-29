@@ -2,7 +2,7 @@
 
 > A curated collection of Django projects demonstrating Django mastery through real-world applications.
 
-**Progress:** 44 / 100 completed
+**Progress:** 45 / 100 completed
 
 ---
 
@@ -55,6 +55,7 @@ This is a Django web application focused on user authentication. | Completed | �
 | 42 | [42-blog_project](42-blog_project) | A feature-rich blog platform where authors can create posts, organize them with categories and tags, and readers can browse, search, and interact with content. | Completed | ✅ |
 | 43 | [43-notes_api](43-notes_api) | A RESTful API for a note-taking application where users can create, read, update, delete, organize, search, and share notes. This is a backend-only API that can be consumed by any frontend (React, mobile app, etc.) | Completed | ✅ |
 | 44 | [44-polls_api](44-polls_api) | A RESTful API for creating and managing polls/surveys where users can create questions, provide multiple choice options, collect votes, and view results in real-time. | Completed | ✅ |
+| 45 | [45-job_board](45-job_board) | A platform where employers can post job listings and job seekers can search, filter, and apply for jobs. Includes user roles (employer, job seeker, admin), job management, applications, and analytics. | Completed | ✅ |
 
 ---
 
