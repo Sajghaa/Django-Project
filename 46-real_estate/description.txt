@@ -1,0 +1,1 @@
+A comprehensive real estate platform where agents/owners can list properties (houses, apartments, commercial spaces) and buyers/renters can search, filter, view property details, schedule viewings, and make inquiries.
