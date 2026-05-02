@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Typography, Grid, Box, CircularProgress } from '@mui/material';
 import PropertyCard from '../components/PropertyCard';
-import { getProperties } from '../services/api';
 import PropertyFilters from '../components/PropertyFilters';
+import { getProperties, getFavorites } from '../services/api';
 
 const Home = () => {
     const [properties, setProperties] = useState([]);
@@ -10,12 +10,7 @@ const Home = () => {
     const [favorites, setFavorites] = useState([]);
     const [filters, setFilters] = useState({});
 
-    useEffect(() => {
-        fetchProperties();
-        fetchFavorites();
-    }, [filters]);
-
-    const fetchProperties = async () => {
+    const fetchProperties = useCallback(async () => {
         setLoading(true);
         try {
             const response = await getProperties(filters);
@@ -24,7 +19,7 @@ const Home = () => {
             console.error('Error fetching properties:', error);
         }
         setLoading(false);
-    };
+    }, [filters]);
 
     const fetchFavorites = async () => {
         const token = localStorage.getItem('token');
@@ -37,6 +32,11 @@ const Home = () => {
             console.error('Error fetching favorites:', error);
         }
     };
+
+    useEffect(() => {
+        fetchProperties();
+        fetchFavorites();
+    }, [fetchProperties]);
 
     const isFavorite = (propertyId) => {
         return favorites.some(fav => fav.property?.id === propertyId);
