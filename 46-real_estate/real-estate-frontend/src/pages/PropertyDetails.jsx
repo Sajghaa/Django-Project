@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
     Container, Grid, Typography, Box, Card, CardMedia, Chip, Button,
     Divider, Rating, TextField, Dialog, DialogTitle, DialogContent,
-    DialogActions, IconButton, ImageList, ImageListItem, CircularProgress
+    DialogActions, IconButton, ImageList, ImageListItem, CircularProgress, MenuItem
 } from '@mui/material';
-import { LocationOn, Bed, Bathtub, SquareFoot, Favorite, FavoriteBorder, Close } from '@mui/icons-material';
-import { getProperty, incrementView, submitInquiry, addReview, getReviews, saveProperty, unsaveProperty } from '../services/api';
+import { LocationOn, Bed, Bathtub, SquareFoot, Favorite, FavoriteBorder } from '@mui/icons-material';
+import { getProperty, incrementView, submitInquiry, addReview, getReviews, saveProperty, unsaveProperty, getFavorites } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-toastify';
 
@@ -29,14 +29,7 @@ const PropertyDetails = () => {
     });
     const [reviewData, setReviewData] = useState({ rating: 5, comment: '' });
 
-    useEffect(() => {
-        fetchProperty();
-        fetchReviews();
-        checkFavorite();
-        incrementViewCount();
-    }, [slug]);
-
-    const fetchProperty = async () => {
+    const fetchProperty = useCallback(async () => {
         try {
             const response = await getProperty(slug);
             setProperty(response.data);
@@ -46,38 +39,42 @@ const PropertyDetails = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [slug, navigate]);
 
-    const fetchReviews = async () => {
+    const fetchReviews = useCallback(async () => {
         try {
             const response = await getReviews(slug);
             setReviews(response.data);
         } catch (error) {
             console.error('Error fetching reviews:', error);
         }
-    };
+    }, [slug]);
 
-    const checkFavorite = async () => {
+    const checkFavorite = useCallback(async () => {
         const token = localStorage.getItem('token');
         if (!token) return;
         try {
-            const response = await fetch('/api/favorites/', {
-                headers: { Authorization: `Token ${token}` }
-            });
-            const data = await response.json();
-            setIsFavorite(data.results?.some(fav => fav.property?.slug === slug));
+            const response = await getFavorites();
+            setIsFavorite(response.data.results?.some(fav => fav.property?.slug === slug));
         } catch (error) {
             console.error('Error checking favorite:', error);
         }
-    };
+    }, [slug]);
 
-    const incrementViewCount = async () => {
+    const incrementViewCount = useCallback(async () => {
         try {
             await incrementView(slug);
         } catch (error) {
             console.error('Error incrementing view:', error);
         }
-    };
+    }, [slug]);
+
+    useEffect(() => {
+        fetchProperty();
+        fetchReviews();
+        checkFavorite();
+        incrementViewCount();
+    }, [fetchProperty, fetchReviews, checkFavorite, incrementViewCount]);
 
     const handleFavorite = async () => {
         if (!user) {
@@ -337,7 +334,7 @@ const PropertyDetails = () => {
                             value={reviewData.rating}
                             onChange={(e, newValue) => setReviewData({ ...reviewData, rating: newValue })}
                             size="large"
-                        />
+                            />
                     </Box>
                     <TextField
                         fullWidth
