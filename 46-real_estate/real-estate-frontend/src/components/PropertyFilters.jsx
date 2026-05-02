@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
     Paper, Grid, TextField, MenuItem, Button, Box, 
-    InputAdornment, Slider, Chip, FormControl, InputLabel, Select 
+    InputAdornment, Slider, Chip, FormControl, InputLabel, Select, Typography
 } from '@mui/material';
 import { Search, Clear } from '@mui/icons-material';
 import { getPropertyTypes, getFeatures } from '../services/api';
