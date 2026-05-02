@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Container, Typography, Grid, Card, CardMedia, CardContent, CardActions, Button, Box, CircularProgress } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { getProperties } from '../services/api';
-import { useAuth } from '../contexts/AuthContext';
 
 const MyProperties = () => {
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
-    const { isAgent } = useAuth();
 
     useEffect(() => {
         fetchMyProperties();
@@ -15,9 +13,7 @@ const MyProperties = () => {
 
     const fetchMyProperties = async () => {
         try {
-            // In production, you'd have a dedicated endpoint for agent's properties
             const response = await getProperties();
-            // Filter properties by agent (simplified - adjust based on your API)
             setProperties(response.data.results || []);
         } catch (error) {
             console.error('Error fetching properties:', error);
