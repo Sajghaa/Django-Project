@@ -1,0 +1,1 @@
+A music streaming application where users can upload, organize, play, and share music. Features include playlists, favorites, search, recommendations, and playback controls.
