@@ -24,8 +24,35 @@ api.interceptors.request.use(
 );
 
 // Authentication
-export const register = (userData) => api.post('/auth/register/', userData);
-export const login = (credentials) => api.post('/auth/login/', credentials);
+export const register = async (userData) => {
+    try {
+        const response = await api.post('/auth/register/', {
+            username: userData.username,
+            email: userData.email,
+            password: userData.password,
+            password2: userData.password2,
+            user_type: userData.user_type
+        });
+        return response;
+    } catch (error) {
+        console.error('Registration error:', error.response?.data);
+        throw error;
+    }
+};
+
+export const login = async (credentials) => {
+    try {
+        const response = await api.post('/auth/login/', {
+            username: credentials.username,
+            password: credentials.password
+        });
+        return response;
+    } catch (error) {
+        console.error('Login error:', error.response?.data);
+        throw error;
+    }
+};
+
 export const getCurrentUser = () => api.get('/auth/me/');
 
 // Properties
