@@ -15,7 +15,8 @@ async function apiCall(endpoint, options = {}) {
     
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         ...options,
-        headers
+        headers,
+        mode: 'cors'
     });
     
     if (!response.ok) {
