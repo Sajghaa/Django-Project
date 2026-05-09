@@ -39,6 +39,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -150,9 +151,6 @@ REST_FRAMEWORK = {
         'user': '100/minute',
     },
 }
-
-# CORS Settings
-CORS_ALLOW_ALL_ORIGINS = True  # For development only
 
 # File upload settings
 MAX_AUDIO_SIZE = 20971520  # 20MB
