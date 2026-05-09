@@ -1,0 +1,143 @@
+/* Custom styles for Harmony Music Player */
+
+/* Glassmorphism Navigation */
+.glass-nav {
+    background: rgba(17, 24, 39, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Search Input */
+.search-input {
+    width: 250px;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    width: 350px;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Nav Links */
+.nav-link {
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.nav-link.active {
+    color: #a855f7;
+}
+
+.nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #a855f7, #d946ef);
+    border-radius: 2px;
+}
+
+/* Dropdown Items */
+.dropdown-item {
+    display: block;
+    padding: 8px 16px;
+    transition: background 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Song Cards */
+.song-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.song-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.3);
+}
+
+.song-card:hover .play-overlay {
+    opacity: 1;
+}
+
+.play-overlay {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Progress Bar */
+#progressBar:hover #progressHandle {
+    opacity: 1;
+}
+
+/* Volume Bar */
+#volumeBar {
+    cursor: pointer;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1f2937;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #a855f7;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #c084fc;
+}
+
+/* Animations */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Loader */
+.loader {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(168, 85, 247, 0.3);
+    border-top-color: #a855f7;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .search-input {
+        width: 180px;
+    }
+    .search-input:focus {
+        width: 200px;
+    }
+    #nowPlayingBar .flex {
+        gap: 1rem;
+    }
+}
