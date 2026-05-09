@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harmony - Modern Music Player</title>
+    
+    <!-- Tailwind CSS + Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-gradient-to-br from-gray-900 to-gray-800 text-white font-['Inter']">
+    <!-- Main App Container -->
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- Navigation -->
+        <nav class="glass-nav sticky top-0 z-50">
+            <div class="container mx-auto px-6 py-4">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-8">
+                        <div class="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                            🎵 Harmony
+                        </div>
+                        <div class="hidden md:flex space-x-6">
+                            <a href="#" class="nav-link active" data-page="home">Home</a>
+                            <a href="#" class="nav-link" data-page="explore">Explore</a>
+                            <a href="#" class="nav-link" data-page="library">My Library</a>
+                            <a href="#" class="nav-link" data-page="playlists">Playlists</a>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative" id="searchContainer">
+                            <input type="text" id="searchInput" placeholder="Search songs..." class="search-input pl-10 pr-4 py-2 rounded-full bg-white/10 border border-white/20 focus:outline-none focus:border-purple-400 transition">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                        <div id="authButtons" class="flex space-x-3">
+                            <button id="loginBtn" class="px-4 py-2 rounded-full bg-purple-600 hover:bg-purple-700 transition">Login</button>
+                            <button id="registerBtn" class="px-4 py-2 rounded-full border border-purple-400 hover:bg-purple-600/20 transition">Register</button>
+                        </div>
+                        <div id="userMenu" class="hidden relative">
+                            <button id="userMenuBtn" class="flex items-center space-x-2 px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 transition">
+                                <i class="fas fa-user-circle text-2xl"></i>
+                                <span id="username" class="text-sm"></span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            <div id="userDropdown" class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl hidden z-50">
+                                <a href="#" class="dropdown-item" data-page="profile">Profile</a>
+                                <a href="#" class="dropdown-item" data-page="favorites">Favorites</a>
+                                <hr class="border-gray-700 my-1">
+                                <button id="logoutBtn" class="dropdown-item text-red-400 w-full text-left">Logout</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-1 container mx-auto px-6 py-8">
+            <div id="content">
+                <!-- Dynamic content loads here -->
+            </div>
+        </main>
+
+        <!-- Now Playing Bar (Global Player) -->
+        <div id="nowPlayingBar" class="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-lg border-t border-gray-700 transform translate-y-full transition-transform">
+            <div class="container mx-auto px-6 py-3">
+                <div class="flex items-center justify-between">
+                    <!-- Song Info -->
+                    <div class="flex items-center space-x-4 w-1/4">
+                        <img id="currentSongCover" src="" alt="Cover" class="w-12 h-12 rounded-lg object-cover">
+                        <div>
+                            <h4 id="currentSongTitle" class="font-semibold text-sm">Select a song</h4>
+                            <p id="currentSongArtist" class="text-xs text-gray-400">-</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Player Controls -->
+                    <div class="flex flex-col items-center w-1/2">
+                        <div class="flex items-center space-x-6">
+                            <button id="shuffleBtn" class="text-gray-400 hover:text-white transition">
+                                <i class="fas fa-random"></i>
+                            </button>
+                            <button id="prevBtn" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition">
+                                <i class="fas fa-step-backward"></i>
+                            </button>
+                            <button id="playPauseBtn" class="w-12 h-12 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center transition shadow-lg">
+                                <i class="fas fa-play text-xl"></i>
+                            </button>
+                            <button id="nextBtn" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition">
+                                <i class="fas fa-step-forward"></i>
+                            </button>
+                            <button id="repeatBtn" class="text-gray-400 hover:text-white transition">
+                                <i class="fas fa-redo-alt"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center space-x-3 w-full max-w-md mt-2">
+                            <span id="currentTime" class="text-xs text-gray-400">0:00</span>
+                            <div class="flex-1 h-1 bg-gray-700 rounded-full cursor-pointer" id="progressBar">
+                                <div id="progressFill" class="h-full bg-purple-500 rounded-full relative" style="width: 0%">
+                                    <div id="progressHandle" class="absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-purple-400 rounded-full opacity-0 transition-opacity"></div>
+                                </div>
+                            </div>
+                            <span id="duration" class="text-xs text-gray-400">0:00</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Volume Control -->
+                    <div class="flex items-center space-x-3 w-1/4 justify-end">
+                        <i class="fas fa-volume-up text-gray-400"></i>
+                        <div class="w-24 h-1 bg-gray-700 rounded-full cursor-pointer" id="volumeBar">
+                            <div id="volumeFill" class="h-full bg-purple-500 rounded-full" style="width: 80%"></div>
+                        </div>
+                        <button id="queueBtn" class="text-gray-400 hover:text-white transition">
+                            <i class="fas fa-list-ul"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Queue Sidebar -->
+        <div id="queueSidebar" class="fixed right-0 top-0 bottom-0 w-96 bg-gray-900 transform translate-x-full transition-transform z-50 shadow-2xl">
+            <div class="p-4 border-b border-gray-700 flex justify-between items-center">
+                <h3 class="font-semibold">Queue</h3>
+                <button id="closeQueueBtn" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="queueList" class="overflow-y-auto h-full pb-32">
+                <!-- Queue items dynamically added -->
+            </div>
+        </div>
+        
+        <!-- Auth Modal -->
+        <div id="authModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+            <div class="bg-gray-800 rounded-2xl w-full max-w-md p-6 relative">
+                <button id="closeModal" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div id="authForms">
+                    <!-- Login/Register forms dynamically loaded -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Toast Notification -->
+        <div id="toast" class="fixed bottom-20 right-6 bg-gray-800 rounded-lg shadow-xl px-4 py-2 hidden transition-all z-50">
+            <span id="toastMessage"></span>
+        </div>
+    </div>
+    
+    <!-- Audio Element -->
+    <audio id="audioPlayer" class="hidden"></audio>
+    
+    <!-- JavaScript Modules -->
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
