@@ -15,35 +15,56 @@ const Auth = {
     },
     
     async login(username, password) {
+        console.log('Attempting login...');
         try {
             const data = await api.login({ username, password });
+            console.log('Login response:', data);
+            
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify({ id: data.user_id, username: data.username }));
             this.currentUser = { id: data.user_id, username: data.username };
             this.updateUI();
             this.hideModal();
             showToast('Login successful! Welcome back!', 'success');
-            await loadHomePage();
+            
+            // Reload the page content
+            if (typeof loadHomePage === 'function') {
+                await loadHomePage();
+            } else if (window.Components) {
+                await Components.renderHome();
+            }
             return true;
         } catch (error) {
-            showToast(error.message, 'error');
+            console.error('Login error details:', error);
+            let errorMsg = 'Login failed. Please check your credentials.';
+            if (error.message) errorMsg = error.message;
+            showToast(errorMsg, 'error');
             return false;
         }
     },
     
     async register(userData) {
+        console.log('Attempting registration...');
         try {
             const data = await api.register(userData);
+            console.log('Registration response:', data);
+            
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
             this.currentUser = data.user;
             this.updateUI();
             this.hideModal();
             showToast('Registration successful! Welcome!', 'success');
-            await loadHomePage();
+            
+            if (window.Components) {
+                await Components.renderHome();
+            }
             return true;
         } catch (error) {
-            showToast(error.message, 'error');
+            console.error('Registration error details:', error);
+            let errorMsg = 'Registration failed. Please try again.';
+            if (error.message) errorMsg = error.message;
+            showToast(errorMsg, 'error');
             return false;
         }
     },
@@ -54,7 +75,9 @@ const Auth = {
         this.currentUser = null;
         this.updateUI();
         showToast('Logged out successfully', 'info');
-        loadHomePage();
+        if (window.Components) {
+            Components.renderHome();
+        }
     },
     
     updateUI() {
@@ -63,18 +86,20 @@ const Auth = {
         const usernameSpan = document.getElementById('username');
         
         if (this.currentUser) {
-            authButtons.classList.add('hidden');
-            userMenu.classList.remove('hidden');
-            usernameSpan.textContent = this.currentUser.username;
+            if (authButtons) authButtons.classList.add('hidden');
+            if (userMenu) userMenu.classList.remove('hidden');
+            if (usernameSpan) usernameSpan.textContent = this.currentUser.username;
         } else {
-            authButtons.classList.remove('hidden');
-            userMenu.classList.add('hidden');
+            if (authButtons) authButtons.classList.remove('hidden');
+            if (userMenu) userMenu.classList.add('hidden');
         }
     },
     
     showModal(type = 'login') {
         const modal = document.getElementById('authModal');
         const formsContainer = document.getElementById('authForms');
+        
+        if (!modal || !formsContainer) return;
         
         if (type === 'login') {
             formsContainer.innerHTML = `
@@ -94,12 +119,15 @@ const Auth = {
                 </p>
             `;
             
-            document.getElementById('loginForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const username = document.getElementById('loginUsername').value;
-                const password = document.getElementById('loginPassword').value;
-                await Auth.login(username, password);
-            });
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const username = document.getElementById('loginUsername').value;
+                    const password = document.getElementById('loginPassword').value;
+                    await Auth.login(username, password);
+                });
+            }
         } else {
             formsContainer.innerHTML = `
                 <h2 class="text-2xl font-bold mb-6 text-center">Create Account</h2>
@@ -124,16 +152,19 @@ const Auth = {
                 </p>
             `;
             
-            document.getElementById('registerForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const userData = {
-                    username: document.getElementById('regUsername').value,
-                    email: document.getElementById('regEmail').value,
-                    password: document.getElementById('regPassword').value,
-                    password2: document.getElementById('regPassword2').value
-                };
-                await Auth.register(userData);
-            });
+            const registerForm = document.getElementById('registerForm');
+            if (registerForm) {
+                registerForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const userData = {
+                        username: document.getElementById('regUsername').value,
+                        email: document.getElementById('regEmail').value,
+                        password: document.getElementById('regPassword').value,
+                        password2: document.getElementById('regPassword2').value
+                    };
+                    await Auth.register(userData);
+                });
+            }
         }
         
         modal.classList.remove('hidden');
@@ -142,15 +173,19 @@ const Auth = {
     
     hideModal() {
         const modal = document.getElementById('authModal');
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
     }
 };
 
-// Helper functions
+// Helper function for toast notifications
 function showToast(message, type = 'info') {
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toastMessage');
+    if (!toast || !toastMessage) return;
+    
     const colors = {
         success: 'bg-green-600',
         error: 'bg-red-600',
@@ -168,3 +203,4 @@ function showToast(message, type = 'info') {
 }
 
 window.Auth = Auth;
+window.showToast = showToast;
