@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .success { color: green; }
+        .error { color: red; }
+        pre { background: #f0f0f0; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        input, button { margin: 5px; padding: 8px; }
+        .section { margin-bottom: 20px; border: 1px solid #ccc; padding: 15px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Music Player API Test</h1>
+    
+    <div class="section">
+        <h2>1. Check Server Status</h2>
+        <button onclick="checkServer()">Check Server</button>
+        <div id="serverStatus"></div>
+    </div>
+    
+    <div class="section">
+        <h2>2. Register New User</h2>
+        <input type="text" id="regUsername" placeholder="Username">
+        <input type="email" id="regEmail" placeholder="Email">
+        <input type="password" id="regPassword" placeholder="Password">
+        <button onclick="registerUser()">Register</button>
+    </div>
+    
+    <div class="section">
+        <h2>3. Login</h2>
+        <input type="text" id="loginUsername" placeholder="Username">
+        <input type="password" id="loginPassword" placeholder="Password">
+        <button onclick="loginUser()">Login</button>
+    </div>
+    
+    <div class="section">
+        <h2>4. Response</h2>
+        <pre id="response">Click a button to see response...</pre>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000/api';
+        
+        async function checkServer() {
+            const statusDiv = document.getElementById('serverStatus');
+            const responseDiv = document.getElementById('response');
+            
+            statusDiv.innerHTML = 'Checking...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/`);
+                if (response.ok) {
+                    statusDiv.innerHTML = '<span class="success">✅ Server is running on port 8000</span>';
+                    responseDiv.textContent = 'Server is reachable!';
+                } else {
+                    statusDiv.innerHTML = `<span class="error">❌ Server returned status: ${response.status}</span>`;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<span class="error">❌ Cannot connect to server. Error: ${error.message}</span>`;
+                responseDiv.textContent = `Error: ${error.message}\n\nMake sure:\n1. Django server is running on port 8000\n2. Run: python manage.py runserver\n3. Check that you're in the correct directory`;
+            }
+        }
+        
+        async function registerUser() {
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const responseDiv = document.getElementById('response');
+            
+            if (!username || !email || !password) {
+                responseDiv.textContent = 'Please fill all fields';
+                return;
+            }
+            
+            const data = {
+                username: username,
+                email: email,
+                password: password,
+                password2: password
+            };
+            
+            responseDiv.textContent = 'Sending request...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/register/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                responseDiv.textContent = JSON.stringify(result, null, 2);
+                
+                if (response.ok) {
+                    alert('Registration successful! You can now login.');
+                } else {
+                    alert('Registration failed: ' + (result.message || JSON.stringify(result)));
+                }
+            } catch (error) {
+                responseDiv.textContent = `Error: ${error.message}`;
+                alert('Failed to connect: ' + error.message);
+            }
+        }
+        
+        async function loginUser() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const responseDiv = document.getElementById('response');
+            
+            if (!username || !password) {
+                responseDiv.textContent = 'Please enter username and password';
+                return;
+            }
+            
+            const data = {
+                username: username,
+                password: password
+            };
+            
+            responseDiv.textContent = 'Sending request...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/login/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                responseDiv.textContent = JSON.stringify(result, null, 2);
+                
+                if (response.ok) {
+                    alert('Login successful! Token: ' + result.token);
+                    // Save token for future requests
+                    localStorage.setItem('token', result.token);
+                    localStorage.setItem('user', result.username);
+                } else {
+                    alert('Login failed: ' + (result.error || 'Invalid credentials'));
+                }
+            } catch (error) {
+                responseDiv.textContent = `Error: ${error.message}`;
+                alert('Failed to connect: ' + error.message);
+            }
+        }
+        
+        // Auto-check server on page load
+        checkServer();
+    </script>
+</body>
+</html>
