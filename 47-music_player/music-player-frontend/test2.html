@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Connection Test</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        .success { color: green; }
+        .error { color: red; }
+        pre { background: #f0f0f0; padding: 10px; border-radius: 5px; }
+        input, button { margin: 5px; padding: 8px; }
+        .section { margin-bottom: 20px; border: 1px solid #ccc; padding: 15px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>API Connection Test</h1>
+    
+    <div class="section">
+        <h2>Step 1: Check if Django is running</h2>
+        <button onclick="testDirect()">Test Direct Connection</button>
+        <div id="directResult"></div>
+    </div>
+    
+    <div class="section">
+        <h2>Step 2: Register User</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="testRegister()">Register</button>
+    </div>
+    
+    <div class="section">
+        <h2>Step 3: Login</h2>
+        <input type="text" id="loginUser" placeholder="Username">
+        <input type="password" id="loginPass" placeholder="Password">
+        <button onclick="testLogin()">Login</button>
+    </div>
+    
+    <div class="section">
+        <h2>Response:</h2>
+        <pre id="response">Waiting for action...</pre>
+    </div>
+
+    <script>
+        // Try different possible URLs
+        const URLs = [
+            'http://127.0.0.1:8000/api/',
+            'http://localhost:8000/api/',
+            'http://192.168.1.100:8000/api/',  // Your local IP
+        ];
+        
+        let workingURL = 'http://127.0.0.1:8000/api/';
+        
+        async function testDirect() {
+            const resultDiv = document.getElementById('directResult');
+            resultDiv.innerHTML = 'Testing connections...<br>';
+            
+            for (const url of URLs) {
+                try {
+                    resultDiv.innerHTML += `Testing ${url}... `;
+                    const response = await fetch(url, { mode: 'cors' });
+                    if (response.ok) {
+                        resultDiv.innerHTML += `<span class="success">✅ WORKING!</span><br>`;
+                        workingURL = url;
+                        document.getElementById('response').textContent = `Using URL: ${workingURL}`;
+                        return;
+                    } else {
+                        resultDiv.innerHTML += `<span class="error">❌ Status: ${response.status}</span><br>`;
+                    }
+                } catch (error) {
+                    resultDiv.innerHTML += `<span class="error">❌ Error: ${error.message}</span><br>`;
+                }
+            }
+            
+            resultDiv.innerHTML += '<br><span class="error">No working connection found! Make sure Django server is running on port 8000</span>';
+        }
+        
+        async function testRegister() {
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const responseDiv = document.getElementById('response');
+            
+            if (!username || !email || !password) {
+                responseDiv.textContent = 'Please fill all fields';
+                return;
+            }
+            
+            const data = {
+                username: username,
+                email: email,
+                password: password,
+                password2: password
+            };
+            
+            responseDiv.textContent = 'Sending request...';
+            
+            try {
+                const response = await fetch(`${workingURL}auth/register/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                responseDiv.textContent = JSON.stringify(result, null, 2);
+                
+                if (response.ok) {
+                    alert('Registration successful!');
+                } else {
+                    alert('Registration failed: ' + JSON.stringify(result));
+                }
+            } catch (error) {
+                responseDiv.textContent = `Error: ${error.message}`;
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        async function testLogin() {
+            const username = document.getElementById('loginUser').value;
+            const password = document.getElementById('loginPass').value;
+            const responseDiv = document.getElementById('response');
+            
+            if (!username || !password) {
+                responseDiv.textContent = 'Please enter username and password';
+                return;
+            }
+            
+            const data = {
+                username: username,
+                password: password
+            };
+            
+            responseDiv.textContent = 'Sending request...';
+            
+            try {
+                const response = await fetch(`${workingURL}auth/login/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                responseDiv.textContent = JSON.stringify(result, null, 2);
+                
+                if (response.ok) {
+                    alert('Login successful!');
+                    localStorage.setItem('token', result.token);
+                } else {
+                    alert('Login failed: ' + JSON.stringify(result));
+                }
+            } catch (error) {
+                responseDiv.textContent = `Error: ${error.message}`;
+                alert('Error: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
