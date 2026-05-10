@@ -12,6 +12,7 @@ router.register(r'library', views.UserLibraryViewSet, basename='library')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('test/', views.test_view, name='test'),
     path('auth/register/', views.RegisterView.as_view(), name='register'),
     path('auth/login/', views.CustomAuthToken.as_view(), name='login'),
     path('search/', views.SearchView.as_view(), name='search'),
