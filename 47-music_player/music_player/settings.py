@@ -28,11 +28,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
      # Third-party apps
+    'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
     'django_filters',
-    'drf_yasg',
-    'corsheaders',
+    'drf_yasg',    
     
     # Local apps
     'music',
