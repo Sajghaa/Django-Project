@@ -364,3 +364,9 @@ class SearchView(generics.ListAPIView):
             serializer = SongListSerializer(page, many=True, context={'request': request})
 
         return self.get_paginated_response(serializer.data)
+    
+
+from django.http import JsonResponse
+
+def test_view(request):
+    return JsonResponse({'status': 'ok', 'message': 'Server is running!'})
