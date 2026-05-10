@@ -14,7 +14,7 @@ SECRET_KEY = 'django-insecure-#n#*x7t%9d%(pn)g_d0x_xax4h6je-7g%t@)s75fkbit18o3r%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']  # For development; restrict in production
 
 
 # Application definition
@@ -42,7 +42,6 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -155,3 +154,18 @@ REST_FRAMEWORK = {
 # File upload settings
 MAX_AUDIO_SIZE = 20971520  # 20MB
 ALLOWED_AUDIO_TYPES = ['.mp3', '.wav', '.ogg', '.m4a']
+
+# CORS settings
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1:3000",
+    "file://",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+# Allow CORS for all endpoints in development
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_EXPOSE_HEADERS = ['Content-Type', 'Authorization']
