@@ -88,35 +88,34 @@ const Components = {
     },
     
     renderSongGrid(containerId, songs) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-        
-        if (!songs || songs.length === 0) {
-            container.innerHTML = '<div class="col-span-full text-center text-gray-400 py-8">No songs found</div>';
-            return;
-        }
-        
-        container.innerHTML = songs.map(song => `
-            <div class="song-card bg-white/5 rounded-xl p-4 hover:bg-white/10 transition group cursor-pointer" data-song='${JSON.stringify(song)}'>
-                <div class="relative">
-                    <img src="${song.cover_art_url || 'https://via.placeholder.com/200/1f2937/ffffff?text=🎵'}" 
-                         class="w-full aspect-square rounded-lg object-cover mb-3">
-                    <div class="play-overlay absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                        <button class="play-song w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center hover:bg-purple-700 transition">
-                            <i class="fas fa-play text-white"></i>
-                        </button>
-                    </div>
-                </div>
-                <h4 class="font-semibold truncate">${song.title}</h4>
-                <p class="text-sm text-gray-400 truncate">${song.artist_name}</p>
-                <div class="flex justify-between items-center mt-2">
-                    <span class="text-xs text-gray-500">${song.play_count || 0} plays</span>
-                    <button class="like-song text-gray-400 hover:text-red-400 transition ${song.is_liked ? 'text-red-400' : ''}" data-song-id="${song.id}">
-                        <i class="fas fa-heart"></i>
-                    </button>
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    if (!songs || songs.length === 0) {
+        container.innerHTML = '<div class="col-span-full text-center text-gray-400 py-8">No songs found</div>';
+        return;
+    }
+    
+    container.innerHTML = songs.map(song => `
+        <div class="song-card bg-white/5 rounded-xl p-4 hover:bg-white/10 transition group cursor-pointer" data-song='${JSON.stringify(song)}'>
+            <div class="relative">
+                <img src="${song.cover_art_url || song.cover_art || 'https://via.placeholder.com/200/1f2937/ffffff?text=🎵'}" 
+                     class="w-full aspect-square rounded-lg object-cover mb-3"
+                     onerror="this.src='https://via.placeholder.com/200/1f2937/ffffff?text=🎵'">
+                <div class="play-overlay absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                    <i class="fas fa-play text-3xl text-white"></i>
                 </div>
             </div>
-        `).join('');
+            <h4 class="font-semibold truncate">${song.title}</h4>
+            <p class="text-sm text-gray-400 truncate">${song.artist_name}</p>
+            <div class="flex justify-between items-center mt-2">
+                <span class="text-xs text-gray-500">${song.play_count || 0} plays</span>
+                <button class="like-song text-gray-400 hover:text-red-400 transition ${song.is_liked ? 'text-red-400' : ''}" data-song-id="${song.id}">
+                    <i class="fas fa-heart"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
         
         // Add event listeners
         container.querySelectorAll('.song-card').forEach(card => {

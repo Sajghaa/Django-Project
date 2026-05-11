@@ -38,31 +38,38 @@ const Player = {
     },
     
     playSong(song, playlist = null, index = 0) {
-        if (playlist) {
-            this.playlist = playlist;
-            this.currentIndex = index;
-        } else {
-            this.playlist = [song];
-            this.currentIndex = 0;
-        }
-        
-        this.currentSong = song;
-        const audio = document.getElementById('audioPlayer');
-        audio.src = song.audio_url;
+    if (playlist) {
+        this.playlist = playlist;
+        this.currentIndex = index;
+    } else {
+        this.playlist = [song];
+        this.currentIndex = 0;
+    }
+    
+    this.currentSong = song;
+    const audio = document.getElementById('audioPlayer');
+    
+    // Use audio_url if available, otherwise try audio_file
+    const audioSource = song.audio_url || song.audio_file;
+    
+    if (audioSource) {
+        audio.src = audioSource;
         audio.load();
         audio.play();
         this.isPlaying = true;
         this.updateUI();
         
         // Track play count
-        api.playSong(song.id);
+        if (api.playSong && song.id) {
+            api.playSong(song.id);
+        }
         
-        // Update now playing display
         this.updateNowPlaying();
-        
-        // Add to recent plays in UI
-        this.addToRecentPlays(song);
-    },
+    } else {
+        console.error('No audio source available for song:', song);
+        showToast('Audio source not available', 'error');
+    }
+},
     
     togglePlayPause() {
         const audio = document.getElementById('audioPlayer');
@@ -320,7 +327,19 @@ const Player = {
                 <p class="text-sm text-gray-400 truncate">${song.artist_name}</p>
             </div>
         `;
+    },
+    
+    getSongCoverUrl(song) {
+        if (song.cover_art_url) return song.cover_art_url;
+        if (song.cover_art) return song.cover_art;
+        if (song.album && song.album.cover_image) return song.album.cover_image;
+        
+        // Use placeholder with album art color based on song ID
+        const colors = ['purple', 'pink', 'blue', 'green', 'yellow', 'red'];
+        const color = colors[song.id % colors.length];
+        return `https://via.placeholder.com/200/1a1a2e/ffffff?text=${encodeURIComponent(song.title?.substring(0, 2) || '🎵')}`;
     }
+
 };
 
 window.Player = Player;
