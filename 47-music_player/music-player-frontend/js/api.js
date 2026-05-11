@@ -111,6 +111,18 @@ async function search(query, type = 'all') {
     return apiCall(`/search/?q=${encodeURIComponent(query)}&type=${type}`);
 }
 
+// Mock song data with sample audio URLs
+const getMockAudioUrl = (songId) => {
+    // Use free sample audio from the internet
+    const sampleAudios = [
+        'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+        'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+        'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+        'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+    ];
+    return sampleAudios[songId % sampleAudios.length];
+};
+
 // Export API functions
 window.api = {
     register,
@@ -127,5 +139,6 @@ window.api = {
     getFavorites,
     getRecentlyPlayed,
     getRecommendations,
-    search
+    search,
+    getMockAudioUrl
 };
