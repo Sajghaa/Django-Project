@@ -20,7 +20,12 @@ async function apiCall(endpoint, options = {}) {
     });
     
     if (!response.ok) {
-        const error = await response.json();
+        let error;
+        try {
+            error = await response.json();
+        } catch (e) {
+            error = { message: response.statusText || 'API call failed' };
+        }
         throw new Error(error.error || error.message || 'API call failed');
     }
     
