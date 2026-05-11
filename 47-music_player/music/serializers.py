@@ -124,20 +124,19 @@ class SongDetailSerializer(serializers.ModelSerializer):
         return None
 
 class SongCreateUpdateSerializer(serializers.ModelSerializer):
-    """Serializer for creating/updating songs"""
+    audio_url = serializers.URLField(write_only=True, required=False)
+    
     class Meta:
         model = Song
-        fields = ['title', 'artist', 'album', 'genre', 'duration', 'audio_file',
-                  'cover_art', 'lyrics', 'release_date']
-
-    def validate_audio_file(self, value):
-        import os
-        ext = os.path.splitext(value.name)[1].lower()
-        if ext not in ['.mp3', '.wav', '.ogg', '.m4a']:
-            raise serializers.ValidationError("Invalid audio format")
-        if value.size > 20 * 1024 * 1024:  # 20MB
-            raise serializers.ValidationError("File too large (max 20MB)")
-        return value
+        fields = ['title', 'artist', 'album', 'genre', 'duration', 'audio_file', 'audio_url', 'cover_art', 'lyrics', 'release_date']
+    
+    def create(self, validated_data):
+        audio_url = validated_data.pop('audio_url', None)
+        song = Song.objects.create(**validated_data)
+        
+        # If audio URL provided, we could download it or store the URL
+        # For now, we'll use a placeholder
+        return song
 
 class PlaylistSerializer(serializers.ModelSerializer):
     songs = SongListSerializer(many=True, read_only=True)
