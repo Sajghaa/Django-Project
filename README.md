@@ -2,7 +2,7 @@
 
 > A curated collection of Django projects demonstrating Django mastery through real-world applications.
 
-**Progress:** 46 / 100 completed
+**Progress:** 48 / 100 completed
 
 ---
 
@@ -57,6 +57,8 @@ This is a Django web application focused on user authentication. | Completed | �
 | 44 | [44-polls_api](44-polls_api) | A RESTful API for creating and managing polls/surveys where users can create questions, provide multiple choice options, collect votes, and view results in real-time. | Completed | ✅ |
 | 45 | [45-job_board](45-job_board) | A platform where employers can post job listings and job seekers can search, filter, and apply for jobs. Includes user roles (employer, job seeker, admin), job management, applications, and analytics. | Completed | ✅ |
 | 46 | [46-real_estate](46-real_estate) | A comprehensive real estate platform where agents/owners can list properties (houses, apartments, commercial spaces) and buyers/renters can search, filter, view property details, schedule viewings, and make inquiries. | Completed | ✅ |
+| 47 | [47-music_player](47-music_player) | A music streaming application where users can upload, organize, play, and share music. Features include playlists, favorites, search, recommendations, and playback controls. | Completed | ✅ |
+| 48 | [48-youtube_clone](48-youtube_clone) | A video-sharing platform where users can upload, watch, like, comment, subscribe to channels, and create playlists - similar to YouTube. | Completed | ✅ |
 
 ---
 
