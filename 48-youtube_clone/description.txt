@@ -1,0 +1,1 @@
+A video-sharing platform where users can upload, watch, like, comment, subscribe to channels, and create playlists - similar to YouTube.
