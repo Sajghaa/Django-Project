@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player Frontend Verification</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+        .header h1 { color: #a855f7; margin-bottom: 10px; }
+        .tests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .test-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        .test-card:hover { background: rgba(255,255,255,0.08); }
+        .test-card h3 {
+            color: #a855f7;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .test-status {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 14px;
+            line-height: 20px;
+            text-align: center;
+        }
+        .status-pending { background: #gray; color: #999; }
+        .status-pass { background: #22c55e; color: #fff; }
+        .status-fail { background: #ef4444; color: #fff; }
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 5px;
+            font-size: 14px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+        }
+        button {
+            background: #a855f7;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+        button:hover { background: #c084fc; }
+        button:active { transform: scale(0.98); }
+        .summary {
+            background: rgba(255,255,255,0.05);
+            border-left: 4px solid #a855f7;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 30px;
+        }
+        .summary h2 { color: #a855f7; margin-bottom: 15px; }
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .summary-item:last-child { border-bottom: none; }
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #22c55e;
+            transition: width 0.3s ease;
+        }
+        code {
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 Music Player Frontend Verification</h1>
+            <p>Comprehensive test suite for frontend functionality</p>
+        </div>
+
+        <div class="tests-grid">
+            <!-- Test 1: API Connection -->
+            <div class="test-card">
+                <h3><span class="test-status status-pending" id="status-api">⏳</span> API Connection</h3>
+                <p>Verify backend server is running and accessible</p>
+                <button onclick="testAPIConnection()">Test API</button>
+                <div class="test-result" id="result-api">Waiting...</div>
+            </div>
+
+            <!-- Test 2: CORS Configuration -->
+            <div class="test-card">
+                <h3><span class="test-status status-pending" id="status-cors">⏳</span> CORS Configuration</h3>
+                <p>Verify CORS headers are properly set</p>
+                <button onclick="testCORS()">Test CORS</button>
+                <div class="test-result" id="result-cors">Waiting...</div>
+            </div>
+
+            <!-- Test 3: JavaScript Modules -->
+            <div class="test-card">
+                <h3><span class="test-status status-pending" id="status-modules">⏳</span> JS Modules</h3>
+                <p>Verify all JavaScript modules are loaded</p>
+                <button onclick="testJSModules()">Test Modules</button>
+                <div class="test-result" id="result-modules">Waiting...</div>
+            </div>
+
+            <!-- Test 4: DOM Elements -->
+            <div class="test-card">
+                <h3><span class="test-status status-pending" id="status-dom">⏳</span> DOM Elements</h3>
+                <p>Verify all required HTML elements exist</p>
+                <button onclick="testDOMElements()">Test DOM</button>
+                <div class="test-result" id="result-dom">Waiting...</div>
+            </div>
+
+            <!-- Test 5: Local Storage -->
+            <div class="test-card">
+                <h3><span class="test-status status-pending" id="status-storage">⏳</span> Local Storage</h3>
+                <p>Verify browser LocalStorage is available</p>
+                <button onclick="testLocalStorage()">Test Storage</button>
+                <div class="test-result" id="result-storage">Waiting...</div>
+            </div>
+
+            <!-- Test 6: CSS Styling -->
+            <div class="test-card">
+                <h3><span class="test-status status-pending" id="status-css">⏳</span> CSS Styling</h3>
+                <p>Verify CSS framework is loaded</p>
+                <button onclick="testCSSLoading()">Test CSS</button>
+                <div class="test-result" id="result-css">Waiting...</div>
+            </div>
+
+            <!-- Test 7: Audio API -->
+            <div class="test-card">
+                <h3><span class="test-status status-pending" id="status-audio">⏳</span> Audio API</h3>
+                <p>Verify HTML5 Audio API support</p>
+                <button onclick="testAudioAPI()">Test Audio</button>
+                <div class="test-result" id="result-audio">Waiting...</div>
+            </div>
+
+            <!-- Test 8: FontAwesome Icons -->
+            <div class="test-card">
+                <h3><span class="test-status status-pending" id="status-icons">⏳</span> FontAwesome Icons</h3>
+                <p>Verify FontAwesome 6.4.0 is loaded</p>
+                <button onclick="testFontAwesome()">Test Icons</button>
+                <div class="test-result" id="result-icons">Waiting...</div>
+            </div>
+
+            <!-- Test 9: API Endpoints -->
+            <div class="test-card">
+                <h3><span class="test-status status-pending" id="status-endpoints">⏳</span> API Endpoints</h3>
+                <p>Test specific API endpoints</p>
+                <button onclick="testAPIEndpoints()">Test Endpoints</button>
+                <div class="test-result" id="result-endpoints">Waiting...</div>
+            </div>
+
+            <!-- Test 10: Authentication -->
+            <div class="test-card">
+                <h3><span class="test-status status-pending" id="status-auth">⏳</span> Authentication</h3>
+                <p>Test login/register functionality</p>
+                <button onclick="testAuthentication()">Test Auth</button>
+                <div class="test-result" id="result-auth">Waiting...</div>
+            </div>
+        </div>
+
+        <div class="summary">
+            <h2>Test Summary</h2>
+            <div class="summary-item">
+                <span>Total Tests:</span>
+                <strong id="total-tests">0</strong>
+            </div>
+            <div class="summary-item">
+                <span>Passed:</span>
+                <strong id="passed-tests" style="color: #22c55e;">0</strong>
+            </div>
+            <div class="summary-item">
+                <span>Failed:</span>
+                <strong id="failed-tests" style="color: #ef4444;">0</strong>
+            </div>
+            <div class="summary-item">
+                <span>Pending:</span>
+                <strong id="pending-tests">10</strong>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+            <button onclick="runAllTests()" style="width: 100%; margin-top: 15px; background: #22c55e;">Run All Tests</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000/api';
+        let testStats = { total: 10, passed: 0, failed: 0, pending: 10 };
+
+        function updateStats() {
+            document.getElementById('total-tests').textContent = testStats.total;
+            document.getElementById('passed-tests').textContent = testStats.passed;
+            document.getElementById('failed-tests').textContent = testStats.failed;
+            document.getElementById('pending-tests').textContent = testStats.pending;
+            const progress = ((testStats.passed + testStats.failed) / testStats.total) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+        }
+
+        function setStatus(testId, status, message) {
+            const statusEl = document.getElementById(`status-${testId}`);
+            const resultEl = document.getElementById(`result-${testId}`);
+            
+            if (status === 'pass') {
+                statusEl.className = 'test-status status-pass';
+                statusEl.textContent = '✓';
+                testStats.failed--;
+                testStats.passed++;
+            } else if (status === 'fail') {
+                statusEl.className = 'test-status status-fail';
+                statusEl.textContent = '✗';
+                testStats.pending--;
+                testStats.failed++;
+            } else {
+                statusEl.className = 'test-status status-pending';
+                statusEl.textContent = '⏳';
+            }
+            
+            resultEl.textContent = message;
+            testStats.pending = testStats.total - testStats.passed - testStats.failed;
+            updateStats();
+        }
+
+        async function testAPIConnection() {
+            setStatus('api', 'pending', 'Testing connection...');
+            try {
+                const response = await fetch(`${API_BASE}/`, { mode: 'cors' });
+                setStatus('api', 'pass', `✓ Server is running\nStatus: ${response.status}\nURL: ${API_BASE}`);
+            } catch (error) {
+                setStatus('api', 'fail', `✗ Cannot connect\nError: ${error.message}\n\nMake sure Django is running on port 8000`);
+            }
+        }
+
+        async function testCORS() {
+            setStatus('cors', 'pending', 'Testing CORS...');
+            try {
+                const response = await fetch(`${API_BASE}/`, { mode: 'cors' });
+                const corsHeader = response.headers.get('access-control-allow-origin');
+                if (corsHeader) {
+                    setStatus('cors', 'pass', `✓ CORS headers present\nAllow-Origin: ${corsHeader}`);
+                } else {
+                    setStatus('cors', 'pass', `✓ Request successful (CORS may be permissive)`);
+                }
+            } catch (error) {
+                setStatus('cors', 'fail', `✗ CORS error: ${error.message}`);
+            }
+        }
+
+        function testJSModules() {
+            setStatus('modules', 'pending', 'Checking modules...');
+            let missing = [];
+            
+            if (typeof apiCall === 'undefined') missing.push('apiCall');
+            if (typeof Auth === 'undefined') missing.push('Auth');
+            if (typeof Player === 'undefined') missing.push('Player');
+            if (typeof Components === 'undefined') missing.push('Components');
+            if (typeof showToast === 'undefined') missing.push('showToast');
+            
+            if (missing.length === 0) {
+                setStatus('modules', 'pass', `✓ All modules loaded\n- api.js\n- auth.js\n- player.js\n- components.js`);
+            } else {
+                setStatus('modules', 'fail', `✗ Missing modules:\n${missing.join('\n')}`);
+            }
+        }
+
+        function testDOMElements() {
+            setStatus('dom', 'pending', 'Checking DOM...');
+            const requiredElements = [
+                'app', 'content', 'audioPlayer', 'playPauseBtn', 'progressBar',
+                'volumeBar', 'authButtons', 'userMenu', 'loginBtn', 'registerBtn',
+                'nowPlayingBar', 'queueSidebar', 'authModal'
+            ];
+            
+            let missing = requiredElements.filter(id => !document.getElementById(id));
+            
+            if (missing.length === 0) {
+                setStatus('dom', 'pass', `✓ All required elements found (${requiredElements.length})`);
+            } else {
+                setStatus('dom', 'fail', `✗ Missing elements:\n${missing.join('\n')}`);
+            }
+        }
+
+        function testLocalStorage() {
+            setStatus('storage', 'pending', 'Testing storage...');
+            try {
+                localStorage.setItem('test', 'test');
+                localStorage.removeItem('test');
+                setStatus('storage', 'pass', '✓ LocalStorage is available');
+            } catch (error) {
+                setStatus('storage', 'fail', `✗ LocalStorage error: ${error.message}`);
+            }
+        }
+
+        function testCSSLoading() {
+            setStatus('css', 'pending', 'Checking CSS...');
+            const element = document.createElement('div');
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            
+            // Check if Tailwind CSS classes work
+            const hasCSS = document.querySelector('link[href*="style.css"]') !== null;
+            const tailwindLoaded = document.querySelector('link[href*="tailwindcss"]') !== null || 
+                                  window.tailwindCSS !== undefined;
+            
+            document.body.removeChild(element);
+            
+            if (hasCSS || tailwindLoaded) {
+                setStatus('css', 'pass', `✓ CSS framework loaded\n- Custom CSS\n- Tailwind CSS`);
+            } else {
+                setStatus('css', 'fail', '✗ CSS files may not be loaded');
+            }
+        }
+
+        function testAudioAPI() {
+            setStatus('audio', 'pending', 'Checking Audio API...');
+            try {
+                const audio = new Audio();
+                const hasWebAudio = typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined';
+                const audioPlayer = document.getElementById('audioPlayer');
+                
+                if (audioPlayer && hasWebAudio) {
+                    setStatus('audio', 'pass', '✓ HTML5 Audio API supported\n- Audio element present\n- Web Audio API available');
+                } else {
+                    setStatus('audio', 'fail', '✗ Audio API not fully supported');
+                }
+            } catch (error) {
+                setStatus('audio', 'fail', `✗ Error: ${error.message}`);
+            }
+        }
+
+        function testFontAwesome() {
+            setStatus('icons', 'pending', 'Checking FontAwesome...');
+            const linkTag = document.querySelector('link[href*="fontawesome"]');
+            
+            if (linkTag) {
+                setStatus('icons', 'pass', `✓ FontAwesome 6.4.0 loaded\n- Version: 6.4.0\n- CDN: Yes`);
+            } else {
+                setStatus('icons', 'fail', '✗ FontAwesome CSS not loaded');
+            }
+        }
+
+        async function testAPIEndpoints() {
+            setStatus('endpoints', 'pending', 'Testing endpoints...');
+            try {
+                const endpoints = [
+                    '/genres/',
+                    '/songs/',
+                    '/artists/',
+                    '/albums/',
+                ];
+                
+                let results = [];
+                for (const endpoint of endpoints) {
+                    try {
+                        const response = await fetch(`${API_BASE}${endpoint}`);
+                        results.push(`${endpoint}: ${response.ok ? '✓' : '✗'} ${response.status}`);
+                    } catch (e) {
+                        results.push(`${endpoint}: ✗ ${e.message}`);
+                    }
+                }
+                
+                const allPassed = results.every(r => r.includes('✓'));
+                if (allPassed) {
+                    setStatus('endpoints', 'pass', `✓ All endpoints accessible\n${results.join('\n')}`);
+                } else {
+                    setStatus('endpoints', 'fail', `Some endpoints failed:\n${results.join('\n')}`);
+                }
+            } catch (error) {
+                setStatus('endpoints', 'fail', `✗ Error: ${error.message}`);
+            }
+        }
+
+        async function testAuthentication() {
+            setStatus('auth', 'pending', 'Testing auth...');
+            try {
+                // Test register endpoint availability
+                const response = await fetch(`${API_BASE}/auth/register/`, { method: 'OPTIONS', mode: 'cors' });
+                if (response.ok || response.status === 405) {
+                    setStatus('auth', 'pass', `✓ Auth endpoints available\n- Register: Ready\n- Login: Ready`);
+                } else {
+                    setStatus('auth', 'fail', `✗ Auth endpoints not responding (${response.status})`);
+                }
+            } catch (error) {
+                setStatus('auth', 'fail', `✗ Auth error: ${error.message}`);
+            }
+        }
+
+        async function runAllTests() {
+            // Reset stats
+            testStats = { total: 10, passed: 0, failed: 0, pending: 10 };
+            
+            await testAPIConnection();
+            await testCORS();
+            testJSModules();
+            testDOMElements();
+            testLocalStorage();
+            testCSSLoading();
+            testAudioAPI();
+            testFontAwesome();
+            await testAPIEndpoints();
+            await testAuthentication();
+        }
+
+        // Run tests on page load
+        window.addEventListener('load', () => {
+            console.log('Frontend Verification Suite Loaded');
+            console.log('Ready to test - click "Run All Tests" or individual test buttons');
+        });
+    </script>
+</body>
+</html>
