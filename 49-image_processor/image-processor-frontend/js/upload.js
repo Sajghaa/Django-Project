@@ -1,5 +1,6 @@
 const UploadHandler = {
     currentFile: null,
+    currentImageId: null,
     currentProcessedId: null,
     
     init() {
@@ -32,28 +33,39 @@ const UploadHandler = {
         });
         
         // Processing options
-        document.getElementById('processBtn').addEventListener('click', () => this.processImage());
+        const processBtn = document.getElementById('processBtn');
+        if (processBtn) {
+            processBtn.addEventListener('click', () => this.processImage());
+        }
         
         // Filter buttons
         document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', () => this.applyFilter(btn.dataset.filter));
+            btn.addEventListener('click', () => {
+                const filterType = btn.dataset.filter;
+                if (filterType) this.applyFilter(filterType);
+            });
         });
         
         // Rotate buttons
         document.querySelectorAll('.rotate-btn').forEach(btn => {
-            btn.addEventListener('click', () => this.rotateImage(parseInt(btn.dataset.rotate)));
+            btn.addEventListener('click', () => {
+                const angle = parseInt(btn.dataset.rotate);
+                if (angle) this.rotateImage(angle);
+            });
         });
         
         // Quality slider
         const qualitySlider = document.getElementById('quality');
         const qualityValue = document.getElementById('qualityValue');
-        qualitySlider.addEventListener('input', () => {
-            qualityValue.textContent = qualitySlider.value;
-        });
+        if (qualitySlider) {
+            qualitySlider.addEventListener('input', () => {
+                qualityValue.textContent = qualitySlider.value;
+            });
+        }
     },
     
     handleFile(file) {
-        if (!file.type.startsWith('image/')) {
+        if (!file || !file.type.startsWith('image/')) {
             this.showToast('Please select an image file', 'error');
             return;
         }
@@ -64,17 +76,27 @@ const UploadHandler = {
         }
         
         this.currentFile = file;
+        this.currentImageId = null;
+        this.currentProcessedId = null;
         
         // Show preview
         const reader = new FileReader();
         reader.onload = (e) => {
-            document.getElementById('originalPreview').src = e.target.result;
+            const originalPreview = document.getElementById('originalPreview');
+            if (originalPreview) originalPreview.src = e.target.result;
         };
         reader.readAsDataURL(file);
         
+        // Clear processed preview
+        const processedPreview = document.getElementById('processedPreview');
+        if (processedPreview) processedPreview.src = '';
+        
         // Show processing options
-        document.getElementById('processingOptions').classList.remove('hidden');
-        document.getElementById('myImagesSection').classList.add('hidden');
+        const processingOptions = document.getElementById('processingOptions');
+        if (processingOptions) processingOptions.classList.remove('hidden');
+        
+        const myImagesSection = document.getElementById('myImagesSection');
+        if (myImagesSection) myImagesSection.classList.add('hidden');
         
         this.showToast('Image loaded! Configure processing options and click Process.', 'success');
     },
@@ -86,17 +108,17 @@ const UploadHandler = {
         }
         
         const loadingOverlay = document.getElementById('loadingOverlay');
-        loadingOverlay.classList.remove('hidden');
+        if (loadingOverlay) loadingOverlay.classList.remove('hidden');
         
         const formData = new FormData();
         formData.append('image', this.currentFile);
         
         // Get resize options
-        const width = document.getElementById('resizeWidth').value;
-        const height = document.getElementById('resizeHeight').value;
-        const maintainAspect = document.getElementById('maintainAspect').checked;
-        const quality = document.getElementById('quality').value;
-        const generateThumbnails = document.getElementById('generateThumbnails').checked;
+        const width = document.getElementById('resizeWidth')?.value;
+        const height = document.getElementById('resizeHeight')?.value;
+        const maintainAspect = document.getElementById('maintainAspect')?.checked || true;
+        const quality = document.getElementById('quality')?.value || 85;
+        const generateThumbnails = document.getElementById('generateThumbnails')?.checked || false;
         
         if (width) formData.append('width', width);
         if (height) formData.append('height', height);
@@ -108,76 +130,105 @@ const UploadHandler = {
             const result = await api.uploadImage(formData);
             this.showToast('Image processed successfully!', 'success');
             
+            // Store the image IDs
+            this.currentImageId = result.id;
+            
             // Show processed preview
-            if (result.processed && result.processed.url_full) {
-                document.getElementById('processedPreview').src = result.processed.url_full;
-                this.currentProcessedId = result.processed.id;
-            } else {
-                document.getElementById('processedPreview').src = result.original_url;
+            const processedPreview = document.getElementById('processedPreview');
+            if (processedPreview) {
+                if (result.processed && result.processed.url_full) {
+                    processedPreview.src = result.processed.url_full;
+                    this.currentProcessedId = result.processed.id;
+                } else if (result.url_full) {
+                    processedPreview.src = result.url_full;
+                }
             }
             
             // Refresh images gallery
             await this.loadImages();
             
+            // Show my images section
+            const myImagesSection = document.getElementById('myImagesSection');
+            if (myImagesSection) myImagesSection.classList.remove('hidden');
+            
         } catch (error) {
-            this.showToast(error.message, 'error');
+            console.error('Process error:', error);
+            this.showToast(error.message || 'Failed to process image', 'error');
         } finally {
-            loadingOverlay.classList.add('hidden');
+            if (loadingOverlay) loadingOverlay.classList.add('hidden');
         }
     },
     
     async applyFilter(filterType) {
-        if (!this.currentProcessedId && !this.currentFile) {
+        // Use the processed image ID if available, otherwise use the original image ID
+        const imageId = this.currentProcessedId || this.currentImageId;
+        
+        if (!imageId) {
             this.showToast('Please process an image first', 'error');
             return;
         }
         
         const loadingOverlay = document.getElementById('loadingOverlay');
-        loadingOverlay.classList.remove('hidden');
+        if (loadingOverlay) loadingOverlay.classList.remove('hidden');
         
         try {
-            let imageId = this.currentProcessedId;
-            if (!imageId) {
-                // First process the image
-                await this.processImage();
-                imageId = this.currentProcessedId;
+            const result = await api.applyFilter(imageId, filterType);
+            
+            // Update the processed preview
+            const processedPreview = document.getElementById('processedPreview');
+            if (processedPreview && result.url_full) {
+                processedPreview.src = result.url_full;
             }
             
-            const result = await api.applyFilter(imageId, filterType);
-            document.getElementById('processedPreview').src = result.url_full;
+            // Update the processed ID for subsequent operations
+            if (result.id) {
+                this.currentProcessedId = result.id;
+            }
+            
             this.showToast(`${filterType} filter applied!`, 'success');
             
+            // Refresh images gallery
+            await this.loadImages();
+            
         } catch (error) {
-            this.showToast(error.message, 'error');
+            console.error('Filter error:', error);
+            this.showToast(error.message || `Failed to apply ${filterType} filter`, 'error');
         } finally {
-            loadingOverlay.classList.add('hidden');
+            if (loadingOverlay) loadingOverlay.classList.add('hidden');
         }
     },
     
     async rotateImage(angle) {
-        if (!this.currentProcessedId && !this.currentFile) {
+        const imageId = this.currentProcessedId || this.currentImageId;
+        
+        if (!imageId) {
             this.showToast('Please process an image first', 'error');
             return;
         }
         
         const loadingOverlay = document.getElementById('loadingOverlay');
-        loadingOverlay.classList.remove('hidden');
+        if (loadingOverlay) loadingOverlay.classList.remove('hidden');
         
         try {
-            let imageId = this.currentProcessedId;
-            if (!imageId) {
-                await this.processImage();
-                imageId = this.currentProcessedId;
+            const result = await api.rotateImage(imageId, angle);
+            
+            const processedPreview = document.getElementById('processedPreview');
+            if (processedPreview && result.url_full) {
+                processedPreview.src = result.url_full;
             }
             
-            const result = await api.rotateImage(imageId, angle);
-            document.getElementById('processedPreview').src = result.url_full;
+            if (result.id) {
+                this.currentProcessedId = result.id;
+            }
+            
             this.showToast(`Image rotated ${angle}°!`, 'success');
+            await this.loadImages();
             
         } catch (error) {
-            this.showToast(error.message, 'error');
+            console.error('Rotate error:', error);
+            this.showToast(error.message || `Failed to rotate image`, 'error');
         } finally {
-            loadingOverlay.classList.add('hidden');
+            if (loadingOverlay) loadingOverlay.classList.add('hidden');
         }
     },
     
@@ -185,6 +236,8 @@ const UploadHandler = {
         try {
             const images = await api.getImages();
             const container = document.getElementById('imagesGrid');
+            
+            if (!container) return;
             
             if (!images.results || images.results.length === 0) {
                 container.innerHTML = '<div class="col-span-full text-center text-gray-400 py-8">No images uploaded yet</div>';
@@ -195,7 +248,7 @@ const UploadHandler = {
                 <div class="bg-gray-800 rounded-xl overflow-hidden group">
                     <img src="${img.url_full}" alt="${img.original_name}" class="w-full h-48 object-cover">
                     <div class="p-3">
-                        <p class="text-sm truncate">${img.original_name}</p>
+                        <p class="text-sm truncate" title="${img.original_name}">${img.original_name.substring(0, 30)}${img.original_name.length > 30 ? '...' : ''}</p>
                         <p class="text-xs text-gray-400">${img.width}x${img.height} • ${(img.file_size / 1024).toFixed(1)}KB</p>
                         <div class="flex justify-between mt-2">
                             <button onclick="UploadHandler.downloadImage('${img.url_full}', '${img.original_name}')" class="text-xs text-purple-400 hover:text-purple-300">
@@ -211,6 +264,7 @@ const UploadHandler = {
             
         } catch (error) {
             console.error('Error loading images:', error);
+            this.showToast('Failed to load images', 'error');
         }
     },
     
@@ -230,8 +284,21 @@ const UploadHandler = {
             await api.deleteImage(imageId);
             this.showToast('Image deleted successfully!', 'success');
             await this.loadImages();
+            
+            // Clear current selection if this was the active image
+            if (this.currentImageId === imageId) {
+                this.currentImageId = null;
+                this.currentProcessedId = null;
+                this.currentFile = null;
+                const originalPreview = document.getElementById('originalPreview');
+                const processedPreview = document.getElementById('processedPreview');
+                if (originalPreview) originalPreview.src = '';
+                if (processedPreview) processedPreview.src = '';
+                const processingOptions = document.getElementById('processingOptions');
+                if (processingOptions) processingOptions.classList.add('hidden');
+            }
         } catch (error) {
-            this.showToast(error.message, 'error');
+            this.showToast(error.message || 'Failed to delete image', 'error');
         }
     },
     
