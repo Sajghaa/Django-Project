@@ -4,7 +4,7 @@ const API_BASE_URL = 'http://127.0.0.1:8000/api';
 async function apiCall(endpoint, options = {}) {
     const token = localStorage.getItem('token');
     const headers = {
-        'Content-Type': 'application/json',
+        'Accept': 'application/json',
         ...options.headers
     };
     
@@ -13,8 +13,8 @@ async function apiCall(endpoint, options = {}) {
     }
     
     // Don't set Content-Type for FormData (browser will set it with boundary)
-    if (options.body instanceof FormData) {
-        delete headers['Content-Type'];
+    if (!(options.body instanceof FormData)) {
+        headers['Content-Type'] = 'application/json';
     }
     
     try {
@@ -24,8 +24,19 @@ async function apiCall(endpoint, options = {}) {
         });
         
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || error.message || 'API call failed');
+            let errorMessage;
+            try {
+                const error = await response.json();
+                errorMessage = error.error || error.message || `HTTP ${response.status}`;
+            } catch (e) {
+                errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+            }
+            throw new Error(errorMessage);
+        }
+        
+        // Return empty object for 204 No Content
+        if (response.status === 204) {
+            return {};
         }
         
         return response.json();
@@ -89,6 +100,13 @@ async function rotateImage(imageId, angle) {
     });
 }
 
+async function cropImage(imageId, cropData) {
+    return apiCall(`/images/${imageId}/crop/`, {
+        method: 'POST',
+        body: JSON.stringify(cropData)
+    });
+}
+
 // Make functions globally available
 window.api = {
     register,
@@ -98,5 +116,6 @@ window.api = {
     deleteImage,
     resizeImage,
     applyFilter,
-    rotateImage
+    rotateImage,
+    cropImage
 };
