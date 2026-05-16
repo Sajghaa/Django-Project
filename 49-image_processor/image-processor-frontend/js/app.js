@@ -1,39 +1,73 @@
+// Main Application
 const App = {
     currentUser: null,
     
     async init() {
         await this.checkAuth();
         this.setupEventListeners();
-        UploadHandler.init();
+        if (window.UploadHandler) {
+            UploadHandler.init();
+        }
     },
     
     async checkAuth() {
         const token = localStorage.getItem('token');
-        const user = localStorage.getItem('user');
+        const userStr = localStorage.getItem('user');
         
-        if (token && user) {
-            this.currentUser = JSON.parse(user);
-            this.showUserMenu();
-            await UploadHandler.loadImages();
-            document.getElementById('myImagesSection').classList.remove('hidden');
+        console.log('Checking auth - token:', !!token, 'userStr:', !!userStr);
+        
+        if (token && userStr) {
+            try {
+                this.currentUser = JSON.parse(userStr);
+                this.showUserMenu();
+                
+                // Load images only after confirming token works
+                if (window.UploadHandler) {
+                    try {
+                        await UploadHandler.loadImages();
+                        const myImagesSection = document.getElementById('myImagesSection');
+                        if (myImagesSection) myImagesSection.classList.remove('hidden');
+                    } catch (error) {
+                        console.error('Error loading images:', error);
+                        // If token is invalid, logout
+                        if (error.message.includes('401')) {
+                            this.logout();
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error('Error parsing user data:', e);
+                this.logout();
+            }
+        } else {
+            this.showAuthButtons();
         }
     },
     
     setupEventListeners() {
-        document.getElementById('loginBtn').addEventListener('click', () => this.showModal('login'));
-        document.getElementById('registerBtn').addEventListener('click', () => this.showModal('register'));
-        document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
-        document.getElementById('closeModal').addEventListener('click', () => this.hideModal());
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const closeModal = document.getElementById('closeModal');
+        const authModal = document.getElementById('authModal');
         
-        const modal = document.getElementById('authModal');
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) this.hideModal();
-        });
+        if (loginBtn) loginBtn.addEventListener('click', () => this.showModal('login'));
+        if (registerBtn) registerBtn.addEventListener('click', () => this.showModal('register'));
+        if (logoutBtn) logoutBtn.addEventListener('click', () => this.logout());
+        if (closeModal) closeModal.addEventListener('click', () => this.hideModal());
+        
+        if (authModal) {
+            authModal.addEventListener('click', (e) => {
+                if (e.target === authModal) this.hideModal();
+            });
+        }
     },
     
     showModal(type) {
         const modal = document.getElementById('authModal');
         const formsContainer = document.getElementById('authForms');
+        
+        if (!modal || !formsContainer) return;
         
         if (type === 'login') {
             formsContainer.innerHTML = `
@@ -53,12 +87,15 @@ const App = {
                 </p>
             `;
             
-            document.getElementById('loginForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const username = document.getElementById('loginUsername').value;
-                const password = document.getElementById('loginPassword').value;
-                await this.login(username, password);
-            });
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const username = document.getElementById('loginUsername').value;
+                    const password = document.getElementById('loginPassword').value;
+                    await this.login(username, password);
+                });
+            }
         } else {
             formsContainer.innerHTML = `
                 <h2 class="text-2xl font-bold mb-6 text-center">Create Account</h2>
@@ -83,16 +120,19 @@ const App = {
                 </p>
             `;
             
-            document.getElementById('registerForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const userData = {
-                    username: document.getElementById('regUsername').value,
-                    email: document.getElementById('regEmail').value,
-                    password: document.getElementById('regPassword').value,
-                    password2: document.getElementById('regPassword2').value
-                };
-                await this.register(userData);
-            });
+            const registerForm = document.getElementById('registerForm');
+            if (registerForm) {
+                registerForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const userData = {
+                        username: document.getElementById('regUsername').value,
+                        email: document.getElementById('regEmail').value,
+                        password: document.getElementById('regPassword').value,
+                        password2: document.getElementById('regPassword2').value
+                    };
+                    await this.register(userData);
+                });
+            }
         }
         
         modal.classList.remove('hidden');
@@ -101,37 +141,58 @@ const App = {
     
     hideModal() {
         const modal = document.getElementById('authModal');
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
     },
     
     async login(username, password) {
         try {
+            console.log('Attempting login...');
             const data = await api.login({ username, password });
+            console.log('Login response:', data);
+            
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify({ id: data.user_id, username: data.username }));
             this.currentUser = { id: data.user_id, username: data.username };
             this.showUserMenu();
             this.hideModal();
-            UploadHandler.showToast('Login successful!', 'success');
-            await UploadHandler.loadImages();
-            document.getElementById('myImagesSection').classList.remove('hidden');
+            
+            if (window.UploadHandler) {
+                window.UploadHandler.showToast('Login successful!', 'success');
+                await UploadHandler.loadImages();
+                const myImagesSection = document.getElementById('myImagesSection');
+                if (myImagesSection) myImagesSection.classList.remove('hidden');
+            }
         } catch (error) {
-            UploadHandler.showToast(error.message, 'error');
+            console.error('Login error:', error);
+            if (window.UploadHandler) {
+                window.UploadHandler.showToast(error.message, 'error');
+            }
         }
     },
     
     async register(userData) {
         try {
+            console.log('Attempting registration...');
             const data = await api.register(userData);
+            console.log('Registration response:', data);
+            
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
             this.currentUser = data.user;
             this.showUserMenu();
             this.hideModal();
-            UploadHandler.showToast('Registration successful!', 'success');
+            
+            if (window.UploadHandler) {
+                window.UploadHandler.showToast('Registration successful!', 'success');
+            }
         } catch (error) {
-            UploadHandler.showToast(error.message, 'error');
+            console.error('Registration error:', error);
+            if (window.UploadHandler) {
+                window.UploadHandler.showToast(error.message, 'error');
+            }
         }
     },
     
@@ -140,22 +201,38 @@ const App = {
         localStorage.removeItem('user');
         this.currentUser = null;
         this.showAuthButtons();
-        UploadHandler.showToast('Logged out successfully', 'info');
-        document.getElementById('processingOptions').classList.add('hidden');
-        document.getElementById('myImagesSection').classList.add('hidden');
-        document.getElementById('originalPreview').src = '';
-        document.getElementById('processedPreview').src = '';
+        
+        if (window.UploadHandler) {
+            window.UploadHandler.showToast('Logged out successfully', 'info');
+        }
+        
+        const processingOptions = document.getElementById('processingOptions');
+        const myImagesSection = document.getElementById('myImagesSection');
+        const originalPreview = document.getElementById('originalPreview');
+        const processedPreview = document.getElementById('processedPreview');
+        
+        if (processingOptions) processingOptions.classList.add('hidden');
+        if (myImagesSection) myImagesSection.classList.add('hidden');
+        if (originalPreview) originalPreview.src = '';
+        if (processedPreview) processedPreview.src = '';
     },
     
     showUserMenu() {
-        document.getElementById('authButtons').classList.add('hidden');
-        document.getElementById('userMenu').classList.remove('hidden');
-        document.getElementById('username').textContent = this.currentUser?.username;
+        const authButtons = document.getElementById('authButtons');
+        const userMenu = document.getElementById('userMenu');
+        const usernameSpan = document.getElementById('username');
+        
+        if (authButtons) authButtons.classList.add('hidden');
+        if (userMenu) userMenu.classList.remove('hidden');
+        if (usernameSpan && this.currentUser) usernameSpan.textContent = this.currentUser.username;
     },
     
     showAuthButtons() {
-        document.getElementById('authButtons').classList.remove('hidden');
-        document.getElementById('userMenu').classList.add('hidden');
+        const authButtons = document.getElementById('authButtons');
+        const userMenu = document.getElementById('userMenu');
+        
+        if (authButtons) authButtons.classList.remove('hidden');
+        if (userMenu) userMenu.classList.add('hidden');
     }
 };
 
