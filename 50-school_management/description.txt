@@ -1,0 +1,1 @@
+A comprehensive school management platform that handles students, teachers, classes, attendance, grades, fees, timetable, and parent communication.
