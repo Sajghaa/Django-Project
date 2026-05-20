@@ -1,0 +1,1 @@
+Django Blog + React Frontend  a modern, full-stack blog application with Django REST API backend and React frontend.
