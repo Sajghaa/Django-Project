@@ -165,11 +165,14 @@ class PostViewSet(viewsets.ModelViewSet):
         return Response({'error': 'Tag slug required'}, status=400)
 
 class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.none()
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = CustomPagination
     
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Comment.objects.none()
         return Comment.objects.filter(approved=True)
     
     def perform_create(self, serializer):
