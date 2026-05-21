@@ -17,6 +17,10 @@
   overflow: hidden;
 }
 
+.prose {
+  max-width: none;
+}
+
 .prose pre {
   background-color: #1f2937;
   color: #f3f4f6;
@@ -35,4 +39,15 @@
 .prose pre code {
   background-color: transparent;
   padding: 0;
+}
+
+/* Loading spinner */
+.loader {
+  border-top-color: #8b5cf6;
+  animation: spinner 1s linear infinite;
+}
+
+@keyframes spinner {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
