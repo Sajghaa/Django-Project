@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getPosts, getFeaturedPosts, getPopularPosts, getTrendingPosts, getCategories } from '../services/api';
 import PostCard from '../components/PostCard';
@@ -14,11 +14,7 @@ const HomePage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    fetchAllData();
-  }, [currentPage]);
-
-  const fetchAllData = async () => {
+  const fetchAllData = useCallback(async () => {
     setLoading(true);
     try {
       const [postsRes, featuredRes, popularRes, trendingRes, categoriesRes] = await Promise.all([
@@ -40,7 +36,11 @@ const HomePage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage]);
+
+  useEffect(() => {
+    fetchAllData();
+  }, [fetchAllData]);
 
   if (loading) return <LoadingSpinner />;
 
@@ -56,7 +56,7 @@ const HomePage = () => {
         </p>
       </div>
 
-      {/* Featured Posts Carousel */}
+      {/* Featured Posts */}
       {featuredPosts.length > 0 && (
         <div className="mb-12">
           <h2 className="text-2xl font-bold mb-6 flex items-center">
