@@ -7,9 +7,9 @@ router.register(r'customers', views.CustomerViewSet)
 router.register(r'interactions', views.InteractionViewSet)
 router.register(r'leads', views.LeadViewSet)
 router.register(r'opportunities', views.OpportunityViewSet)
-router.register(r'register', views.RegisterViewSet, basename='register')
-router.register(r'login', views.LoginViewSet, basename='login')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('register/', views.RegisterView.as_view(), name='register'),
+    path('login/', views.LoginView.as_view(), name='login'),
 ]
