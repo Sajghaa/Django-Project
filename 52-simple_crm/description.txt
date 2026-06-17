@@ -1,0 +1,1 @@
+A customer relationship management system where users can:Manage customer info, Track interactions, Manage leads and opportunities ,View customer activity history, Generate simple reports
