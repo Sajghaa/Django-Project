@@ -1,8 +1,9 @@
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
+from rest_framework import viewsets, status, generics
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404
@@ -12,10 +13,10 @@ from .serializers import (
     LeadSerializer, OpportunitySerializer
 )
 
-class RegisterViewSet(viewsets.ViewSet):
-    permission_classes = []
+class RegisterView(APIView):
+    permission_classes = [AllowAny]
     
-    def create(self, request):
+    def post(self, request):
         username = request.data.get('username')
         email = request.data.get('email')
         password = request.data.get('password')
@@ -38,12 +39,10 @@ class RegisterViewSet(viewsets.ViewSet):
             'access': str(refresh.access_token)
         }, status=status.HTTP_201_CREATED)
 
-class LoginViewSet(viewsets.ViewSet):
-    permission_classes = []
+class LoginView(APIView):
+    permission_classes = [AllowAny]
     
-    def create(self, request):
-        from django.contrib.auth import authenticate
-        
+    def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
         
@@ -61,6 +60,7 @@ class LoginViewSet(viewsets.ViewSet):
         })
 
 class CustomerViewSet(viewsets.ModelViewSet):
+    queryset = Customer.objects.none()  # Required for router
     serializer_class = CustomerSerializer
     permission_classes = [IsAuthenticated]
     
@@ -96,6 +96,7 @@ class CustomerViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 class InteractionViewSet(viewsets.ModelViewSet):
+    queryset = Interaction.objects.none()
     serializer_class = InteractionSerializer
     permission_classes = [IsAuthenticated]
     
@@ -106,6 +107,7 @@ class InteractionViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 class LeadViewSet(viewsets.ModelViewSet):
+    queryset = Lead.objects.none()
     serializer_class = LeadSerializer
     permission_classes = [IsAuthenticated]
     
@@ -131,7 +133,7 @@ class LeadViewSet(viewsets.ModelViewSet):
             'user': request.user.id
         }
         
-        customer_serializer = CustomerSerializer(data=customer_data)
+        customer_serializer = CustomerSerializer(data=customer_data, context={'request': request})
         if customer_serializer.is_valid():
             customer = customer_serializer.save()
             lead.converted_to_customer = customer
@@ -139,6 +141,7 @@ class LeadViewSet(viewsets.ModelViewSet):
             lead.save()
             
             # Create a note interaction
+            from django.utils import timezone
             Interaction.objects.create(
                 customer=customer,
                 user=request.user,
@@ -156,6 +159,7 @@ class LeadViewSet(viewsets.ModelViewSet):
         return Response(customer_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class OpportunityViewSet(viewsets.ModelViewSet):
+    queryset = Opportunity.objects.none()
     serializer_class = OpportunitySerializer
     permission_classes = [IsAuthenticated]
     
