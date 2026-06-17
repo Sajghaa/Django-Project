@@ -1,7 +1,8 @@
-from rest_framework import viewsets, status, generics
+from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.decorators import action
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
@@ -12,6 +13,7 @@ from .serializers import (
     UserSerializer, CustomerSerializer, InteractionSerializer,
     LeadSerializer, OpportunitySerializer
 )
+from django.utils import timezone
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
@@ -60,7 +62,7 @@ class LoginView(APIView):
         })
 
 class CustomerViewSet(viewsets.ModelViewSet):
-    queryset = Customer.objects.none()  # Required for router
+    queryset = Customer.objects.none()
     serializer_class = CustomerSerializer
     permission_classes = [IsAuthenticated]
     
@@ -121,7 +123,6 @@ class LeadViewSet(viewsets.ModelViewSet):
     def convert(self, request, pk=None):
         lead = self.get_object()
         
-        # Create customer from lead
         customer_data = {
             'first_name': lead.first_name,
             'last_name': lead.last_name,
@@ -140,8 +141,6 @@ class LeadViewSet(viewsets.ModelViewSet):
             lead.status = 'qualified'
             lead.save()
             
-            # Create a note interaction
-            from django.utils import timezone
             Interaction.objects.create(
                 customer=customer,
                 user=request.user,
