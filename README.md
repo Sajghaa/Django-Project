@@ -2,7 +2,7 @@
 
 > A curated collection of Django projects demonstrating Django mastery through real-world applications.
 
-**Progress:** 48 / 100 completed
+**Progress:** 52 / 100 completed
 
 ---
 
@@ -59,6 +59,10 @@ This is a Django web application focused on user authentication. | Completed | �
 | 46 | [46-real_estate](46-real_estate) | A comprehensive real estate platform where agents/owners can list properties (houses, apartments, commercial spaces) and buyers/renters can search, filter, view property details, schedule viewings, and make inquiries. | Completed | ✅ |
 | 47 | [47-music_player](47-music_player) | A music streaming application where users can upload, organize, play, and share music. Features include playlists, favorites, search, recommendations, and playback controls. | Completed | ✅ |
 | 48 | [48-youtube_clone](48-youtube_clone) | A video-sharing platform where users can upload, watch, like, comment, subscribe to channels, and create playlists - similar to YouTube. | Completed | ✅ |
+| 49 | [49-image_processor](49-image_processor) |  | Completed | ✅ |
+| 50 | [50-school_management](50-school_management) | A comprehensive school management platform that handles students, teachers, classes, attendance, grades, fees, timetable, and parent communication. | Completed | ✅ |
+| 51 | [51-django_react_blog](51-django_react_blog) | Django Blog + React Frontend  a modern, full-stack blog application with Django REST API backend and React frontend. | Completed | ✅ |
+| 52 | [52-simple_crm](52-simple_crm) | A customer relationship management system where users can:Manage customer info, Track interactions, Manage leads and opportunities ,View customer activity history, Generate simple reports | Completed | ✅ |
 
 ---
 
