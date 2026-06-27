@@ -1,0 +1,38 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-2xl font-bold mb-4">Search Results for "{{ query }}"</h1>
+    {% if posts %}
+        {% for post in posts %}
+            <div class="bg-white rounded-lg shadow-md p-4 mb-4">
+                <h2><a href="{% url 'post_detail' post.slug %}" class="text-indigo-600 hover:underline">{{ post.title }}</a></h2>
+                <p class="text-gray-600 text-sm">By {{ post.author.username }} on {{ post.created_at|date:"M d, Y" }}</p>
+                <p class="text-gray-700 mt-2">{{ post.content|striptags|truncatewords:20 }}</p>
+            </div>
+        {% endfor %}
+        <!-- Pagination -->
+        {% if posts.has_other_pages %}
+            <div class="flex justify-center space-x-2 mt-4">
+                {% if posts.has_previous %}
+                    <a href="?q={{ query }}&page={{ posts.previous_page_number }}" class="px-3 py-1 bg-white border rounded hover:bg-gray-100">Prev</a>
+                {% endif %}
+                {% for num in posts.paginator.page_range %}
+                    {% if posts.number == num %}
+                        <span class="px-3 py-1 bg-indigo-600 text-white rounded">{{ num }}</span>
+                    {% else %}
+                        <a href="?q={{ query }}&page={{ num }}" class="px-3 py-1 bg-white border rounded hover:bg-gray-100">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+                {% if posts.has_next %}
+                    <a href="?q={{ query }}&page={{ posts.next_page_number }}" class="px-3 py-1 bg-white border rounded hover:bg-gray-100">Next</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <p class="text-gray-500">No posts found for "{{ query }}".</p>
+    {% endif %}
+</div>
+{% endblock %}
