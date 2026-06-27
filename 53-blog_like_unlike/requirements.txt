@@ -1,7 +1,8 @@
 asgiref==3.11.1
 Django==5.2.15
+django-allauth==65.18.0
+django-ckeditor==6.7.3
+django-js-asset==4.0.1
+pillow==12.2.0
 sqlparse==0.5.5
 tzdata==2026.2
-pillow
-django-ckeditor
-django-allauth
