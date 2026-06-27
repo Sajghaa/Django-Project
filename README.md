@@ -2,7 +2,7 @@
 
 > A curated collection of Django projects demonstrating Django mastery through real-world applications.
 
-**Progress:** 52 / 100 completed
+**Progress:** 53 / 100 completed
 
 ---
 
@@ -63,6 +63,7 @@ This is a Django web application focused on user authentication. | Completed | �
 | 50 | [50-school_management](50-school_management) | A comprehensive school management platform that handles students, teachers, classes, attendance, grades, fees, timetable, and parent communication. | Completed | ✅ |
 | 51 | [51-django_react_blog](51-django_react_blog) | Django Blog + React Frontend  a modern, full-stack blog application with Django REST API backend and React frontend. | Completed | ✅ |
 | 52 | [52-simple_crm](52-simple_crm) | A customer relationship management system where users can:Manage customer info, Track interactions, Manage leads and opportunities ,View customer activity history, Generate simple reports | Completed | ✅ |
+| 53 | [53-blog_like_unlike](53-blog_like_unlike) | Blog with Like/Unlike system using Django with server-side templates and AJAX for seamless interactions. | Completed | ✅ |
 
 ---
 
