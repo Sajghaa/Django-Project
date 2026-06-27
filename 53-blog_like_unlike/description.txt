@@ -1,0 +1,1 @@
+Blog with Like/Unlike system using Django with server-side templates and AJAX for seamless interactions.
