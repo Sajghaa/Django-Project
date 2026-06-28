@@ -55,7 +55,7 @@ def post_create(request):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
-            form.save_m2m()  # save tags
+            form.save_m2m()
             messages.success(request, 'Post created successfully!')
             return redirect('post_detail', slug=post.slug)
     else:
